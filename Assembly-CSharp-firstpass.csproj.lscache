@@ -21,7 +21,7 @@ ProjectAssetsFile=<PATH>Temp/obj/Assembly-CSharp-firstpass/project.assets.json
 RootNamespace=
 RunAnalyzers=
 RunAnalyzersDuringLiveAnalysis=
-SolutionPath=<PATH>minigame-project.slnx
+SolutionPath=<PATH>minigame-project-MINJUN17.slnx
 TargetFrameworkIdentifier=.NETStandard
 TargetPath=<PATH>Temp/bin/Debug/Assembly-CSharp-firstpass.dll
 TargetRefPath=
@@ -63,7 +63,7 @@ Assets/Plugins/Demigiant/DOTween/Modules/
 Temp/obj/Assembly-CSharp-firstpass/.NETStandard,Version=v2.1.AssemblyAttributes.cs
 
 [metadataReferences]
-../../../../../Program Files/Unity/Hub/Editor/6000.3.15f1/Editor/Data/Managed/UnityEngine/
+../../../../Program Files/Unity/Hub/Editor/6000.3.15f1/Editor/Data/Managed/UnityEngine/
  UnityEditor.AccessibilityModule.dll
  UnityEditor.AdaptivePerformanceModule.dll
  UnityEditor.AssetComplianceModule.dll
@@ -194,7 +194,7 @@ Temp/obj/Assembly-CSharp-firstpass/.NETStandard,Version=v2.1.AssemblyAttributes.
  UnityEngine.VRModule.dll
  UnityEngine.WindModule.dll
  UnityEngine.XRModule.dll
-../../../../../Program Files/Unity/Hub/Editor/6000.3.15f1/Editor/Data/NetStandard/compat/2.1.0/shims/netfx/
+../../../../Program Files/Unity/Hub/Editor/6000.3.15f1/Editor/Data/NetStandard/compat/2.1.0/shims/netfx/
  mscorlib.dll
  System.ComponentModel.Composition.dll
  System.Core.dll
@@ -212,7 +212,7 @@ Temp/obj/Assembly-CSharp-firstpass/.NETStandard,Version=v2.1.AssemblyAttributes.
  System.Xml.dll
  System.Xml.Linq.dll
  System.Xml.Serialization.dll
-../../../../../Program Files/Unity/Hub/Editor/6000.3.15f1/Editor/Data/NetStandard/compat/2.1.0/shims/netstandard/
+../../../../Program Files/Unity/Hub/Editor/6000.3.15f1/Editor/Data/NetStandard/compat/2.1.0/shims/netstandard/
  Microsoft.Win32.Primitives.dll
  System.AppContext.dll
  System.Buffers.dll
@@ -316,15 +316,13 @@ Temp/obj/Assembly-CSharp-firstpass/.NETStandard,Version=v2.1.AssemblyAttributes.
  System.Xml.XmlSerializer.dll
  System.Xml.XPath.dll
  System.Xml.XPath.XDocument.dll
-../../../../../Program Files/Unity/Hub/Editor/6000.3.15f1/Editor/Data/NetStandard/
+../../../../Program Files/Unity/Hub/Editor/6000.3.15f1/Editor/Data/NetStandard/
  Extensions/2.0.0/System.Runtime.InteropServices.WindowsRuntime.dll
  ref/2.1.0/netstandard.dll
-../../../../../Program Files/Unity/Hub/Editor/6000.3.15f1/Editor/Data/PlaybackEngines/AndroidPlayer/
+../../../../Program Files/Unity/Hub/Editor/6000.3.15f1/Editor/Data/PlaybackEngines/AndroidPlayer/
  Unity.Android.Gradle.dll
  Unity.Android.Types.dll
-Assets/
- Imported/AstarPathfindingProject/Plugins/DotNetZip/Pathfinding.Ionic.Zip.Reduced.dll
- Plugins/Demigiant/DOTween/DOTween.dll
+Assets/Plugins/Demigiant/DOTween/DOTween.dll
 Library/PackageCache/com.unity.collections@12999e356c23/
  Unity.Collections.LowLevel.ILSupport/Unity.Collections.LowLevel.ILSupport.dll
  Unity.Collections.Tests/
@@ -405,18 +403,13 @@ Library/ScriptAssemblies/
  UnityEditor.UI.Analytics.dll
  UnityEditor.UI.dll
  UnityEngine.UI.dll
-Temp/bin/Debug/
- AstarPathfindingProject.dll
- AstarPathfindingProjectEditor.dll
- PackageToolsEditor.dll
 
 [analyzerReferences]
-../../../../../Program Files/Unity/Hub/Editor/6000.3.15f1/Editor/Data/Tools/BuildPipeline/Unity.SourceGenerators/
+../../../../Program Files/Unity/Hub/Editor/6000.3.15f1/Editor/Data/Tools/BuildPipeline/Unity.SourceGenerators/
  Unity.Properties.SourceGenerator.dll
  Unity.SourceGenerators.dll
  Unity.UIToolkit.SourceGenerator.dll
-../../../.vscode/extensions/visualstudiotoolsforunity.vstuc-1.2.2/Analyzers/Microsoft.Unity.Analyzers.dll
-Assets/Imported/AstarPathfindingProject/Plugins/DotNetZip/Pathfinding.Ionic.Zip.Reduced.dll
+../../.vscode/extensions/visualstudiotoolsforunity.vstuc-1.2.2/Analyzers/Microsoft.Unity.Analyzers.dll
 
 [analyzerConfigFiles]
 Temp/obj/Assembly-CSharp-firstpass/Assembly-CSharp-firstpass.GeneratedMSBuildEditorConfig.editorconfig
