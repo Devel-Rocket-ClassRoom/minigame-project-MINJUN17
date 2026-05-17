@@ -54,6 +54,9 @@ Assets/_project/Scripts/Grid/
  GridCell.cs
  GridManager.cs
  GridVisualizer.cs
+Assets/_project/Scripts/
+ PlacedObjectData.cs
+ PlacementSystem.cs
 Temp/obj/Assembly-CSharp/.NETStandard,Version=v2.1.AssemblyAttributes.cs
 
 [metadataReferences]

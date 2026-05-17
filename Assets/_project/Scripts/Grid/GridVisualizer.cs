@@ -16,8 +16,9 @@ public class GridVisualizer : MonoBehaviour
         {
             for(int y = 0; y < gridManager.GridHeight; y++)
             {
-                GridCell cell = gridManager.GetCell(x, y);
-                if(cell == null) return;
+                Vector2Int pos = new Vector2Int(x, y);
+                GridCell cell = gridManager.GetCell(pos);
+                if(cell == null) continue;
                 if (cell.isOccupied)
                 {
                     Gizmos.color = occupiedColor;
@@ -30,7 +31,7 @@ public class GridVisualizer : MonoBehaviour
                 {
                     Gizmos.color = inActiveColor;
                 }
-                Vector3 center = gridManager.CellToWorld(x, y);
+                Vector3 center = gridManager.CellToWorld(pos);
                 Gizmos.DrawCube(center, new Vector3(0.95f, 0.95f, 0.01f));
             }
         }
