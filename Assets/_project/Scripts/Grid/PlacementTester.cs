@@ -37,6 +37,15 @@ public class PlacementTester : MonoBehaviour
         if (GUILayout.Button("삭제 (Remove)", GUILayout.Height(45)))
             placementSystem.StartRemove();
 
+        // Place / Move 모드에서만 회전 버튼 노출
+        if (placementSystem.Mode == Mode.Place || placementSystem.Mode == Mode.Move)
+        {
+            GUI.backgroundColor = Color.cyan;
+            if (GUILayout.Button("회전 (Rotate 90°)", GUILayout.Height(45)))
+                placementSystem.RotatePreview();
+            GUI.backgroundColor = Color.white;
+        }
+
         GUILayout.Space(20);
 
         GUI.backgroundColor = Color.green;

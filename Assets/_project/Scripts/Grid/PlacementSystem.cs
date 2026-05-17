@@ -20,6 +20,7 @@ public class PlacementSystem : MonoBehaviour
     private GameObject _previewInstance;
     private SpriteRenderer _previewRenderer;
     private Vector2Int _currentOrigin;
+    private int _previewRotationStep;
 
     // Move 전용: 이동 중인 원본 (취소 시 복원용)
     private PlacedObject _movingOriginal;
@@ -29,6 +30,26 @@ public class PlacementSystem : MonoBehaviour
     private PlacedObject _removeTarget;
     private SpriteRenderer _removeTargetRenderer;
     private Color _removeTargetOriginalColor;
+
+    // 회전을 반영한 preview footprint / anchor (PlacedObject의 계산과 동일)
+    private int PreviewWidth  => _previewRotationStep % 2 == 0 ? _previewData.width  : _previewData.height;
+    private int PreviewHeight => _previewRotationStep % 2 == 0 ? _previewData.height : _previewData.width;
+    private Vector2Int PreviewAnchor
+    {
+        get
+        {
+            int w = _previewData.width, h = _previewData.height;
+            int ax = _previewData.anchorX, ay = _previewData.anchorY;
+            return _previewRotationStep switch
+            {
+                0 => new Vector2Int(ax, ay),
+                1 => new Vector2Int(ay, w - 1 - ax),
+                2 => new Vector2Int(w - 1 - ax, h - 1 - ay),
+                3 => new Vector2Int(h - 1 - ay, ax),
+                _ => Vector2Int.zero
+            };
+        }
+    }
 
     private void OnEnable() => EnhancedTouchSupport.Enable();
     private void OnDisable() => EnhancedTouchSupport.Disable();
@@ -67,7 +88,7 @@ public class PlacementSystem : MonoBehaviour
         startOrigin = gridManager.ClampToActiveArea(startOrigin, data.width, data.height);
 
         GameObject preview = Instantiate(data.prefab);
-        BeginDragging(data, preview, startOrigin);
+        BeginDragging(data, preview, startOrigin, 0);
         Mode = Mode.Place;
     }
 
@@ -83,6 +104,20 @@ public class PlacementSystem : MonoBehaviour
         Mode = Mode.Remove;
     }
 
+    // Place / Move 모드에서 preview를 90° CW 회전
+    public void RotatePreview()
+    {
+        if (Mode != Mode.Place && Mode != Mode.Move) return;
+        if (_previewInstance == null) return; // Move 모드에서 아직 선택 안 한 상태 방어
+
+        _previewRotationStep = (_previewRotationStep + 1) % 4;
+        _previewInstance.transform.rotation = Quaternion.Euler(0, 0, -90 * _previewRotationStep);
+
+        // 회전 후 footprint 크기가 바뀌었으므로 origin을 다시 클램프
+        _currentOrigin = gridManager.ClampToActiveArea(_currentOrigin, PreviewWidth, PreviewHeight);
+        UpdatePreviewVisuals();
+    }
+
     // ========== 모드 내부: 탭으로 오브젝트 선택 ==========
     private void TrySelectForMove()
     {
@@ -95,7 +130,7 @@ public class PlacementSystem : MonoBehaviour
         target.Instance.SetActive(false);
 
         GameObject preview = Instantiate(target.Data.prefab);
-        BeginDragging(target.Data, preview, target.Origin);
+        BeginDragging(target.Data, preview, target.Origin, target.RotationStep);
     }
 
     private void TrySelectForRemove()
@@ -114,20 +149,25 @@ public class PlacementSystem : MonoBehaviour
     // ========== UI: 통합 확정 ==========
     public void Confirm()
     {
+        bool success;
         switch (Mode)
         {
-            case Mode.Place: ApplyPlace(); break;
+            case Mode.Place:
+                success = ApplyPlace();
+                break;
             case Mode.Move:
                 if (_movingOriginal == null) return; // 선택 안된 상태면 무시
-                ApplyMove();
+                success = ApplyMove();
                 break;
             case Mode.Remove:
                 if (_removeTarget == null) return; // 선택 안된 상태면 무시
-                ApplyRemove();
+                success = ApplyRemove();
                 break;
             default: return;
         }
-        ResetState();
+
+        // 실패하면 모드 유지 (사용자가 다시 시도하거나 Cancel을 누르도록)
+        if (success) ResetState();
     }
 
     // ========== UI: 통합 취소 ==========
@@ -156,80 +196,89 @@ public class PlacementSystem : MonoBehaviour
         ResetState();
     }
 
-    // ========== 내부 적용 로직 ==========
-    private void ApplyPlace()
+    // ========== 내부 적용 로직 (성공 시 true, 실패 시 false) ==========
+    private bool ApplyPlace()
     {
-        if (!gridManager.CanPlace(_currentOrigin, _previewData.width, _previewData.height)) return;
+        if (!gridManager.CanPlace(_currentOrigin, PreviewWidth, PreviewHeight)) return false;
 
         GameObject instance = Instantiate(
             _previewData.prefab,
-            gridManager.CellToWorld(_currentOrigin, _previewData.width, _previewData.height),
-            Quaternion.identity);
+            gridManager.CellToWorld(_currentOrigin, PreviewWidth, PreviewHeight),
+            Quaternion.Euler(0, 0, -90 * _previewRotationStep));
 
-        PlacedObject placed = new PlacedObject(_previewData, instance, _currentOrigin);
+        PlacedObject placed = new PlacedObject(_previewData, instance, _currentOrigin, _previewRotationStep);
         gridManager.PlaceObject(placed);
         Destroy(_previewInstance);
+        return true;
     }
 
-    private void ApplyMove()
+    private bool ApplyMove()
     {
-        if (!gridManager.CanPlace(_currentOrigin, _previewData.width, _previewData.height))
-        {
-            // 못 놓으면 원래 자리로 복원
-            _movingOriginal.Origin = _originalOrigin;
-            gridManager.PlaceObject(_movingOriginal);
-            _movingOriginal.Instance.SetActive(true);
-            Destroy(_previewInstance);
-            return;
-        }
+        // 못 놓는 위치면 아무것도 하지 않고 false (사용자가 계속 드래그하거나 Cancel)
+        if (!gridManager.CanPlace(_currentOrigin, PreviewWidth, PreviewHeight)) return false;
 
         _movingOriginal.Origin = _currentOrigin;
+        _movingOriginal.RotationStep = _previewRotationStep;
         _movingOriginal.Instance.transform.position =
-            gridManager.CellToWorld(_currentOrigin, _previewData.width, _previewData.height);
+            gridManager.CellToWorld(_currentOrigin, PreviewWidth, PreviewHeight);
+        _movingOriginal.Instance.transform.rotation = Quaternion.Euler(0, 0, -90 * _previewRotationStep);
         _movingOriginal.Instance.SetActive(true);
         gridManager.PlaceObject(_movingOriginal);
         Destroy(_previewInstance);
+        return true;
     }
 
-    private void ApplyRemove()
+    private bool ApplyRemove()
     {
-        if (_removeTarget == null) return;
-
         gridManager.RemoveObject(_removeTarget);
         Destroy(_removeTarget.Instance);
+        return true;
     }
 
     // ========== 드래그 ==========
-    private void BeginDragging(FurnitureData data, GameObject preview, Vector2Int startOrigin)
+    private void BeginDragging(FurnitureData data, GameObject preview, Vector2Int startOrigin, int rotationStep)
     {
         _previewData = data;
         _previewInstance = preview;
         _previewRenderer = preview.GetComponent<SpriteRenderer>();
+        _previewRotationStep = rotationStep;
         _currentOrigin = startOrigin;
 
-        _previewInstance.transform.position = gridManager.CellToWorld(startOrigin, data.width, data.height);
-        _previewRenderer.color = gridManager.CanPlace(startOrigin, data.width, data.height) ? validColor : invalidColor;
+        _previewInstance.transform.rotation = Quaternion.Euler(0, 0, -90 * rotationStep);
+        UpdatePreviewVisuals();
     }
 
     private void DragMove()
     {
         if (!TryFindCell(out Vector2Int cell)) return;
 
-        Vector2Int rawOrigin = cell - new Vector2Int(_previewData.anchorX, _previewData.anchorY);
-        _currentOrigin = gridManager.ClampToActiveArea(rawOrigin, _previewData.width, _previewData.height);
+        Vector2Int rawOrigin = cell - PreviewAnchor;
+        _currentOrigin = gridManager.ClampToActiveArea(rawOrigin, PreviewWidth, PreviewHeight);
 
+        UpdatePreviewVisuals();
+    }
+
+    private void UpdatePreviewVisuals()
+    {
         _previewInstance.transform.position =
-            gridManager.CellToWorld(_currentOrigin, _previewData.width, _previewData.height);
+            gridManager.CellToWorld(_currentOrigin, PreviewWidth, PreviewHeight);
         _previewRenderer.color =
-            gridManager.CanPlace(_currentOrigin, _previewData.width, _previewData.height) ? validColor : invalidColor;
+            gridManager.CanPlace(_currentOrigin, PreviewWidth, PreviewHeight) ? validColor : invalidColor;
     }
 
     // ========== 유틸 ==========
     private bool TryFindCell(out Vector2Int cell)
     {
         cell = Vector2Int.zero;
-        if (Touch.activeTouches.Count == 0) return false;
-        Vector3 worldPos = camera.ScreenToWorldPoint(Touch.activeTouches[0].screenPosition);
+        var touches = Touch.activeTouches;
+        if (touches.Count == 0) return false;
+
+        // UI 버튼을 떼고난 직후 한 프레임 동안 Ended 상태로 남는 터치가
+        // 버튼의 화면 좌표를 그리드 셀로 변환해버리는 걸 방지
+        Touch touch = touches[0];
+        if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled) return false;
+
+        Vector3 worldPos = camera.ScreenToWorldPoint(touch.screenPosition);
         cell = gridManager.WorldToCell(worldPos);
         return true;
     }
@@ -256,6 +305,7 @@ public class PlacementSystem : MonoBehaviour
         _previewData = null;
         _previewInstance = null;
         _previewRenderer = null;
+        _previewRotationStep = 0;
         _movingOriginal = null;
         _removeTarget = null;
         _removeTargetRenderer = null;
