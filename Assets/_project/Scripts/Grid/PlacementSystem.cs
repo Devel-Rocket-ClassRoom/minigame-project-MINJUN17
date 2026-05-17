@@ -9,7 +9,7 @@ public class PlacementSystem : MonoBehaviour
 {
     public Mode Mode { get; private set; } = Mode.None;
 
-    [SerializeField] private new Camera camera;
+    [SerializeField] private Camera cam;
     [SerializeField] private GridManager gridManager;
     [SerializeField] private Color validColor = new Color(0f, 1f, 0f, 0.5f);
     [SerializeField] private Color invalidColor = new Color(1f, 0f, 0f, 0.5f);
@@ -278,7 +278,7 @@ public class PlacementSystem : MonoBehaviour
         Touch touch = touches[0];
         if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled) return false;
 
-        Vector3 worldPos = camera.ScreenToWorldPoint(touch.screenPosition);
+        Vector3 worldPos = cam.ScreenToWorldPoint(touch.screenPosition);
         cell = gridManager.WorldToCell(worldPos);
         return true;
     }
@@ -291,7 +291,7 @@ public class PlacementSystem : MonoBehaviour
         if (touches.Count == 0) return false;
         if (touches[0].phase != TouchPhase.Began) return false;
 
-        Vector3 worldPos = camera.ScreenToWorldPoint(touches[0].screenPosition);
+        Vector3 worldPos = cam.ScreenToWorldPoint(touches[0].screenPosition);
         Vector2Int cellPos = gridManager.WorldToCell(worldPos);
         GridCell cell = gridManager.GetCell(cellPos);
         if (cell == null || cell.placedObject == null) return false;
