@@ -106,9 +106,9 @@ public class GridManager : MonoBehaviour
 
     public void PlaceObject(PlacedObject placed)
     {
-        for (int dx = 0; dx < placed.Data.width; dx++)
+        for (int dx = 0; dx < placed.Width; dx++)
         {
-            for (int dy = 0; dy < placed.Data.height; dy++)
+            for (int dy = 0; dy < placed.Height; dy++)
             {
                 GridCell cell = GetCell(placed.Origin + new Vector2Int(dx, dy));
                 cell.isOccupied = true;
@@ -119,9 +119,9 @@ public class GridManager : MonoBehaviour
 
     public void RemoveObject(PlacedObject placed)
     {
-        for (int dx = 0; dx < placed.Data.width; dx++)
+        for (int dx = 0; dx < placed.Width; dx++)
         {
-            for (int dy = 0; dy < placed.Data.height; dy++)
+            for (int dy = 0; dy < placed.Height; dy++)
             {
                 GridCell cell = GetCell(placed.Origin + new Vector2Int(dx, dy));
                 cell.isOccupied = false;
