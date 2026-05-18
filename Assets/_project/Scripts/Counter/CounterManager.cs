@@ -7,11 +7,13 @@ public class CounterManager : MonoBehaviour
     private List<Counter> counters = new();
     [SerializeField] private GameObject counterPrefab;
     [SerializeField] private Transform[] startSpawnPoints;
+    
 
     public int CounterCount => counters.Count;
     public IReadOnlyList<Counter> Counters => counters;
+    
 
-    private void Start()
+    private void Awake()
     {
         SpawnInitialCounters();
     }
@@ -29,6 +31,17 @@ public class CounterManager : MonoBehaviour
         }
     }
 
+    public Counter GetReadyCounter()
+    {
+        foreach (var counter in counters)
+        {
+            if (!counter.IsEmpty && !counter.IsOccupied)
+            {
+                return counter;
+            }
+        }
+        return null;
+    }
     public Counter GetFirstEmptyCounter()
     {
         return counters.FirstOrDefault(c => c.IsEmpty);

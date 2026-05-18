@@ -3,7 +3,7 @@ using UnityEngine;
 public class Staff : MonoBehaviour
 {
     [SerializeField] private StaffData data;
-    [SerializeField] private Counter assignedCounter;   // null = 미배정(대기 중)
+    private Counter assignedCounter;   // null = 미배정(대기 중)
     [SerializeField] private int id;
 
     public StaffData Data => data;
