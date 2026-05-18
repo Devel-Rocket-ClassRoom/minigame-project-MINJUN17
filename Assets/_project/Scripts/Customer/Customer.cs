@@ -14,9 +14,6 @@ public class Customer : MonoBehaviour
     private Counter _targetCounter;
     private Seat _targetSeat;
 
-    [SerializeField] private float arriveThreshold = 0.05f;
-    [SerializeField] private float dummyWaitDuration = 3f;   // #5에서 직원 트리거로 교체 예정
-
     [Header("만족도")]
     [SerializeField] private float baseSatisfaction = 50f;
     [SerializeField] private float eatGainRate = 5f;         // 초당 증가
@@ -82,7 +79,7 @@ public class Customer : MonoBehaviour
         switch (s)
         {
             case CustomerState.WAIT_AT_COUNTER:
-                _targetCounter.OnCustomerArrived();
+                _targetCounter.OnCustomerArrived(this);
                 _waitStartTime = Time.time;
                 int dummyPrice = Random.Range(3000, 10000);   // 임시 (메뉴 시스템 별도 이슈)
                 _targetCounter.ReceiveOrder(dummyPrice);
@@ -131,8 +128,13 @@ public class Customer : MonoBehaviour
 
     private void WaitAtCounterState()
     {
-        // TODO: #5 직원이 음식 준비 완료하면 PAY로 전이
-        if (_stateTimer >= dummyWaitDuration)
+        // 직원이 OnFoodReady 호출할 때까지 대기
+    }
+
+    // === 외부 진입점 (Counter가 호출) ===
+    public void OnFoodReady()
+    {
+        if (_state == CustomerState.WAIT_AT_COUNTER)
             ChangeState(CustomerState.PAY);
     }
 
@@ -157,11 +159,5 @@ public class Customer : MonoBehaviour
             Destroy(gameObject);
     }
 
-    private bool MoveTowards(Vector3 target)
-    {
-        float speed = _data.moveSpeed;
-        transform.position = Vector3.MoveTowards(
-            transform.position, target, speed * Time.deltaTime);
-        return Vector3.Distance(transform.position, target) <= arriveThreshold;
-    }
+    private bool MoveTowards(Vector3 target) => MoveUtil.MoveTowards(transform, target, _data.moveSpeed);
 }

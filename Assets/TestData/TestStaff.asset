@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: TestStaff
   m_EditorClassIdentifier: Assembly-CSharp::StaffData
   Type: 0
-  HireCost: 0
-  Salary: 0
-  Speed: 5
-  Kindness: 5
+  hireCost: 0
+  salary: 0
+  moveSpeed: 2
+  kindness: 0
