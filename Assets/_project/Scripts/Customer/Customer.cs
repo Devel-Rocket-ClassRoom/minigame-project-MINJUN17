@@ -15,13 +15,13 @@ public class Customer : MonoBehaviour
     private Seat _targetSeat;
 
     [Header("만족도")]
-    [SerializeField] private float baseSatisfaction = 50f;
-    [SerializeField] private float eatGainRate = 5f;         // 초당 증가
-    [SerializeField] private float waitPenaltyRate = 3f;     // patience 초과 1초당 감소
+    [SerializeField] private int baseSatisfaction = 50;
+    [SerializeField] private int eatGainRate = 5;         // 초당 증가
+    [SerializeField] private int waitPenaltyRate = 3;     // patience 초과 1초당 감소
 
     private float _stateTimer;
     private float _waitStartTime;
-    private float _satisfaction;
+    private int _satisfaction;
 
     public void Init(CustomerData data, CounterManager counterManager, SeatManager seatManager, QueueManager queueManager, Vector3 exitPoint)
     {
@@ -94,13 +94,13 @@ public class Customer : MonoBehaviour
             case CustomerState.LEAVE:
                 float waitDuration = _waitStartTime > 0 ? Time.time - _waitStartTime : 0f;
                 if (waitDuration > _data.patience)
-                    _satisfaction -= (waitDuration - _data.patience) * waitPenaltyRate;
-                _satisfaction = Mathf.Max(0f, _satisfaction);
+                    _satisfaction -= Mathf.FloorToInt((waitDuration - _data.patience) * waitPenaltyRate);
+                _satisfaction = Mathf.Max(0, _satisfaction);
 
                 _targetSeat?.Release();
                 _targetSeat = null;
+                SatisfactionSystem.Instance.Earn(_satisfaction);
 
-                // TODO: #7 ReputationSystem.Add(_satisfaction)
                 break;
         }
     }
@@ -147,7 +147,7 @@ public class Customer : MonoBehaviour
     private void EatState()
     {
         // TODO: 인테리어/직원 능력치 보너스 곱셈으로 반영
-        _satisfaction += Time.deltaTime * eatGainRate;
+        _satisfaction += Mathf.FloorToInt(Time.deltaTime * eatGainRate);
 
         if (_stateTimer >= _data.eatSpeed)
             ChangeState(CustomerState.LEAVE);
@@ -156,7 +156,10 @@ public class Customer : MonoBehaviour
     private void LeaveState()
     {
         if (MoveTowards(_exitPoint))
+        {
+
             Destroy(gameObject);
+        }
     }
 
     private bool MoveTowards(Vector3 target) => MoveUtil.MoveTowards(transform, target, _data.moveSpeed);

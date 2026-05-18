@@ -51,8 +51,7 @@ public class Counter : MonoBehaviour
         _waitingCustomer = null;
         if (_currentPrice > 0)
         {
-            // TODO: #7 MoneySystem.Instance.Add(_currentPrice);
-            Debug.Log($"[Counter] +{_currentPrice}원 결제");
+            MoneySystem.Instance.Earn(_currentPrice);
             _currentPrice = 0;
         }
     }

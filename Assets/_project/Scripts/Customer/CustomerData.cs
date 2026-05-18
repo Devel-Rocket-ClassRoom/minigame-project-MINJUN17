@@ -10,6 +10,8 @@ public class CustomerData : ScriptableObject
     public int minOrderCount = 1;      // 최소 주문 개수
     public int maxOrderCount = 1;      // 최대 주문 개수
 
+    public int baseSatisfaction;
+
     public float moveSpeed = 2f;
     public float eatSpeed = 5f;
     public float patience = 20f;
