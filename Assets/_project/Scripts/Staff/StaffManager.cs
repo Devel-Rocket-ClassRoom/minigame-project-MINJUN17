@@ -27,7 +27,9 @@ public class StaffManager : MonoBehaviour
     public Staff HireStaff(StaffData data)
     {
         if (data == null) return null;
+        if (staffPrefab == null) return null;
         if (staffs.Count >= MaxStaffCount) return null;
+        if (MoneySystem.Instance == null) return null;
         if (!MoneySystem.Instance.CanAfford(data.HireCost)) return null;
 
         MoneySystem.Instance.Spend(data.HireCost);
