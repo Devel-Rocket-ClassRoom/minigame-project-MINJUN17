@@ -1,9 +1,12 @@
+using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Customer : MonoBehaviour
 {
     private CustomerData _data;
     public CustomerData Data => _data;
+    public event Action<Customer> OnDespawned;
 
     private CounterManager _counterManager;
     private SeatManager _seatManager;
@@ -157,10 +160,11 @@ public class Customer : MonoBehaviour
     {
         if (MoveTowards(_exitPoint))
         {
-
             Destroy(gameObject);
         }
     }
+
+    private void OnDestroy() => OnDespawned?.Invoke(this);
 
     private bool MoveTowards(Vector3 target) => MoveUtil.MoveTowards(transform, target, _data.moveSpeed);
 }
