@@ -5,6 +5,7 @@ using UnityEngine;
 public class CounterManager : MonoBehaviour
 {
     [SerializeField] private List<Counter> counters = new();
+    [SerializeField] private GameObject counterPrefab;
 
     public int CounterCount => counters.Count;
     public IReadOnlyList<Counter> Counters => counters;
@@ -12,7 +13,9 @@ public class CounterManager : MonoBehaviour
     private void Awake()
     {
         if (counters.Count == 0)
+        {
             counters.AddRange(FindObjectsByType<Counter>(FindObjectsSortMode.None));
+        }
     }
 
     public Counter GetFirstEmptyCounter()
