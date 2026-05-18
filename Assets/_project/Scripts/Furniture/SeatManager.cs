@@ -4,6 +4,8 @@ using UnityEngine;
 public class SeatManager : MonoBehaviour
 {
     private List<Seat> seats = new();
+
+    
     private void Awake()
     {
         seats.AddRange(FindObjectsByType<Seat>(FindObjectsSortMode.None));
