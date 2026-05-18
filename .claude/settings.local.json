@@ -6,7 +6,8 @@
       "PowerShell(gh api *)",
       "Bash(gh repo *)",
       "Bash(gh project *)",
-      "Bash(gh issue *)"
+      "Bash(gh issue *)",
+      "Bash(git add *)"
     ]
   }
 }

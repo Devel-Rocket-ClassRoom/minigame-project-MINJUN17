@@ -748,6 +748,8 @@ GameObject:
   - component: {fileID: 1118384913}
   - component: {fileID: 1118384918}
   - component: {fileID: 1118384917}
+  - component: {fileID: 1118384919}
+  - component: {fileID: 1118384920}
   m_Layer: 0
   m_Name: Testmanager
   m_TagString: Untagged
@@ -925,6 +927,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 504609639697d2146abb9947bb37b5e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SatisfactionSystem
+--- !u!114 &1118384919
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1118384907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0b3bd81da43ee54facbcd84bf48a533, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TimeSystem
+  _nightHourInterval: 0.5
+  _hourInterval: 15
+  _openHour: 8
+  _closeHour: 12
+--- !u!114 &1118384920
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1118384907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9e56d5152aef6446a2765b991027647, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DayCycleController
+  time: {fileID: 1118384919}
+  customerManager: {fileID: 1118384915}
 --- !u!1 &1170707369
 GameObject:
   m_ObjectHideFlags: 0
@@ -1630,8 +1662,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HudView
   moneyText: {fileID: 222350462}
   satisfactionText: {fileID: 1284588597}
-  timeSystem: {fileID: 0}
-  timeText: {fileID: 0}
+  timeSystem: {fileID: 1118384919}
+  timeText: {fileID: 919544941}
 --- !u!1 &1876948334
 GameObject:
   m_ObjectHideFlags: 0
