@@ -7,6 +7,8 @@ public class StaffManager : MonoBehaviour
     [SerializeField] private Staff staffPrefab;
     [SerializeField] private StaffData starterStaffData;   // 시작 시 자동 고용할 신입 데이터
 
+    [SerializeField] private Transform toolPos; // 더미
+
     private int nextId = 1;
     private readonly List<Staff> staffs = new();
 
@@ -30,13 +32,13 @@ public class StaffManager : MonoBehaviour
         if (staffPrefab == null) return null;
         if (staffs.Count >= MaxStaffCount) return null;
         if (MoneySystem.Instance == null) return null;
-        if (!MoneySystem.Instance.CanAfford(data.HireCost)) return null;
+        if (!MoneySystem.Instance.CanAfford(data.hireCost)) return null;
 
-        MoneySystem.Instance.Spend(data.HireCost);
+        MoneySystem.Instance.Spend(data.hireCost);
 
         var staff = Instantiate(staffPrefab);
         staff.gameObject.name = $"Staff_{nextId}";
-        staff.Init(data, nextId);
+        staff.Init(data, nextId, toolPos);
         nextId++;
 
         staffs.Add(staff);
@@ -47,9 +49,9 @@ public class StaffManager : MonoBehaviour
     public bool FireStaff(Staff staff)
     {
         if (staff == null || !staffs.Contains(staff)) return false;
-        if (!MoneySystem.Instance.CanAfford(staff.Data.Salary)) return false;
+        if (!MoneySystem.Instance.CanAfford(staff.Data.salary)) return false;
 
-        MoneySystem.Instance.Spend(staff.Data.Salary);
+        MoneySystem.Instance.Spend(staff.Data.salary);
         UnassignStaff(staff);
         staffs.Remove(staff);
         Destroy(staff.gameObject);

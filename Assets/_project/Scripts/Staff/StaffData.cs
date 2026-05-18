@@ -4,8 +4,8 @@ using UnityEngine;
 public class StaffData : ScriptableObject
 {
     public StaffType Type;
-    public long HireCost;
-    public long Salary;
-    public float Speed;
-    public float Kindness;
+    public long hireCost;
+    public long salary;
+    public float moveSpeed;
+    public float kindness;
 }
