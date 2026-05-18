@@ -4,17 +4,28 @@ using UnityEngine;
 
 public class CounterManager : MonoBehaviour
 {
-    [SerializeField] private List<Counter> counters = new();
+    private List<Counter> counters = new();
     [SerializeField] private GameObject counterPrefab;
+    [SerializeField] private Transform[] startSpawnPoints;
 
     public int CounterCount => counters.Count;
     public IReadOnlyList<Counter> Counters => counters;
 
-    private void Awake()
+    private void Start()
     {
-        if (counters.Count == 0)
+        SpawnInitialCounters();
+    }
+
+    private void SpawnInitialCounters()
+    {
+        if (counterPrefab == null || startSpawnPoints == null) return;
+
+        foreach (var point in startSpawnPoints)
         {
-            counters.AddRange(FindObjectsByType<Counter>(FindObjectsSortMode.None));
+            if (point == null) continue;
+            var go = Instantiate(counterPrefab, point.position, point.rotation);
+            if (go.TryGetComponent(out Counter counter))
+                RegisterCounter(counter);
         }
     }
 
