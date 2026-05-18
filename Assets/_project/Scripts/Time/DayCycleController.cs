@@ -12,20 +12,26 @@ public class DayCycleController : MonoBehaviour
     private void OnEnable()
     {
         time.OnCloseHourReached += HandleClose;
+        time.OnDayStarted += HandleDayStarted;
         customerManager.OnEmpty += HandleEmpty;
     }
 
     private void OnDisable()
     {
         time.OnCloseHourReached -= HandleClose;
+        time.OnDayStarted -= HandleDayStarted;
         customerManager.OnEmpty -= HandleEmpty;
     }
 
     private void Start()
     {
-        customerManager.StartSpawning();
         time.BeginDay();
         OnSettlementReady += AutoConfirm;
+    }
+
+    private void HandleDayStarted()
+    {
+        customerManager.StartSpawning();
     }
     private void AutoConfirm() // 임시
     {
@@ -59,7 +65,6 @@ public class DayCycleController : MonoBehaviour
     public void ConfirmSettlement()
     {
         MoneySystem.Instance.SettleDailyOrMonthly();
-        customerManager.StartSpawning();
         time.BeginDay();
     }
 }

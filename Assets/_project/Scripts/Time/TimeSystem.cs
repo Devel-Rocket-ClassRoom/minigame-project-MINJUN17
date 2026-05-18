@@ -23,6 +23,7 @@ public class TimeSystem : MonoBehaviour
     public bool IsOpen => _ticking;
 
     public event Action OnCloseHourReached;
+    public event Action OnDayStarted;
 
     private void Update()
     {
@@ -62,5 +63,6 @@ public class TimeSystem : MonoBehaviour
         }
         _timer = 0f;
         _ticking = true;
+        OnDayStarted?.Invoke();
     }
 }
