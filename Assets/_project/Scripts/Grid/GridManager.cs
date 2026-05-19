@@ -37,7 +37,7 @@ public class GridManager : MonoBehaviour
         {
             for (int y = 0; y < _gridHeight; y++)
             {
-                if((x == 4 || x == 5) && (y == 3 || y == 4))
+                if(((x >= 3 && x <= 5 ) &&  y >= 3) || ((y >= 3 && y <= 5) && x <= 5))
                 {
                     var counterZone = new Vector2Int(x, y);
                     _reservedCells.Add(counterZone);
