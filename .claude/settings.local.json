@@ -7,7 +7,8 @@
       "Bash(gh repo *)",
       "Bash(gh project *)",
       "Bash(gh issue *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "mcp__GitHub__issue_write"
     ]
   }
 }

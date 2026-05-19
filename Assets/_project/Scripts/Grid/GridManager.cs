@@ -1,12 +1,13 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GridManager : MonoBehaviour
 {
     [Header("Grid Size")]
-    [SerializeField] private int _gridWidth = 12;
+    [SerializeField] private int _gridWidth = 9;
     [SerializeField] private int _gridHeight = 12;
-    [SerializeField] private int _startGridWidth = 6;
-    [SerializeField] private int _startGridHeight = 6;
+    [SerializeField] private int _startGridWidth = 4;
+    [SerializeField] private int _startGridHeight = 8;
 
     [Header("Camera")]
     [SerializeField] private Camera mainCamera;
@@ -19,11 +20,30 @@ public class GridManager : MonoBehaviour
 
     private GridCell[,] _cells;
 
+    private HashSet<Vector2Int> _reservedCells = new HashSet<Vector2Int>
+    {
+        new Vector2Int(0, 0), // 출입구
+    };
+
     private void Awake()
     {
         if (mainCamera == null) mainCamera = Camera.main;
         CreateGrid();
         CenterCameraOnActiveGrid();
+
+
+        // 카운터 및 직원 이동 통로
+        for(int x = 0; x  < _gridWidth; x++)
+        {
+            for (int y = 0; y < _gridHeight; y++)
+            {
+                if((x == 4 || x == 5) && (y == 3 || y == 4))
+                {
+                    var counterZone = new Vector2Int(x, y);
+                    _reservedCells.Add(counterZone);
+                }
+            }
+        }
     }
 
     // 활성 영역(_startGridWidth × _startGridHeight) 중앙으로 카메라 정렬
@@ -39,11 +59,7 @@ public class GridManager : MonoBehaviour
         mainCamera.transform.position = new Vector3(centerX, centerY, pos.z);
 
         if (mainCamera.orthographic)
-        {
-            float requiredHalfH = _startGridHeight / 2f + cameraPadding;
-            float requiredHalfW = (_startGridWidth / 2f + cameraPadding) / mainCamera.aspect;
-            mainCamera.orthographicSize = Mathf.Max(requiredHalfH, requiredHalfW);
-        }
+        mainCamera.orthographicSize = 6f;
     }
 
     private void CreateGrid()
@@ -54,7 +70,15 @@ public class GridManager : MonoBehaviour
             for (int y = 0; y < _gridHeight; y++)
             {
                 bool isActive = x < _startGridWidth && y < _startGridHeight;
-                _cells[x, y] = new GridCell(x, y, isActive);
+                bool isReserved = _reservedCells.Contains(new Vector2Int(x, y));
+                if (x <= 3 && y >= 5)
+                {
+                    _cells[x, y] = new GridCell(x, y, isActive, isReserved, CellZone.Kitchen);
+                }
+                else
+                {
+                    _cells[x, y] = new GridCell(x, y, isActive, isReserved, CellZone.Hall);
+                }
             }
         }
     }
@@ -93,12 +117,12 @@ public class GridManager : MonoBehaviour
 
     public bool CanPlace(Vector2Int origin, int width, int height)
     {
-        for (int dx = 0; dx < width; dx++)
+        for(int dx = 0; dx < width; dx++)
         {
             for (int dy = 0; dy < height; dy++)
             {
                 GridCell cell = GetCell(origin + new Vector2Int(dx, dy));
-                if (cell == null || cell.isOccupied || !cell.isActive) return false;
+                if (cell == null || cell.isOccupied || !cell.isActive || cell.isReserved) return false;
             }
         }
         return true;

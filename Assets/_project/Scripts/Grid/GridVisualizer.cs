@@ -6,6 +6,7 @@ public class GridVisualizer : MonoBehaviour
     public GridManager gridManager;
     public Color activeColor = new Color(0f, 1f, 0f, 0.2f);
     public Color occupiedColor = new Color(0f, 0f, 1f, 0.3f);
+    public Color reservedColor = new Color(0f, 0f, 1f, 0.3f);
     public Color inActiveColor = new Color(1f, 0f, 0f, 0.1f);
     public Color lineColor = new Color(1f, 1f, 1f, 0.4f);
 
@@ -45,6 +46,7 @@ public class GridVisualizer : MonoBehaviour
             GridCell cell = gridManager.GetCell(pos);
             if (cell != null)
             {
+                if (cell.isReserved) return reservedColor;
                 if (cell.isOccupied) return occupiedColor;
                 if (cell.isActive) return activeColor;
                 return inActiveColor;
