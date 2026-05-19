@@ -24,6 +24,7 @@ public class TimeSystem : MonoBehaviour
 
     public event Action OnCloseHourReached;
     public event Action OnDayStarted;
+    public event Action OnYearEnded;
 
     private void Update()
     {
@@ -57,7 +58,7 @@ public class TimeSystem : MonoBehaviour
             {
                 _hour = 0;
                 _month++;
-                if (_month > 12) { _month = 1; _year++; }
+                if (_month > 12) { _month = 1; _year++; OnYearEnded?.Invoke(); }
             }
             OnHourChanged?.Invoke();
         }

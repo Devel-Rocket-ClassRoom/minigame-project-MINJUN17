@@ -23,20 +23,29 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
     private float _spawnInterval;
     private float _spawnTimer;
     private bool _spawning;
+    private float _marketingMultiplier = 1f;
     public Vector3 EntryPosition => entryPoint.position;
     public Vector3 ExitPosition => exitPoint.position;
 
     public event Action OnEmpty;
 
+    public void SetMarketingMultiplier(float m) => _marketingMultiplier = Mathf.Max(0.01f, m);
+
+    private float RollSpawnInterval()
+    {
+        float baseInterval = Random.Range(_minSpawnInterval, _maxSpawnInterval);
+        return baseInterval / _marketingMultiplier;
+    }
+
     private void Start()
     {
-        _spawnInterval = Random.Range(_minSpawnInterval, _maxSpawnInterval);
+        _spawnInterval = RollSpawnInterval();
     }
 
     public void StartSpawning()
     {
         _spawning = true;
-        _spawnInterval = UnityEngine.Random.Range(_minSpawnInterval, _maxSpawnInterval);
+        _spawnInterval = RollSpawnInterval();
         _spawnTimer = 0f;
     }
 
@@ -49,7 +58,7 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
         if (_spawnTimer > _spawnInterval)
         {
             _spawnTimer = 0f;
-            _spawnInterval = Random.Range(_minSpawnInterval, _maxSpawnInterval);
+            _spawnInterval = RollSpawnInterval();
             Spawn();
         }
     }

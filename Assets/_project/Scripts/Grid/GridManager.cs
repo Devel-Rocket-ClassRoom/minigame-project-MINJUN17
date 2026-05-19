@@ -17,6 +17,17 @@ public class GridManager : MonoBehaviour
     public int GridHeight => _gridHeight;
     public int StartGridWidth => _startGridWidth;
     public int StartGridHeight => _startGridHeight;
+    public int ActiveCellCount
+    {
+        get
+        {
+            int count = 0;
+            for (int x = 0; x < _gridWidth; x++)
+                for (int y = 0; y < _gridHeight; y++)
+                    if (_cells[x, y].isActive) count++;
+            return count;
+        }
+    }
 
     private GridCell[,] _cells;
 

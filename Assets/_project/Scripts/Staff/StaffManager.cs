@@ -109,7 +109,19 @@ public class StaffManager : MonoBehaviour
         counter.AssignStaff(staff);
         return true;
     }
+    public long CalculateTotalSalaryCost()
+    {
+        long salary = 0;
 
+        foreach (var cook in StaffManager.Instance.CookStaffs)
+            salary += cook.Data.salary;
+        foreach (var server in StaffManager.Instance.ServerStaffs)
+            salary += server.Data.salary;
+        //foreach (var rider in StaffManager.Instance.RiderStaffs)
+        //    salary += rider.Data.salary;
+
+        return salary;
+    }
     public void UnassignCounter(ServerStaff staff)
     {
         if (staff == null || staff.AssignedCounter == null) return;

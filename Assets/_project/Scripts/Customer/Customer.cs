@@ -104,7 +104,7 @@ public class Customer : MonoBehaviour
                 _targetSeat?.Release();
                 _targetSeat = null;
                 SatisfactionSystem.Instance.Earn(_satisfaction);
-                Debug.Log($"만족도: {_satisfaction} 얻음");
+                ReputationSystem.Instance?.Report(_satisfaction);
                 break;
         }
     }
@@ -115,8 +115,12 @@ public class Customer : MonoBehaviour
         {
             _satisfaction += Mathf.FloorToInt(server.Data.kindness);
             int totalPrice = OrderedMenus.Sum(m => m.price);
+
+            foreach (var menu in OrderedMenus)
+            {
+                SalesTracker.Instance.RecordSale(menu);
+            }
             _targetCounter.OnCustomerPaid(totalPrice);
-            Debug.Log($"{totalPrice} 결제");
             _targetCounter = null;
             ChangeState(CustomerState.WALK_TO_SEAT);
         }

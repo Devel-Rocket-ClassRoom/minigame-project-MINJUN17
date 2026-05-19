@@ -64,7 +64,7 @@ public class DayCycleController : MonoBehaviour
     // 정산 UI의 "다음 날" 버튼이 호출
     public void ConfirmSettlement()
     {
-        MoneySystem.Instance.SettleDailyOrMonthly();
+        MoneySystem.Instance.SettleMonthly();
         time.BeginDay();
     }
 }
