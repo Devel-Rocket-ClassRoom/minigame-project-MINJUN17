@@ -4,3 +4,9 @@ public enum StaffType
     Senior,
     Manager,
 }
+public enum StaffRole
+{
+    Cook,
+    Server,
+    Rider,
+}

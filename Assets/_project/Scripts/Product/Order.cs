@@ -1,0 +1,1 @@
+public class Order { public Customer customer; /* 1주차: 메뉴 데이터는 TBD */ }
