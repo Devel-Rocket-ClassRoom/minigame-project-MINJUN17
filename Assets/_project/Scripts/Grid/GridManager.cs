@@ -7,7 +7,7 @@ public class GridManager : MonoBehaviour
     [SerializeField] private int _gridWidth = 9;
     [SerializeField] private int _gridHeight = 12;
     [SerializeField] private int _startGridWidth = 4;
-    [SerializeField] private int _startGridHeight = 8;
+    [SerializeField] private int _startGridHeight = 9;
 
     [Header("Camera")]
     [SerializeField] private Camera mainCamera;
@@ -22,7 +22,8 @@ public class GridManager : MonoBehaviour
 
     private HashSet<Vector2Int> _reservedCells = new HashSet<Vector2Int>
     {
-        new Vector2Int(0, 0), // 출입구
+        new Vector2Int(0, 3), // 출입구 (홀 좌하단)
+        // 픽업대 셀은 시작 배치 좌표에 맞춰 추가 (예: new Vector2Int(1, 8))
     };
 
     private void Awake()
@@ -31,19 +32,17 @@ public class GridManager : MonoBehaviour
         CreateGrid();
         CenterCameraOnActiveGrid();
 
-
-        // 카운터 및 직원 이동 통로
-        for(int x = 0; x  < _gridWidth; x++)
-        {
-            for (int y = 0; y < _gridHeight; y++)
-            {
-                if(((x >= 3 && x <= 5 ) &&  y >= 3) || ((y >= 3 && y <= 5) && x <= 5))
-                {
-                    var counterZone = new Vector2Int(x, y);
-                    _reservedCells.Add(counterZone);
-                }
-            }
-        }
+        // ※ 좌표계 변경(좌상단 시작) 후 통로/예약 셀 정책 미정.
+        //    필요해지면 새 좌표 기준으로 다시 작성.
+        //
+        // for (int x = 0; x < _gridWidth; x++)
+        // {
+        //     for (int y = 0; y < _gridHeight; y++)
+        //     {
+        //         if (/* 새 좌표 기준 조건 */)
+        //             _reservedCells.Add(new Vector2Int(x, y));
+        //     }
+        // }
     }
 
     // 활성 영역(_startGridWidth × _startGridHeight) 중앙으로 카메라 정렬
@@ -53,32 +52,29 @@ public class GridManager : MonoBehaviour
         if (mainCamera == null) return;
 
         float centerX = _startGridWidth / 2f;
-        float centerY = _startGridHeight / 2f;
+        float centerY = _gridHeight - _startGridHeight / 2f;   // 좌상단 기준
 
         Vector3 pos = mainCamera.transform.position;
         mainCamera.transform.position = new Vector3(centerX, centerY, pos.z);
 
         if (mainCamera.orthographic)
-        mainCamera.orthographicSize = 6f;
+            mainCamera.orthographicSize = 6f;
     }
 
     private void CreateGrid()
     {
         _cells = new GridCell[_gridWidth, _gridHeight];
+        int activeYStart = _gridHeight - _startGridHeight;   // 12 - 9 = 3
+        int kitchenYStart = _gridHeight - 4;                 // 12 - 4 = 8 (위 4행이 주방)
+
         for (int x = 0; x < _gridWidth; x++)
         {
             for (int y = 0; y < _gridHeight; y++)
             {
-                bool isActive = x < _startGridWidth && y < _startGridHeight;
+                bool isActive = x < _startGridWidth && y >= activeYStart;
                 bool isReserved = _reservedCells.Contains(new Vector2Int(x, y));
-                if (x <= 3 && y >= 5)
-                {
-                    _cells[x, y] = new GridCell(x, y, isActive, isReserved, CellZone.Kitchen);
-                }
-                else
-                {
-                    _cells[x, y] = new GridCell(x, y, isActive, isReserved, CellZone.Hall);
-                }
+                CellZone zone = (x < 4 && y >= kitchenYStart) ? CellZone.Kitchen : CellZone.Hall;
+                _cells[x, y] = new GridCell(x, y, isActive, isReserved, zone);
             }
         }
     }
@@ -103,10 +99,11 @@ public class GridManager : MonoBehaviour
     public Vector2Int ClampToActiveArea(Vector2Int origin, int width, int height)
     {
         int maxX = Mathf.Max(0, _startGridWidth - width);
-        int maxY = Mathf.Max(0, _startGridHeight - height);
+        int minY = _gridHeight - _startGridHeight;                  // 3
+        int maxY = Mathf.Max(minY, _gridHeight - height);           // 12 - h
         return new Vector2Int(
             Mathf.Clamp(origin.x, 0, maxX),
-            Mathf.Clamp(origin.y, 0, maxY)
+            Mathf.Clamp(origin.y, minY, maxY)
         );
     }
 
@@ -155,6 +152,21 @@ public class GridManager : MonoBehaviour
                 GridCell cell = GetCell(placed.Origin + new Vector2Int(dx, dy));
                 cell.isOccupied = false;
                 cell.placedObject = null;
+            }
+        }
+    }
+
+    public void ActivateCells(ExpansionStageData stage)
+    {
+        for (int dx = 0; dx < stage.width; dx++)
+        {
+            for (int dy = 0; dy < stage.height; dy++)
+            {
+                var pos = stage.origin + new Vector2Int(dx, dy);
+                if (!IsInBounds(pos)) continue;
+                var cell = _cells[pos.x, pos.y];
+                cell.isActive = true;
+                cell.zone = stage.newZone;
             }
         }
     }

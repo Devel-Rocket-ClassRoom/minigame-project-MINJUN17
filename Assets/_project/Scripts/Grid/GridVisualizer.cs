@@ -20,13 +20,20 @@ public class GridVisualizer : MonoBehaviour
         int sw = gridManager.StartGridWidth;
         int sh = gridManager.StartGridHeight;
 
+        int activeYStart = h - sh;       // 좌상단 기준 활성 영역 시작 y
+        int kitchenYStart = h - 4;       // 주방 시작 y (위 4행)
+
         for (int x = 0; x < w; x++)
         {
             for (int y = 0; y < h; y++)
             {
                 Vector2Int pos = new Vector2Int(x, y);
                 Vector3 center = gridManager.CellToWorld(pos);
-                Gizmos.color = GetCellColor(pos, x < sw && y < sh);
+
+                bool isInStartArea = x < sw && y >= activeYStart;
+                bool isKitchen = x < sw && y >= kitchenYStart;
+
+                Gizmos.color = GetCellColor(pos, isInStartArea, isKitchen);
                 Gizmos.DrawCube(center, new Vector3(0.95f, 0.95f, 0.01f));
             }
         }
@@ -39,8 +46,9 @@ public class GridVisualizer : MonoBehaviour
             Gizmos.DrawLine(new Vector3(0, y, 0), new Vector3(w, y, 0));
     }
 
-    private Color GetCellColor(Vector2Int pos, bool isInStartArea)
+    private Color GetCellColor(Vector2Int pos, bool isInStartArea, bool isKitchen)
     {
+        // 플레이 중에는 실제 셀 상태 반영
         if (Application.isPlaying)
         {
             GridCell cell = gridManager.GetCell(pos);
@@ -52,7 +60,9 @@ public class GridVisualizer : MonoBehaviour
                 return inActiveColor;
             }
         }
-        // 에디터에서는 시작 활성 영역만 활성색으로
-        return isInStartArea ? hallColor : inActiveColor;
+        // 에디터에서는 시작 활성 영역만 색 구분
+        if (!isInStartArea) return inActiveColor;
+        return isKitchen ? kitchenColor : hallColor;
     }
+
 }
