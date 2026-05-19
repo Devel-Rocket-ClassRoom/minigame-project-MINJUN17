@@ -74,7 +74,16 @@ public class PlacementSystem : MonoBehaviour
                 break;
         }
     }
+    public void PlaceInitial(FurnitureData data, Vector2Int pos, int rotationStep = 0)
+    {
+        GameObject instance = Instantiate(
+            data.prefab,
+            gridManager.CellToWorld(pos, data.width, data.height),
+            Quaternion.Euler(0, 0, -90 * rotationStep));
 
+        PlacedObject placed = new PlacedObject(data, instance, pos, rotationStep);
+        gridManager.PlaceObject(placed);
+    }
     // ========== UI: 진입점 ==========
     public void StartPlace(FurnitureData data)
     {

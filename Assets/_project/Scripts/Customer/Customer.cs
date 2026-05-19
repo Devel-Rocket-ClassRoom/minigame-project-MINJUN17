@@ -37,6 +37,7 @@ public class Customer : MonoBehaviour
 
         // 옵션 A: 자리 먼저 예약. 없으면 입장 거부
         _targetSeat = _seatManager.GetFirstAvailableSeat();
+        Debug.Log($"[Customer] Init 호출, _targetSeat={_targetSeat}");
         if (_targetSeat == null)
         {
             Destroy(gameObject);
@@ -110,6 +111,7 @@ public class Customer : MonoBehaviour
 
     private void EnterState()
     {
+
         MoveTowards(_queueManager.GetSlotPosition(this));
 
         if (!_queueManager.IsFront(this)) return;

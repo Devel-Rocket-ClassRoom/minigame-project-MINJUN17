@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class StaffManager : MonoBehaviour
 {
+    public static StaffManager Instance;
     [SerializeField] private CounterManager counterManager;
     [SerializeField] private Staff staffPrefab;
     [SerializeField] private StaffData starterStaffData;   // 시작 시 자동 고용할 신입 데이터
@@ -14,6 +15,12 @@ public class StaffManager : MonoBehaviour
 
     public IReadOnlyList<Staff> Staffs => staffs;
     private int MaxStaffCount => counterManager.CounterCount;
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        Instance = this;
+    }
 
     private void Start()
     {

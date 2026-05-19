@@ -39,6 +39,6 @@ public class HudView : MonoBehaviour
     private void UpdateSatisfaction(int satisfaction) => satisfactionText.text = $"Satis : {satisfaction}";
     private void UpdateTime()
     {
-        timeText.text = $"{timeSystem.Year}년 {timeSystem.Month}월  {timeSystem.Hour:D2}:00";
+        timeText.text = $"{timeSystem.Year}year {timeSystem.Month}month  {timeSystem.Hour:D2}:00";
     }
 }

@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f0cc6336acd53945a1d4307bb60037e, type: 3}
+  m_Name: PassWindow
+  m_EditorClassIdentifier: Assembly-CSharp::FurnitureData
+  prefab: {fileID: 4311967154920751949, guid: a1d348a5115565f40bc1cd5d9474567f, type: 3}
+  zone: 0
+  width: 2
+  height: 1
+  anchorX: 0
+  anchorY: 0
