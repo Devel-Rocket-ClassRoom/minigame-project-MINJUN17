@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -26,6 +28,7 @@ public class Customer : MonoBehaviour
     private float _waitStartTime;
     private int _satisfaction;
 
+    public List<MenuData> OrderedMenus { get; private set; }
     public void Init(CustomerData data, CounterManager counterManager, SeatManager seatManager, QueueManager queueManager, Vector3 exitPoint)
     {
         _data = data;
@@ -37,7 +40,7 @@ public class Customer : MonoBehaviour
 
         // 옵션 A: 자리 먼저 예약. 없으면 입장 거부
         _targetSeat = _seatManager.GetFirstAvailableSeat();
-        Debug.Log($"[Customer] Init 호출, _targetSeat={_targetSeat}");
+        
         if (_targetSeat == null)
         {
             Destroy(gameObject);
@@ -52,6 +55,12 @@ public class Customer : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
+        int orderCount = Random.Range(_data.minOrderCount, _data.maxOrderCount + 1);
+        OrderedMenus = new List<MenuData>();
+        for (int i = 0; i < orderCount; i++)
+            OrderedMenus.Add(MenuManager.Instance.PickRandomByWeight());
+
         _waitStartTime = Time.time;
         ChangeState(CustomerState.Enter);
     }
@@ -104,7 +113,8 @@ public class Customer : MonoBehaviour
     {
         if (_state == CustomerState.WAIT_AT_COUNTER)
         {
-            _targetCounter.OnCustomerPaid(); // 결제 처리
+            int totalPrice = OrderedMenus.Sum(m => m.price);
+            _targetCounter.OnCustomerPaid(totalPrice);
             _targetCounter = null;
             ChangeState(CustomerState.WALK_TO_SEAT);
         }

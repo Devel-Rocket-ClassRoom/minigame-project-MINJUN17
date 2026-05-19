@@ -9,8 +9,6 @@ public class StaffManager : MonoBehaviour
     [SerializeField] private ServerStaff serverStaffPrefab;
     [SerializeField] private StaffData starterCookData;
     [SerializeField] private StaffData starterServerData;
-
-    [SerializeField] private Transform toolPos;          // 더미 (1주차)
     [SerializeField] private Transform kitchenIdlePos;
 
     private int nextId = 1;
@@ -52,7 +50,7 @@ public class StaffManager : MonoBehaviour
         MoneySystem.Instance.Spend(data.hireCost);
         var staff = Instantiate(cookStaffPrefab);
         staff.gameObject.name = $"Cook_{nextId}";
-        staff.Init(data, nextId, kitchenIdlePos, toolPos);
+        staff.Init(data, nextId, kitchenIdlePos);
         nextId++;
         cookStaffs.Add(staff);
         return staff;

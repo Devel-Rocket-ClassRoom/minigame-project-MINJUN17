@@ -86,8 +86,14 @@ public class ServerStaff : MonoBehaviour
             return;
         }
 
-        Order order = new Order { customer = customer };
+
+        Order order = new Order
+        {
+            customer = customer,
+            menus = customer.OrderedMenus
+        };
         PassWindowManager.Instance.SubmitOrder(order);
+
         customer.OnOrderTaken();
 
         ChangeState(ServerState.IDLE_AT_COUNTER);

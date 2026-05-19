@@ -56,14 +56,7 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
 
     private void Spawn()
     {
-        Debug.Log($"[Spawn] queueManager.HasSpace={queueManager.HasSpace}, pool={pool?.Length}");
-        if (!queueManager.HasSpace) { Debug.Log("[Spawn] 종료: 큐 꽉참"); return; }
-        if (pool == null || pool.Length == 0) { Debug.Log("[Spawn] 종료: pool 없음"); return; }
         var data = PickByWeight();
-        if (data == null) { Debug.Log("[Spawn] 종료: data null"); return; }
-        if (data.customerPrefab == null) { Debug.Log("[Spawn] 종료: prefab null"); return; }
-
-        Debug.Log("[Spawn] 손님 생성 시도");
         var go = Instantiate(data.customerPrefab, entryPoint.position, Quaternion.identity);
         var c = go.GetComponent<Customer>();
         c.OnDespawned += HandleDespawn;

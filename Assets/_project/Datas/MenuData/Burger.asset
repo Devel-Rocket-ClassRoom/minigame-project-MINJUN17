@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88ad3a3536494ba42ac37b1a58e4863e, type: 3}
+  m_Name: Burger
+  m_EditorClassIdentifier: Assembly-CSharp::MenuData
+  menuName: "\uD584\uBC84\uAC70"
+  price: 5000
+  cost: 2000
+  tool: {fileID: 11400000, guid: d19e3da870805a242a72292d0739cb8f, type: 2}
+  satisfactionUnlock: 0
+  spawnWeight: 0

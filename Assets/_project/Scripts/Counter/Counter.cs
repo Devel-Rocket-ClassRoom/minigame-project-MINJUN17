@@ -38,18 +38,13 @@ public class Counter : MonoBehaviour
         _waitingCustomer = c;
         // Server가 IDLE에서 폴링해서 가져감 (push 알림 없음)
     }
-
-    private int _currentPrice;
-    public void ReceiveOrder(int price) => _currentPrice = price;
-
-    public void OnCustomerPaid()
+    public void OnCustomerPaid(int price)
     {
         _isOccupied = false;
         _waitingCustomer = null;
-        if (_currentPrice > 0)
+        if (price > 0)
         {
-            MoneySystem.Instance.Earn(_currentPrice);
-            _currentPrice = 0;
+            MoneySystem.Instance.Earn(price);
         }
     }
 }

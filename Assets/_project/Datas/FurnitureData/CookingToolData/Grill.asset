@@ -9,12 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3f0cc6336acd53945a1d4307bb60037e, type: 3}
+  m_Script: {fileID: 11500000, guid: c0ea88a793e072c4a93ff59edf571335, type: 3}
   m_Name: Grill
-  m_EditorClassIdentifier: Assembly-CSharp::FurnitureData
+  m_EditorClassIdentifier: Assembly-CSharp::CookingToolData
   prefab: {fileID: 3385571978879531138, guid: c05f9d3be9148604abb07b1d6f593e8c, type: 3}
   zone: 0
   width: 1
   height: 1
   anchorX: 0
   anchorY: 0
+  toolType: 0
+  usingDuration: 5

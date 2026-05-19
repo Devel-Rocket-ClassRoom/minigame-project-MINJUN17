@@ -34,8 +34,6 @@ public class MoneySystem : MonoBehaviour
 
     public void Earn(long amount)
     {
-        Debug.Log($"[Money] Earn({amount}) 호출됨, before={_money}");
-
         _money += amount;
         OnMoneyChanged?.Invoke(_money);
     }

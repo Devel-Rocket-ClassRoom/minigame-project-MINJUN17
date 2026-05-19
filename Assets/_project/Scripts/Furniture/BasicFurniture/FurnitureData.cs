@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "FurnitureData", menuName = "Grid/Furniture Data")]
+[CreateAssetMenu(fileName = "FurnitureData", menuName = "Furniture/Furniture Data")]
 public class FurnitureData : ScriptableObject
 {
     public GameObject prefab;

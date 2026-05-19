@@ -371,142 +371,219 @@ DELIVER_TO_CUSTOMER   (손님에게 음식 전달)
 - **카메라**: 세로 고정, 9×12 전체 표시
 - **입구/출구**: 홀 좌하단 (0, 7), 배치 불가 셀
 
-### 9.3 1주차 끝물 이슈 (이번 대화에서 도출된 변경/추가)
+### 9.3 1주차 작업 완료 상태
 
-#### 그리드/카메라 (Phase 1)
-- [ ] **① 시작 그리드 6×6 → 4×8 변경** (주방 4×3 상단 + 홀 4×5 하단)
-- [ ] **② 최대 그리드 12×12 → 9×12 변경**
-- [ ] **③ 셀별 활성 플래그 `bool[,] isActive`로 전환** (단순 사각형 → 셀별 관리)
-- [ ] **⑦ `CellZone` enum 추가 (Inactive/Kitchen/Hall/Border)**, `zoneMap` 관리
-- [ ] **⑨ 카메라 4×8 시작 영역 + 9×12 최종 영역 세로 화면 꽉 차게 재조정** (Ortho Size = 6)
-- [ ] **⑩ 입구 (0, 7) 셀 마킹 + 배치 불가 처리**
+#### 그리드/카메라 (Phase 1) ✅
+- [x] 시작 그리드 4×8 변경 (주방 4×3 상단 + 홀 4×5 하단)
+- [x] 최대 그리드 9×12 변경
+- [x] 셀별 `isActive` + `isReserved` 플래그 도입 (`HashSet<Vector2Int>`로 reserved 셀 관리)
+- [x] `CellZone` enum 추가 — **Kitchen/Hall만 사용** (Border/Inactive는 필요 시 도입)
+- [x] 카메라 Ortho Size = 6 고정, 세로 화면
+- [x] 입구 셀 마킹 + 배치 불가 처리 (Unity y-up 좌표계 적용으로 입구는 (0,0))
 
-#### 영역/배치 규칙 (Phase 2)
-- [ ] **⑥ 배치 오브젝트에 `PlacementZone` 필드 추가 (Kitchen/Hall/Border)**
-- [ ] **⑥ 배치 시 zone 체크 로직 추가** (조리도구 = Kitchen만, 카운터/가구 = Hall만, 픽업대 = Border만)
-- [ ] **⑲ 주방/홀 영역 색상 살짝 다르게 (시각 구분)**
+#### 영역/배치 규칙 (Phase 2) ✅
+- [x] `PlacementZone` 필드 추가 + `CanPlace` 시 zone 체크
+- [x] 주방/홀 셀 색상 구분 (`GridVisualizer`)
 
-#### 픽업대 + 직원 enum (Phase 3)
-- [ ] **⑤ 픽업대(PassWindow) 오브젝트 생성** (회색 박스, `Queue<Order>` + `Queue<Food>` 점유 상태 관리)
-- [ ] **⑰ 픽업대 시작 위치 1개 고정 배치** (잠정: 주방-홀 경계 셀 중 1곳, 1주차 끝물 막판 (1, 2) 추천)
-- [ ] **④ 직원 클래스에 `StaffRole` enum (Cook/Server/Rider) 필드 추가** (분기 로직은 X, 필드만)
+#### 픽업대 + 직원 (Phase 3) ✅ + 추가 작업
+- [x] `PassWindow` 클래스 (큐 2개)
+- [x] **`PassWindowManager` 신규 도입** (2주차 다중 픽업대 대비, 매니저 패턴)
+- [x] 픽업대 시작 위치 고정 배치
+- [x] ~~`StaffRole` enum 추가~~ → **`CookStaff` / `ServerStaff` 클래스 완전 분리로 진행** (2주차 작업 땡겨옴)
 
-#### 시작 상태 세팅 (Phase 4)
-- [ ] **시작 직원 스폰: 요리사 1 + 홀 2 (튜토리얼 완료 상태)**
-- [ ] **시작 카운터 2개 배치** (잠정 위치: (1,3), (2,3) — 홀 최상단 경계 근처)
-- [ ] **⑱ 시작 조리도구 2~3개 회색 박스로 주방에 고정 배치** (예: 그릴 1, 작업대 1)
-- [ ] **시작 테이블 세트 2개 (책상1+의자2)×2** 홀에 배치
+#### 시작 상태 세팅 (Phase 4) ✅
+- [x] `GameInitializer` 신규 — 카운터/픽업대/조리도구/테이블 시작 배치 일괄 처리
+- [x] `PlacementSystem.PlaceInitial()` 메서드 신규 — 시작 배치 전용 진입점
+- [x] 시작 직원: Cook 1 + Server N (카운터 수만큼 자동 채용 + 배정)
 
-#### 손님/직원 FSM 흐름 변경 (Phase 5)
-- [ ] **⑪ 손님 길찾기에 영역 제한 적용** (주방 진입 금지)
-- [ ] **⑬ 손님 FSM 흐름 P로 변경** (Section 4.1 참고)
-  - ENTER → WALK_TO_COUNTER → WAIT_AT_COUNTER → WALK_TO_SEAT → WAIT_AT_SEAT → EAT → LEAVE
-- [ ] **자리 없으면 ENTER 직후 LEAVE 처리** (퇴장 흐름)
-- [ ] **픽업대 주문/음식 큐 임시 구현** (단순 Queue)
-- [ ] **⑭ 만족도 페널티: 일단 ENTER~음식받음 전체 시간으로 통합 측정** (분리는 2주차)
+#### 손님/직원 FSM (Phase 5) ✅ + 추가 작업
+- [x] 손님 FSM 7상태 P 흐름 (`WAIT_AT_SEAT` 추가)
+- [x] 빈 자리 없으면 Init 시점에 즉시 Destroy (자리 선점/확정 로직 같이 정리 — 2주차 작업 땡겨옴)
+- [x] 픽업대 주문/음식 큐 연동 (PassWindowManager 경유)
+- [x] 만족도 페널티 통합 측정 (ENTER 시점부터)
+- [x] **Cook/Server FSM 본격 분리** (원래 2주차) — Server는 IDLE 폴링으로 음식 우선 처리
+- [ ] 손님 길찾기 영역 제한 — 현재 레이아웃상 자연 충족, 본격 A* 영역 필터링은 2주차
 
-#### 추가 짚을 점
-- ⑧ 직원 길찾기 영역 필터링은 2주차에 본격 적용 (1주차에는 enum만)
-- ⑮ 카운터 배치 위치는 2주차에 ScriptableObject로 데이터화
-- ⑯ 손님 자리 점유 시점 변경: 신구조에서는 WALK_TO_SEAT 시작 시점에 자리 예약 (선점), WAIT_AT_SEAT 진입 시 점유 확정
+#### 인프라/패턴 작업 (계획 외 추가)
+- [x] 매니저 싱글톤 패턴 통일 (Counter/Seat/Staff/PassWindowManager + Money/Satisfaction)
+- [x] 자기 등록 패턴: Counter/Seat/PassWindow가 Awake에서 매니저에 자기 등록 → 런타임 생성 오브젝트 자동 추적
+- [x] `TimeSystem._closeHour: 12 → 24` 버그 픽스
 
----
-
-## 10. 2주차 작업 범위
-
-### 10.1 원본 명세 (변경 전, 참고용)
-- 데이터화: 메뉴/조리도구/마케팅을 ScriptableObject로 정리
-- 메뉴 개발: 만족도로 신메뉴 해금
-- 마케팅: 만족도 소비해서 손님 빈도 증가
-- 순위 시스템: 연간 매출 집계 → Top 100 순위 계산
-- UI: 빌드 메뉴, 메뉴 개발 화면, HUD, 결산 화면
-- 맵 확장: 돈으로 매장 넓히기
-- 아트: 회색 박스 → 실제 스프라이트 교체
-
-### 10.2 신규 명세 (확장 반영)
-- **데이터화**: 메뉴/조리도구/가구/카운터/픽업대/마케팅/**직원(종류×등급)** ScriptableObject로 정리
-- **메뉴 개발**: 만족도로 신메뉴 해금 (메뉴별 필요 조리도구 순서 데이터 포함)
-- **마케팅**: 만족도 소비해서 손님 빈도 증가
-- **순위 시스템**: 연간 매출 집계 → Top 100 순위 계산
-- **UI**: 빌드 메뉴, 메뉴 개발 화면, HUD, 결산 화면, **직원 종류/등급 관리 화면**
-- **맵 확장**: 돈으로 매장 넓히기. **확장 단계 3개 (홀1단 → 주방1단 → 홀2단)를 ScriptableObject로 정의** (각 단계: 활성 셀 영역 + 비용 + 해금 조건)
-- **아트**: 회색 박스 → 실제 스프라이트 교체
-
-### 10.3 2주차 신규 작업 (1주차에서 미룬 것 + 추가)
-- **직원 FSM 본격 분리**: 요리사(Cook) FSM + 홀(Server) FSM 분리 (1주차에는 통합)
-- **직원 활동 영역 길찾기 필터링** (Cook = 주방+Border, Server = 홀+Border)
-- **만족도 페널티 분리**: 카운터 대기 페널티 + 음식 대기 페널티
-- **튜토리얼 진입 상태 분기** (시작 카운터 1 + 홀 1 + 테이블 1 → 튜토리얼 클리어로 +1세트씩)
-- **카운터/픽업대 배치 데이터화**: 시작 배치 위치를 ScriptableObject로
-- **자리 점유 선점/확정 로직 정리** (WALK_TO_SEAT 진입 시 예약, WAIT_AT_SEAT 진입 시 확정)
+#### 1주차에서 미룬 것 (2주차로)
+- A* 길찾기 (영역 필터링 포함)
+- 만족도 페널티 분리 (카운터 대기 vs 음식 대기)
+- 메뉴/조리도구 데이터화 — 1주차에 더미값으로 동작 중
 
 ---
 
-## 11. 3주차 작업 범위
+## 10. 2주차 작업 범위 (코드 중심)
 
-### 11.1 원본 명세 (변경 전, 참고용)
-- 세이브/로드: 껐다 켜도 진행도 유지
-- 사운드: BGM + 효과음 7종
-- 손맛: 플로팅 텍스트, 파티클, 카운트업 애니메이션
-- 밸런싱: 난이도 조정 (2회 풀 플레이 테스트)
-- 엣지 케이스: 이상한 상황에서도 에러 안 나게
-- 빌드/포트폴리오: 최종 빌드, 시연 영상, README
+### 10.1 방향성
 
-### 11.2 신규 명세 (확장 반영)
-- **세이브/로드**: 껐다 켜도 진행도 유지 (직원 종류/등급, 확장 단계, 영역 zone 정보 포함)
-- **사운드**: BGM + 효과음 7종
-- **손맛**: 플로팅 텍스트, 파티클, 카운트업 애니메이션
-- **밸런싱**: 난이도 조정 (2회 풀 플레이 테스트). 직원 3종(라이더 포함 시) × 등급 3개 밸런싱 추가
-- **엣지 케이스**: 이상한 상황에서도 에러 안 나게
-- **빌드/포트폴리오**: 최종 빌드, 시연 영상, README
+1주차에 코드 작업이 빨리 진행돼서 일부 2주차 작업(Staff FSM 분리, 자리 선점, PassWindowManager)을 미리 처리함. 남은 UI/유니티 에디터 작업이 시간을 많이 잡아먹을 것으로 예상되어, **2주차는 핵심 게임 시스템 코드 위주**로 진행하고 UI/폴리시는 3주차로 몰빵.
 
-### 11.3 3주차 신규 작업 (확장 반영)
-- **라이더 시스템 도입 검토** (시간 여유 시): 배달 손님 별도 FSM + 라이더 FSM
-- **DT 시스템 도입 검토** (시간 여유 시, 또는 출시 후): 최종 확장 보상으로 해금
-- ※ 라이더/DT는 시간 여유에 따라 3주차에 넣을지, 출시 후 업데이트로 미룰지 결정 — Section 14 TBD
+### 10.2 우선순위
+
+**A. 메뉴/음식/주문 시스템 — 최우선**
+
+지금 모든 더미 데이터(가격, 조리시간, 단일 도구)의 진원지. 이거 들어와야 Cook FSM이 진짜 의미를 가지고 돈/만족도 흐름이 데이터로 작동.
+
+- `MenuData` (이름, 가격, 원가, 조리도구 순서 배열)
+- `ToolData` (도구 종류, 사용 시간)
+- Cook FSM 단계별 도구 순회 실구현 (현재 단일 `_toolPos` 더미 → 메뉴.tools[] 순회)
+- 손님 주문 시 메뉴 선택 → `Order.menu` 보유 → `Counter.ReceiveOrder(menu.price)` 실 가격 반영
+- `Counter._currentPrice` 누락 버그 같이 해소
+
+**B. 조리도구/가구/카운터/픽업대 ScriptableObject 데이터화**
+
+`FurnitureData` 패턴 확장. 메뉴 시스템과 묶여있는 도구 먼저 → 그 외 가구.
+
+**C. A* 길찾기 + 영역 필터링**
+
+- A* Pathfinding Project Free 도입
+- 노드에 zone 정보 반영
+- Customer: Kitchen 진입 금지
+- CookStaff: Hall 진입 금지
+- ServerStaff: 모든 zone 가능 (Kitchen은 PassWindow 셀까지만)
+- 가구 통과 방지
+
+**D. 만족도 페널티 분리**
+
+현재 ENTER~음식받음 통합 측정 → `WAIT_AT_COUNTER 진입~WALK_TO_SEAT 진입` (카운터 대기), `WAIT_AT_SEAT 진입~EAT 진입` (음식 대기) 분리.
+
+**E. 맵 확장 시스템 (코드 레벨)**
+
+- `ExpansionStageData` SO (활성화될 셀 영역 + 비용 + 해금 조건)
+- 3단계 확장 데이터 (홀1단 5×5, 주방1단 4×4, 홀2단 5×7)
+- `GridManager.ActivateCells(stage)` 메서드 — UI 없이 코드/디버그 키로 동작
+- UI는 3주차
+
+**F. 정산/마케팅/순위 시스템 (코드 레벨)**
+
+- 월말 정산: 재료비 = Σ(메뉴 원가 × 판매 개수), 운영비 공식
+- 마케팅 효과: 손님 스폰 빈도 가중치 변경
+- 연말 Top 100 계산식
+- UI는 3주차
+
+**G. 직원 고용/배정/업그레이드 시스템 (로직)**
+
+- 채용 후보 풀 (`StaffCandidatePool`) — 매월 후보 N명 랜덤 생성
+- 등급(Junior/Senior/Manager) 능력치 차이 데이터화
+- 업그레이드 (돈+만족도 비용으로 한 단계 승급)
+- 월말 정산에 일당 통합
+- 채용 UI는 3주차
+
+**H. 라이더 시스템**
+
+- 매장 손님과 별개의 배달 손님(`DeliveryCustomer`) + 라이더 직원(`RiderStaff`) FSM
+- `DeliveryOrderManager`로 배달 주문 발생/관리
+- PassWindowManager 경유로 음식 픽업 → 가상 배달 처리
+
+**I. DT(드라이브 스루) 시스템**
+
+- 매장 손님 FSM 단축 버전(`DTCustomer`) + DT 창구(`DTWindow`)
+- 9×12 최종 확장 이후 해금 (E 맵 확장과 의존)
+- DT 차로는 그리드 외부 표현
+- UI/차량 스프라이트는 3주차
+
+### 10.3 미루는 것 (3주차로)
+
+- UI 전반 (빌드 메뉴, 메뉴 개발, 결산, 직원 관리, 마케팅, 순위 표시, 맵 확장 버튼)
+- 튜토리얼 진입 상태 분기 (지금은 완료 상태로 시작)
+- 회색 박스 → 실제 스프라이트 교체
 
 ---
 
-## 12. 시스템 구성 (1~3주차에서 도출)
+## 11. 3주차 작업 범위 (UI + 폴리시 중심)
 
-### 12.1 1주차 시스템
+### 11.1 방향성
+
+2주차에 게임 시스템 코드가 데이터 기반으로 완성된 상태. 3주차는 **UI 제작 + 아트 교체 + 폴리시**가 메인. 유니티 에디터에서 시간 많이 걸리는 작업이라 충분한 시간 배정.
+
+### 11.2 UI 작업
+
+- **HUD**: 돈, 만족도, 시간(YYYY-MM HH:00), 현재 손님 수 (이미 일부 구현)
+- **빌드 메뉴 UI**: 카테고리별 가구 목록, 가격 표시, 배치 시작 버튼
+- **메뉴 개발 UI**: 잠긴/해금된 메뉴 목록, 만족도 소비 해금 버튼
+- **직원 관리 UI**: 채용/해고/배정/업그레이드. Cook/Server 분리 표시
+- **마케팅 UI**: 마케팅 옵션 목록, 만족도 비용/효과
+- **결산 UI**: 월말 정산 화면 (매출/재료비/운영비 요약)
+- **순위 UI**: 연말 Top 100 표시, 자기 순위 강조
+- **맵 확장 UI**: 다음 확장 단계 미리보기 + 해금 버튼
+
+### 11.3 폴리시
+
+- **아트 교체**: 회색 박스 → 실제 픽셀 스프라이트 (참고 에셋: https://limezu.itch.io/moderninteriors)
+- **사운드**: BGM + 효과음 7종 (결제, 음식 완성, 손님 입장/퇴장 등)
+- **손맛**: 플로팅 텍스트 (+₩, 만족도), 파티클, 카운트업 애니메이션 (DOTween)
+
+### 11.4 영속화/최종화
+
+- **세이브/로드**: JSON으로 진행도 영속화
+  - 돈/만족도/연월/확장 단계
+  - 직원 (종류·등급·배정 카운터)
+  - 배치된 가구/조리도구/카운터/픽업대 (위치·회전)
+  - 해금된 메뉴
+- **밸런싱**: 2회 풀 플레이 테스트 후 수치 조정
+- **엣지 케이스 방어**: 이상 입력/상태 전이 방어
+- **빌드/포트폴리오**: 안드로이드 빌드, 시연 영상, README
+
+
+---
+
+## 12. 시스템 구성
+
+### 12.1 1주차 (완료)
 | 시스템 | 책임 |
 |--------|------|
-| Grid | 9×12 격자, 셀별 활성/zone 관리, 시작 4×8 |
-| Placement | 가구/조리도구/카운터/픽업대 배치/철거/이동 + zone 체크 |
-| Customer AI | 7상태 FSM (Section 4 신구조 P), 영역 제한 길찾기 |
-| Staff AI | enum(Cook/Server) 필드만 분리, 통합 FSM 유지, A* 길찾기 |
-| Counter Management | 카운터-홀 직원 배정, 점유 상태 |
-| PassWindow Management | 픽업대 점유, 주문/음식 큐 |
+| Grid | 9×12 격자, 시작 4×8, `isActive` + `isReserved` + `CellZone`(Kitchen/Hall) |
+| Placement | 가구/조리도구/카운터/픽업대 배치/철거/이동 + zone 체크, `PlaceInitial` 시작 배치 |
+| GameInitializer | 시작 시 카운터/픽업대/조리도구/테이블 일괄 배치, `StaffManager.Init()` 트리거 |
+| Customer AI | 7상태 P 흐름 FSM, 자리 선점(Init), 만족도 페널티 통합 측정 |
+| CookStaff AI | 주방 FSM 독립 클래스 — IDLE → 도구 → PassWindow |
+| ServerStaff AI | 홀 FSM 독립 클래스 — IDLE 폴링 (음식 우선 / 주문 응대) |
+| Counter Management | 싱글톤 매니저, 자기 등록, Server-카운터 1:1 배정 |
+| Seat Management | 싱글톤 매니저, 자기 등록 |
+| PassWindow + PassWindowManager | 픽업대 큐(주문/음식), 매니저로 다중 픽업대 대비 |
 | Time | 영업 16시간 = 실시간 4분 = 한 달 |
-| Money / Satisfaction | 기본 재화 시스템, 페널티 통합 측정 |
-| Camera | 세로 화면 고정 카메라 |
+| Money / Satisfaction | 싱글톤, 기본 재화 시스템 (정산은 더미) |
+| Camera | 세로 화면 고정, Ortho Size = 6 |
 
-### 12.2 2주차 시스템
+### 12.2 2주차 (코드 중심)
 | 시스템 | 책임 |
 |--------|------|
-| Data (ScriptableObject) | 메뉴, 조리도구, 가구, 카운터, 픽업대, 마케팅, 직원(종류×등급) 데이터 |
-| Menu Development | 만족도로 신메뉴 해금 |
-| Marketing | 만족도 소비 → 손님 빈도 증가 |
-| Ranking | 연간 매출/평판 → Top 100 순위 계산 |
-| UI | 빌드/메뉴 개발/HUD/결산/직원 관리 |
-| Map Expansion | 돈으로 매장 넓히기 (3단계 확장, 셀+비용+해금 조건 데이터화) |
-| Monthly Settlement | 재료비/운영비 차감 |
-| Staff FSM 분리 | Cook FSM + Server FSM, 영역 필터링 |
-| Satisfaction 페널티 분리 | 카운터 대기 + 음식 대기 별도 측정 |
-| Tutorial | 시작 진입 상태 분기 |
+| Menu Data (SO) | 이름, 가격, 원가, 조리도구 순서 배열 |
+| Tool Data (SO) | 도구 종류, 사용 시간 |
+| Cook FSM 실구현 | 메뉴.tools[] 순회 처리 |
+| Order/Food 확장 | menu 참조 보유, 실제 가격 흐름 |
+| Furniture/Counter/PassWindow SO | 가격/크기/배치 zone 데이터화 |
+| A* Pathfinding | 영역 zone 필터링 + 가구 회피 |
+| Satisfaction 페널티 분리 | 카운터 대기 + 음식 대기 분리 측정 |
+| Map Expansion (코드) | 3단계 확장 데이터 + `ActivateCells(stage)` |
+| Settlement | 재료비/운영비 실 계산 |
+| Marketing (로직) | 스폰 가중치 변경 |
+| Ranking (계산) | Top 100 점수 계산식 |
 
-### 12.3 3주차 시스템
+### 12.3 3주차 (UI + 폴리시)
 | 시스템 | 책임 |
 |--------|------|
-| Save/Load | JSON으로 진행도 영속화 (확장 단계/zone/직원 종류·등급 포함) |
+| HUD | 돈, 만족도, 시간, 손님 수 |
+| Build Menu UI | 카테고리/가격/배치 시작 |
+| Menu Development UI | 잠긴/해금 메뉴, 해금 버튼 |
+| Staff Management UI | 채용/해고/배정/업그레이드 |
+| Marketing UI | 옵션/비용/효과 |
+| Settlement UI | 월말 정산 요약 |
+| Ranking UI | 연말 Top 100 표시 |
+| Map Expansion UI | 다음 단계 미리보기 + 해금 |
+| Tutorial | 시작 진입 상태 분기 (카운터 1 + 홀 1 + 테이블 1) |
+| Art | 회색 박스 → 실제 스프라이트 |
 | Audio | BGM + 효과음 7종 |
 | Juice/Polish | 플로팅 텍스트, 파티클, 카운트업 |
-| Balancing | 풀 플레이 테스트 기반 |
-| Edge Cases | 예외 처리 |
+| Save/Load | JSON 영속화 |
+| Balancing | 풀 플레이 테스트 기반 수치 조정 |
+| Edge Cases | 예외 방어 |
 | Build/Portfolio | 빌드, 영상, README |
-| Rider (시간 여유 시) | 배달 손님 + 라이더 FSM |
-| DT (시간 여유 시) | 최종 확장 보상 시스템 |
+| Rider/DT (선택) | 시간 여유 시 |
 
 ---
 
@@ -537,7 +614,18 @@ DELIVER_TO_CUSTOMER   (손님에게 음식 전달)
     - 3주차 또는 그 이후: Rider 추가 검토
 21. **직원 등급 3단계: 신입 / 경력 / 매니저 유지** *(추가)*
 22. **DT 시스템 = 최종 확장 보상**. 9×12 완성 이후 해금. 3주차 또는 그 이후 검토 *(추가)*
-23. **셀별 활성 플래그 + zone(Kitchen/Hall/Border) 관리** *(추가)*
+23. **셀별 활성 플래그 + zone(Kitchen/Hall) 관리** *(추가, 1주차 구현 시 단순화 — Border/Inactive는 필요 시 도입)*
+24. **셀별 `isReserved` 플래그 + `HashSet<Vector2Int>`로 시스템 예약 셀(입구, 픽업대 등) 관리** *(추가)*
+25. **매니저 싱글톤 패턴 통일** — `CounterManager`, `SeatManager`, `StaffManager`, `PassWindowManager`, `MoneySystem`, `SatisfactionSystem` 모두 `Instance` 정적 참조 *(추가)*
+26. **자기 등록 패턴** — Counter/Seat/PassWindow는 Awake에서 해당 매니저에 자기 등록 → 런타임 생성 오브젝트 자동 추적 *(추가)*
+27. **`PassWindowManager` 도입** — 다중 픽업대 대비 매니저 패턴, 직원은 매니저 API만 호출. 1주차 단일, 2주차 다중 확장 *(추가)*
+28. **Staff FSM 완전 분리** — `Staff` base 없이 `CookStaff` / `ServerStaff` 독립 클래스. 공통 코드 적어서 상속/베이스 미사용 *(추가, 2주차 작업을 1주차에 진행)*
+29. **Server는 폴링 방식** — Counter가 알림(push) 안 하고, Server가 `IDLE_AT_COUNTER`에서 `_assignedCounter.WaitingCustomer`와 `PassWindowManager.HasReadyFood()`를 폴링. 음식 우선 처리 *(추가)*
+30. **Server가 IDLE에서 음식 즉시 큐에서 dequeue** — 여러 Server 헛걸음 방지. "멘탈 클레임" 방식 *(추가)*
+31. **음식은 owner 없음** — `Food.order.customer` 참조로 운반 대상만 식별. 누구든 가져가서 배달 *(추가)*
+32. **`GameInitializer` + `PlacementSystem.PlaceInitial()`** — 시작 배치 일괄 처리. 런타임 등록 순서 보장 (시작 가구 배치 → `StaffManager.Init()`) *(추가)*
+33. **손님 자리 선점 시점 = Init (스폰 시점)** — 자리 없으면 즉시 Destroy. WALK_TO_SEAT/WAIT_AT_SEAT 진입 시 별도 점유 단계 없음 *(추가, 2주차 작업을 1주차에 진행)*
+34. **Unity y-up 좌표계 사용** — 설계 문서의 "좌상단 (0,0)"과 y축이 뒤집힘. 입구 셀은 (0,0), 주방은 y=5~7 (위쪽), 홀은 y=0~4 (아래쪽) *(추가)*
 
 ---
 
