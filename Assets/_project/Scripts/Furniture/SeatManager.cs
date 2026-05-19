@@ -3,13 +3,16 @@ using UnityEngine;
 
 public class SeatManager : MonoBehaviour
 {
+    public static SeatManager Instance;
     private List<Seat> seats = new();
 
-    
     private void Awake()
     {
-        seats.AddRange(FindObjectsByType<Seat>(FindObjectsSortMode.None));
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        Instance = this;
+        // FindObjectsByType 제거
     }
+
     public Seat GetFirstAvailableSeat()
     {
         foreach (Seat seat in seats)

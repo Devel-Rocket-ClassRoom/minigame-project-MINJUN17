@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class CounterManager : MonoBehaviour
 {
+    public static CounterManager Instance;
     private List<Counter> counters = new();
     [SerializeField] private GameObject counterPrefab;
-    [SerializeField] private Transform[] startSpawnPoints;
     
 
     public int CounterCount => counters.Count;
@@ -15,20 +15,8 @@ public class CounterManager : MonoBehaviour
 
     private void Awake()
     {
-        SpawnInitialCounters();
-    }
-
-    private void SpawnInitialCounters()
-    {
-        if (counterPrefab == null || startSpawnPoints == null) return;
-
-        foreach (var point in startSpawnPoints)
-        {
-            if (point == null) continue;
-            var go = Instantiate(counterPrefab, point.position, point.rotation);
-            if (go.TryGetComponent(out Counter counter))
-                RegisterCounter(counter);
-        }
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        Instance = this;
     }
 
     public Counter GetReadyCounter()

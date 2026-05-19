@@ -20,6 +20,11 @@ public class Counter : MonoBehaviour
     private Customer _waitingCustomer;
     public Customer WaitingCustomer => _waitingCustomer;
 
+    private void Awake()
+    {
+        CounterManager.Instance.RegisterCounter(this);
+    }
+
     public void Reserve()
     {
         // 손님이 카운터로 출발하는 순간 호출 — 다른 손님이 못 가져가게 즉시 점유 표시
