@@ -10,9 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 71b6d6edfdc5c4d48bd6304ba69e48cf, type: 3}
-  m_Name: TestStaff
+  m_Name: TestServerStaff
   m_EditorClassIdentifier: Assembly-CSharp::StaffData
   Type: 0
+  Role: 1
   hireCost: 0
   salary: 0
   moveSpeed: 2

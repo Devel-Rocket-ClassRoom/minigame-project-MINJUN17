@@ -636,6 +636,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1118384911}
+  - component: {fileID: 1118384922}
   - component: {fileID: 1118384910}
   - component: {fileID: 1118384916}
   - component: {fileID: 1118384915}
@@ -794,10 +795,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb33115de0755b542ab1cc239f28be8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaffManager
-  counterManager: {fileID: 1118384914}
-  staffPrefab: {fileID: 7644904084745166977, guid: 6a92917207efc234f9e3e2ab7be0a39a, type: 3}
-  starterStaffData: {fileID: 11400000, guid: 5d2eb3138119569498296b90770ca39e, type: 2}
+  cookStaffPrefab: {fileID: 2745432210784163718, guid: 5cfe7435734a8df438482e12b153b0a7, type: 3}
+  serverStaffPrefab: {fileID: 7600616054015399713, guid: e5841e042147b5140b58d3e073d8886a, type: 3}
+  starterCookData: {fileID: 11400000, guid: 5d2eb3138119569498296b90770ca39e, type: 2}
+  starterServerData: {fileID: 11400000, guid: 8b9c81dbdfd53ba4fa9779c3119f5f42, type: 2}
   toolPos: {fileID: 1913861041}
+  kitchenIdlePos: {fileID: 2129540808}
 --- !u!114 &1118384917
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -870,6 +873,18 @@ MonoBehaviour:
   chairData: {fileID: 11400000, guid: 74de6b7a3626ae640897fd30ff46ae6d, type: 2}
   grillData: {fileID: 11400000, guid: 0e0e5be2ebdaf7640abe99ff71492aa3, type: 2}
   passWindowData: {fileID: 11400000, guid: 566169bc16ffb764399c096a70f75dac, type: 2}
+--- !u!114 &1118384922
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1118384907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6e0269b56fc8c0448142725f82c5608, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PassWindowManager
 --- !u!1 &1189613674
 GameObject:
   m_ObjectHideFlags: 0
@@ -1324,6 +1339,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2246993635534829351, guid: c05f9d3be9148604abb07b1d6f593e8c, type: 3}
   m_PrefabInstance: {fileID: 5486837871139133130}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2129540807
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2129540808}
+  m_Layer: 0
+  m_Name: KitchenIdlePos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2129540808
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2129540807}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.5, y: 6.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &5486837871139133130
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1394,3 +1440,4 @@ SceneRoots:
   - {fileID: 5486837871139133130}
   - {fileID: 263340472}
   - {fileID: 728917152}
+  - {fileID: 2129540808}
