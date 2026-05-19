@@ -19,5 +19,6 @@ public class PlacedObjectInit : MonoBehaviour
         placementSystem.PlaceInitial(chairData, new Vector2Int(3, 0));
         placementSystem.PlaceInitial(chairData, new Vector2Int(1, 1));
         placementSystem.PlaceInitial(chairData, new Vector2Int(3, 1));
+        StaffManager.Instance.Init();
     }
 }

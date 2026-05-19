@@ -22,7 +22,7 @@ public class StaffManager : MonoBehaviour
         Instance = this;
     }
 
-    private void Start()
+    public void Init()
     {
         // 시작 시 신입 1명 자동 고용 + 첫 빈 카운터에 자동 배정 (튜토리얼 초기 상태)
         if (starterStaffData == null) return;
