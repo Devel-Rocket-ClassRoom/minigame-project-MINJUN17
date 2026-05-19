@@ -2,23 +2,21 @@ using UnityEngine;
 
 public class Counter : MonoBehaviour
 {
-    [SerializeField] private ServerStaff assignedStaff;   // null = 빈 카운터
-    [SerializeField] private Transform servicePos;        // 인스펙터 연결
-    [SerializeField] private Transform staffPos;          // 인스펙터 연결
+    [SerializeField] private Transform servicePos;
+    [SerializeField] private Transform staffPos;
 
     public Transform ServicePos => servicePos;
     public Transform StaffPos => staffPos;
-    public ServerStaff AssignedStaff => assignedStaff;
-    public bool IsEmpty => assignedStaff == null;
-
-    public void AssignStaff(ServerStaff staff) => assignedStaff = staff;
-    public void UnassignStaff() => assignedStaff = null;
 
     private bool _isOccupied;
     public bool IsOccupied => _isOccupied;
 
     private Customer _waitingCustomer;
     public Customer WaitingCustomer => _waitingCustomer;
+
+    private ServerStaff _servicingServer;
+    public ServerStaff ServicingServer => _servicingServer;
+    public bool HasServicingServer => _servicingServer != null;
 
     private void Awake()
     {
@@ -27,17 +25,15 @@ public class Counter : MonoBehaviour
 
     public void Reserve()
     {
-        // 손님이 카운터로 출발하는 순간 호출 — 다른 손님이 못 가져가게 즉시 점유 표시
         _isOccupied = true;
     }
 
     public void OnCustomerArrived(Customer c)
     {
-        if (IsEmpty) return;
         _isOccupied = true;
         _waitingCustomer = c;
-        // Server가 IDLE에서 폴링해서 가져감 (push 알림 없음)
     }
+
     public void OnCustomerPaid(int price)
     {
         _isOccupied = false;
@@ -46,5 +42,17 @@ public class Counter : MonoBehaviour
         {
             MoneySystem.Instance.Earn(price);
         }
+    }
+
+    public bool TryClaim(ServerStaff server)
+    {
+        if (_servicingServer != null) return false;
+        _servicingServer = server;
+        return true;
+    }
+
+    public void ReleaseClaim(ServerStaff server)
+    {
+        if (_servicingServer == server) _servicingServer = null;
     }
 }

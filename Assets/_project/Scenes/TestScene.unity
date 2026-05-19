@@ -790,6 +790,7 @@ MonoBehaviour:
   exitPoint: {fileID: 1510811181}
   _minSpawnInterval: 1
   _maxSpawnInterval: 2
+  waitingSlots: []
 --- !u!114 &1118384916
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -807,6 +808,10 @@ MonoBehaviour:
   starterCookData: {fileID: 11400000, guid: 0bd73b5a0e5c6ab4aab5bcbfd61c608e, type: 2}
   starterServerData: {fileID: 11400000, guid: 9ec0cdf7aa2f6404c94c5e9943a0a76f, type: 2}
   kitchenIdlePos: {fileID: 2129540808}
+  timeSystem: {fileID: 1118384919}
+  cookGrades: []
+  serverGrades: []
+  riderGrades: []
 --- !u!114 &1118384917
 MonoBehaviour:
   m_ObjectHideFlags: 0

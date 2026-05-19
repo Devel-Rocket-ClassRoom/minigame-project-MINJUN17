@@ -80,7 +80,8 @@
 
 ### 4.1 상태 흐름
 ```
-ENTER                (입구에서 스폰)
+WAIT_FOR_SEAT        (자리 대기. 자리 비면 진입, patience 초과 시 LEAVE)
+ENTER                (자리 확보 후 카운터 줄로 이동)
 WALK_TO_COUNTER      (빈 카운터로 이동)
 WAIT_AT_COUNTER      (카운터 점유, 홀 직원 응대 대기 → 주문/결제)
 WALK_TO_SEAT         (자리로 이동, 카운터 점유 해제)
@@ -90,25 +91,25 @@ LEAVE                (퇴장)
 ```
 
 ### 4.2 상세 규칙
-- **ENTER**: 입구(홀 좌하단 (0,7))에서 스폰. 평판/점수에 따라 빈도 결정.
-  - 빈 카운터가 있고 빈 자리도 있으면 → `WALK_TO_COUNTER`
-  - **빈 자리가 없으면 즉시 LEAVE** (만족도 감소 없음, 손님 카운트만 -)
-  - 모든 카운터 점유 중일 때 신규 손님 행동: TBD (대기? 퇴장?)
-- **WALK_TO_COUNTER**: 빈 카운터 탐색 후 이동. 도착 → `WAIT_AT_COUNTER`
+- **WAIT_FOR_SEAT** *(이슈 #51에서 변경)*: 스폰 즉시 진입. `CustomerManager.waitingSlots`의 대기 위치로 이동. 매 프레임 `SeatManager.GetFirstAvailableSeat()` 폴링.
+  - 자리 확보 → 좌석/카운터 큐 등록, `_waitStartTime` 리셋 → `ENTER`
+  - `Time.time - _spawnTime > _data.patience` → 만족도 0으로 LEAVE (평판만 떨어짐, 만족도 풀에는 0 가산이라 영향 없음)
+  - 대기 슬롯 수보다 대기 인원이 많으면 마지막 슬롯에 겹쳐서 대기
+- **ENTER**: 자리 + 카운터 줄(`QueueManager`) 확보 완료. 카운터 줄의 자기 슬롯으로 이동. 줄 맨 앞이고 카운터가 비어있으면 → `WALK_TO_COUNTER`
+- **WALK_TO_COUNTER**: 빈 카운터로 이동(카운터는 `Reserve()` 호출되어 다른 손님 차단). 도착 → `WAIT_AT_COUNTER`
 - **WAIT_AT_COUNTER**: 손님이 카운터 점유. 홀 직원에게 주문. 결제(돈 증가). 대기 시간이 길수록 만족도 페널티(카운터 대기 페널티). 결제 완료 → `WALK_TO_SEAT`
-- **WALK_TO_SEAT**: 빈 자리 탐색 후 이동. 카운터 점유 해제. 도착 → `WAIT_AT_SEAT`
-- **WAIT_AT_SEAT**: 자리 점유. 홀이 픽업대에서 음식 받아 자리로 가져올 때까지 대기. 대기 시간이 길수록 만족도 페널티(음식 대기 페널티). 음식 받음 → `EAT`
-- **EAT**: TBD초 식사. 만족도 증가 (인테리어 등 반영해서 랜덤). → `LEAVE`
-- **LEAVE**: 자리 해제. 출구(입구와 동일)로 이동. 도착 시 파괴. 만족도 → 평판 반영
+- **WALK_TO_SEAT**: 자리로 이동. 카운터 점유 해제. 도착 → `WAIT_AT_SEAT`
+- **WAIT_AT_SEAT**: 자리 점유. 홀이 픽업대에서 음식 받아 자리로 가져올 때까지 대기. 음식 받음 → `EAT`
+- **EAT**: 식사. 만족도 증가. → `LEAVE`
+- **LEAVE**: 자리 해제. 출구로 이동. 도착 시 파괴. 만족도 → `SatisfactionSystem.Earn`, 평판 → `ReputationSystem.Report`
 
 ### 4.3 구현 노트
-- 카운터 점유 상태는 카운터가 관리 (`bool isOccupied`)
+- 카운터 점유 상태는 카운터가 관리 (`bool _isOccupied`)
 - 자리 점유 상태는 자리가 관리 (`bool isOccupied`)
-- 손님 길찾기: 주방 영역 진입 금지 (영역 zone 필터링)
-- 카운터 대기시간 측정: `WAIT_AT_COUNTER` 진입 ~ `WALK_TO_SEAT` 진입
-- 음식 대기시간 측정: `WAIT_AT_SEAT` 진입 ~ `EAT` 진입
-- 1주차에는 두 대기시간 통합 측정으로 임시 처리, 2주차에 분리
-- 만족도 계산식: TBD
+- 손님 길찾기: 주방 영역 진입 금지 (영역 zone 필터링, 2주차)
+- 카운터 대기시간 측정: `_waitStartTime`(자리 확보 시점 리셋) ~ `EAT` 진입. 즉 자리 대기는 patience 페널티에서 제외 — 별도 타임아웃으로 LEAVE 처리
+- 만족도 계산식: 기본값 + 직원 친절도 보너스 + 식사 중 가산 - 대기 페널티. EAT 진입 시 카운터 대기 페널티 정산
+- `_satisfaction = 0`은 평판에 0 가산이라 평판 평균을 내림 (페널티 효과)
 
 ---
 
@@ -116,18 +117,23 @@ LEAVE                (퇴장)
 
 ### 5.1 직원 종류
 - **요리사 (Cook)**: 주방 영역 상주. 카운터 배정 X. 픽업대에서 주문 확인 → 조리도구 순회 → 픽업대에 음식 놓기.
-- **홀 (Server)**: 카운터 배정. 손님 응대 → 주문/결제 → 픽업대에서 음식 픽업 → 자리에 전달. **(설거지는 2주차 이후 추가)**
-- **라이더 (Rider)**: 배달 손님 전담. **1주차에는 구현하지 않음.** 2주차 이후 별도 시스템.
+- **홀 (Server)**: **풀로 운영(카운터 귀속 X)**. 손님이 도착한 카운터로 가장 가까운 idle 서버가 가서 응대. 픽업대 음식 픽업 → 자리에 전달.
+- **라이더 (Rider)**: 배달 손님 전담. 미구현. 라이더 시스템 도입 시 `StaffCandidatePool.isDeliveryUnlocked` 토글로 후보 풀에 포함.
 
-### 5.2 카운터-직원 배정
-- **카운터 1개당 홀 직원 1명 배정**
-- 요리사는 카운터에 배정되지 않고 주방 영역에 상주
-- 시작 시 카운터 2개 배치 (자세한 시작 인원은 Section 5.6)
+### 5.2 카운터-직원 배정 *(이슈 #51에서 변경)*
+- **카운터-직원 귀속 폐기**. 1:1 비율은 채용 한도(`MaxServerCount = CounterManager.CounterCount`)로만 유지
+- 요리사 채용 한도도 카운터 수와 동일 (`MaxCookCount = CounterManager.CounterCount`)
+- ServerStaff IDLE 우선순위:
+  1. PassWindow에 준비된 음식 있으면 픽업
+  2. `CounterManager.GetCounterWithUnservedCustomer()`로 미점유 대기 손님이 있는 카운터를 찾아 `TryClaim` → 응대
+  3. 없으면 가장 가까운 빈 카운터의 `staffPos`로 이동 (다른 서버가 idle 타겟으로 잡지 않은 슬롯 중 거리 최단)
+- 카운터는 `_servicingServer` 필드 + `TryClaim/ReleaseClaim`으로 같은 손님에 서버 2명 가는 것 차단
 
 ### 5.3 직원 등급 (Cook/Server/Rider 공통)
-- **신입 / 경력 / 매니저** 3등급 유지
-- 등급은 능력치(속도, 만족도 보너스 등) 차이로 표현
-- 등급은 ScriptableObject 데이터 (2주차)
+- **Junior / Senior / Manager** 3등급
+- 등급별 ScriptableObject 자산: `Cook_Junior/Senior/Manager`, `Server_Junior/Senior/Manager`, `Rider_Junior/Senior/Manager` (총 9개, 인스펙터에서 `StaffManager.cookGrades/serverGrades/riderGrades` 리스트에 등록)
+- 능력치: `moveSpeed`, `kindness`, `speedMultiplier`, `hireCost`, `salary`
+- **등급 데이터 튜닝 규칙**: Junior 12개월 성장 누적치(베이스 × 1.36)보다 Senior 베이스가 높도록 설정. 마찬가지로 Senior 36% 성장치보다 Manager 베이스가 높도록.
 
 ### 5.4 요리사(Cook) 상태 흐름
 ```
@@ -168,28 +174,73 @@ DELIVER_TO_CUSTOMER   (손님에게 음식 전달)
 - 길찾기 노드에 영역 정보 반영, 직원 역할에 따라 가능 노드 필터링
 - 1주차 끝물에는 enum/필드만 잡아두고, 실제 필터링은 2주차
 
-### 5.8 시작 인원 (1주차 테스트용, 튜토리얼 완료 상태)
-- 시작 카운터 2개 (둘 다 작동)
-- 시작 요리사 1명
-- 시작 홀 2명 (카운터 2개에 각각 배정)
-- 시작 테이블 세트 2개 (책상1 + 의자2) × 2
-- ※ 튜토리얼 진입 상태(카운터 1 + 홀 1 + 테이블 1)는 2주차 이후 구현 예정
+### 5.8 시작 인원 (튜토리얼 완료 상태) *(변경됨)*
+- 시작 카운터 1개
+- 시작 요리사 1명 (Junior)
+- 시작 홀 1명 (Junior)
+- 시작 테이블 세트 (현재 구현 기준 유지)
+- ※ 튜토리얼 진입 상태는 3주차 UI 작업 시 구현
 
-### 5.9 직원 업그레이드
-- 돈과 만족도로 업그레이드 가능 (구체적 효과 TBD)
-- 종류별로 다른 스탯 (요리사 = 조리 속도, 홀 = 이동/응대 속도 등)
-- 등급 진급(신입 → 경력 → 매니저)도 업그레이드 경로
+### 5.9 직원 근속/성장 *(이슈 #51 신규)*
+- 채용 이후 누적 개월(`_tenureMonths`)이 매월(`OnDayStarted`) +1
+- 매월 능력치 +3%, 12개월까지 누적(최대 +36%, 캡 `_growthBumps == 12`)
+- role별 성장 적용 스탯:
+  - Cook → `speedMultiplier` (조리속도, `CookStaff.EffectiveSpeedMultiplier`)
+  - Server → `kindness` (친절도, `ServerStaff.EffectiveKindness`)
+  - Rider → `speedMultiplier` (배달속도, 구현 시)
+- `EffectiveMoveSpeed`는 성장 미적용, 변동치만 반영
+- 업그레이드해도 `_tenureMonths`/`_growthBumps`/`_growthMultiplier` 보존(누적치 안 사라짐)
+- 성장 매월 틱은 `StaffManager.MonthTick`이 `TimeSystem.OnDayStarted` 구독해서 전체 직원에 일괄 호출
 
-### 5.10 직원 추가
-- 카운터 추가하면 추가 홀 직원 채용해야 그 카운터 작동
-- 요리사는 카운터와 별개로 추가 채용 가능
-- 채용 비용/일당: TBD
+### 5.10 직원 업그레이드(승급) *(이슈 #51 신규)*
+- 자격 조건 (`Staff.CanUpgrade`):
+  - 다음 등급 = Senior: 누적 6개월 이상
+  - 다음 등급 = Manager: 누적 12개월 이상
+  - 등급 무관 같은 누적 기준. 채용 시 Junior든 Senior든 채용 시점부터 카운트
+  - **Junior → Manager 직행 불가**: 항상 Senior 거쳐서. 누적 12개월차 Junior는 `UpgradeCook/Server` 두 번 연속 호출로 한 번에 Senior→Manager 가능
+- 비용: **`next.hireCost / 2`** (만족도 비용 없음)
+- 호출: `StaffManager.UpgradeCook(staff)` / `UpgradeServer(staff)` — 다음 등급 자동 조회(`GetNextGrade`)
+- `SetData(nextGrade)` 시 데이터만 갈아끼움, 성장 누적치 유지
 
-### 5.11 메뉴-조리도구 매핑
+### 5.11 직원 모집 시스템 *(이슈 #51 신규)*
+- 후보는 자동 생성 X, **모집권을 사야 생김**
+- 모집권 티어: **Normal / High / Rare**
+  - 인스펙터(`StaffCandidatePool.tierConfigs`)에 각 티어의 만족도 비용 + Junior/Senior/Manager weight 등록
+  - 제안값: Normal(비용 50, 80/18/2), High(150, 40/50/10), Rare(400, 10/55/35)
+- 모집권 구매 = 만족도 차감(`SatisfactionSystem.Spend`) + 2개월 지연 큐(`_pendingTickets`) 추가
+- **영업일당 모집권 1회만 구매 가능** (`_purchasedThisMonth` 플래그, 매월 `OnDayStarted`에서 리셋)
+- 2개월 후(`monthsRemaining == 0`) 후보 2명 자동 생성:
+  - 역할: `isDeliveryUnlocked` 플래그 — false면 Cook/Server 50:50, true면 Cook/Server/Rider 1/3씩
+  - 등급: 티어 weight 가중치 추첨
+  - 능력치: ±10% 변동치(`_hireVariance`) 1개를 뽑아서 `moveSpeed/kindness/speedMultiplier/salary`에 일괄 적용 (능력↑ ⇒ 월급↑). `hireCost`는 변동 없음
+- 후보 풀은 통합 단일 리스트, **최대 5명** 캡. 초과 시 가장 오래된 후보 자동 제거(FIFO). 만료 없음
+- 채용 시: `StaffCandidatePool.Hire(candidate)` → `StaffManager.HireXxxStaff(baseData, hireVariance)` → 직원 인스턴스에 `_hireVariance` 저장됨 → 업그레이드해도 변동치 그대로 유지
+
+### 5.12 메뉴-조리도구 매핑
 - 각 메뉴는 하나 이상의 조리도구를 순회해서 만들어짐
 - 예시: 햄버거는 그릴(패티) + 작업대(조립) 순회
 - 어떤 메뉴가 어떤 도구 순서로 가는지: TBD (메뉴 데이터에 포함)
 - 단일 도구 메뉴도 가능 (예: 음료는 음료 디스펜서 1번)
+
+### 5.13 직원 클래스 구조 *(이슈 #51 신규)*
+```
+Staff (abstract MonoBehaviour)         ← 공통 필드/로직
+  ├─ _data, id, _stateTimer
+  ├─ _tenureMonths, _growthBumps, _growthMultiplier
+  ├─ _hireVariance
+  ├─ Data, EffectiveMoveSpeed, EffectiveSalary 프로퍼티
+  ├─ CanUpgrade, SetData, TickMonth, InitBase, MoveTowards
+  │
+  ├─ CookStaff : Staff                 ← 주방 FSM
+  │    ├─ CookState 상태머신
+  │    └─ EffectiveSpeedMultiplier 프로퍼티
+  │
+  ├─ ServerStaff : Staff               ← 홀 FSM
+  │    ├─ ServerState 상태머신
+  │    └─ EffectiveKindness 프로퍼티
+  │
+  └─ (RiderStaff : Staff)              ← 추후 추가
+```
 
 ---
 
@@ -292,18 +343,34 @@ DELIVER_TO_CUSTOMER   (손님에게 음식 전달)
 | 돈 | 손님 결제 | 가구/조리도구 구매, 직원(종류별/등급별) 채용/업그레이드, 맵 확장, 운영비, 재료비 |
 | 만족도 | 손님 식사 후 (대기시간/인테리어 반영, 랜덤) | 신메뉴 해금, 마케팅 |
 
-### 7.2 정산 (인게임 한 달마다)
-- **재료비** = Σ (메뉴 원가 × 그 달에 팔린 개수)
-- **운영비** = f(가게 크기, 직원 수, 직원 등급) — 구체 공식 TBD
+### 7.2 정산 (인게임 한 달마다) *(이슈 #50에서 구현)*
+- `MoneySystem.SettleMonthly()` 호출:
+  - **재료비** = `SalesTracker.CalculateMaterialCost()` = Σ(메뉴 원가 × 판매 개수)
+  - **운영비** = `GridManager.ActiveCellCount × PricePerSquareMeter` (셀당 비용은 인스펙터)
+  - **일당** = `StaffManager.CalculateTotalSalaryCost()` = Σ(직원 `EffectiveSalary`)
+- 정산 후 `SalesTracker.ResetMonthly()` 호출 (메뉴 판매 통계 리셋)
 
-### 7.3 평판
-- 손님 빈도에 영향
-- 만족도와 어떻게 연결되는지: TBD
+### 7.3 평판 *(이슈 #50에서 구현, 의미 변경)*
+- **손님 빈도에 영향 없음** (스폰 가중치 multiplier 제거됨)
+- `ReputationSystem.AnnualReputation` = 1년간 손님 만족도 합산(`int customerSatisfaction` 누적)
+- 손님이 LEAVE 진입 시 `ReputationSystem.Report(_satisfaction)` 호출
+- 연말(`OnYearEnded`)에 `RankingSystem`이 사용 후 `ResetAnnual()`
 
-### 7.4 Top 100 순위 (인게임 매년)
-- 기준: 매출, 가게 평판
-- 가중치 / 점수 계산식: TBD
-- 최종 목표: 1등
+### 7.4 Top 100 순위 (인게임 매년) *(이슈 #50에서 구현)*
+- 트리거: `TimeSystem.OnYearEnded` (12월 → 1월 롤오버)
+- 점수 = `AnnualRevenue / revenueDivisor + AnnualReputation`
+  - 기본 `revenueDivisor = 100` (매출 100분의 1로 축소해서 평판 합산)
+- 점수 ≥ `minQualifyingScore`(인스펙터) 미달 시 순위 미표시 (Qualified=false)
+- 자격 충족 시 인스펙터의 `dummyTop100`(내림차순 정렬된 더미 점수 리스트)과 대조해 자기 순위 산출
+- 점수 임계값/더미 데이터는 1년 플레이 후 캘리브레이션 예정 (TBD)
+
+### 7.5 마케팅 *(이슈 #50에서 구현)*
+- `MarketingData` (SO): `satisfactionCost`, `spawnBoost`, `durationMonths`
+- `MarketingManager.Apply(data)` → 만족도 차감 + `_pending` 큐에 추가 (오늘 효과 X)
+- 다음 영업일 `OnDayStarted`에 `_pending` → `_active`로 이동, 효과 시작
+- 매 영업일마다 활성 캠페인 `RemainingMonths -= 1`, 0이면 자동 만료
+- 손님 스폰 빈도 가중치: `multiplier = 1 + ln(1 + Σspawnboost)` — 누적될수록 디미니싱, 절대 감소하지 않음
+- `CustomerManager.SetMarketingMultiplier(m)` → `RollSpawnInterval`에서 `baseInterval / multiplier`
 
 ---
 
@@ -458,19 +525,26 @@ DELIVER_TO_CUSTOMER   (손님에게 음식 전달)
 - `GridManager.ActivateCells(stage)` 메서드 — UI 없이 코드/디버그 키로 동작
 - UI는 3주차
 
-**F. 정산/마케팅/순위 시스템 (코드 레벨)**
+**F. 정산/마케팅/순위 시스템 (코드 레벨)** ✅ 완료 (이슈 #50)
 
-- 월말 정산: 재료비 = Σ(메뉴 원가 × 판매 개수), 운영비 공식
-- 마케팅 효과: 손님 스폰 빈도 가중치 변경
-- 연말 Top 100 계산식
+- ✅ 월말 정산: `MoneySystem.SettleMonthly` 구현. 재료비/운영비/일당 통합 차감, 메뉴 판매 통계 리셋
+- ✅ 마케팅: `MarketingData` SO + `MarketingManager` — 다음 영업일부터 효과, 개월 단위 지속, `ln(1+Σboost)` 디미니싱 (절대 감소 없음)
+- ✅ 평판: `ReputationSystem` — 1년 만족도 누적 (스폰 빈도 영향 X)
+- ✅ 연말 순위: `RankingSystem` — `OnYearEnded` 트리거, `score = 매출/100 + 평판합`, 임계점 미만 미표시
+- ✅ `TimeSystem.OnYearEnded` 이벤트 추가
 - UI는 3주차
 
-**G. 직원 고용/배정/업그레이드 시스템 (로직)**
+**G. 직원 고용/배정/업그레이드 시스템 (로직)** ✅ 완료 (이슈 #51)
 
-- 채용 후보 풀 (`StaffCandidatePool`) — 매월 후보 N명 랜덤 생성
-- 등급(Junior/Senior/Manager) 능력치 차이 데이터화
-- 업그레이드 (돈+만족도 비용으로 한 단계 승급)
-- 월말 정산에 일당 통합
+- ✅ 카운터-직원 귀속 제거 (`Counter.assignedStaff` 삭제, `_servicingServer` claim 시스템). 1:1 비율은 채용 한도로만 유지
+- ✅ 손님 자리 대기 큐 (`WAIT_FOR_SEAT` 상태, patience 타임아웃, `_waitingForSeat` 리스트 + 슬롯)
+- ✅ 등급별 SO 자산화 (Cook/Server/Rider × Junior/Senior/Manager = 9개)
+- ✅ `Staff` 추상 베이스 도입, Cook/Server 상속
+- ✅ 근속/성장 시스템 (매월 +3%, 12개월 캡, 36% 누적)
+- ✅ 업그레이드 (6/12개월 자격, 비용 `next.hireCost/2`, 누적 능력치 유지)
+- ✅ 직원 모집 시스템 (`StaffCandidatePool`) — Normal/High/Rare 모집권, 만족도 비용, 2개월 지연, 풀 캡 5 FIFO, 영업일당 1회
+- ✅ 변동치 `_hireVariance` 영구 유지 (±10% 능력/월급 동시, 업그레이드 후에도 유지)
+- ✅ 월말 정산 일당 통합 (`EffectiveSalary` 기준)
 - 채용 UI는 3주차
 
 **H. 라이더 시스템**
@@ -550,19 +624,27 @@ DELIVER_TO_CUSTOMER   (손님에게 음식 전달)
 | Camera | 세로 화면 고정, Ortho Size = 6 |
 
 ### 12.2 2주차 (코드 중심)
-| 시스템 | 책임 |
-|--------|------|
-| Menu Data (SO) | 이름, 가격, 원가, 조리도구 순서 배열 |
-| Tool Data (SO) | 도구 종류, 사용 시간 |
-| Cook FSM 실구현 | 메뉴.tools[] 순회 처리 |
-| Order/Food 확장 | menu 참조 보유, 실제 가격 흐름 |
-| Furniture/Counter/PassWindow SO | 가격/크기/배치 zone 데이터화 |
-| A* Pathfinding | 영역 zone 필터링 + 가구 회피 |
-| Satisfaction 페널티 분리 | 카운터 대기 + 음식 대기 분리 측정 |
-| Map Expansion (코드) | 3단계 확장 데이터 + `ActivateCells(stage)` |
-| Settlement | 재료비/운영비 실 계산 |
-| Marketing (로직) | 스폰 가중치 변경 |
-| Ranking (계산) | Top 100 점수 계산식 |
+| 시스템 | 상태 | 책임 |
+|--------|------|------|
+| Menu Data (SO) | ✅ | 이름, 가격, 원가, 조리도구 순서 |
+| Tool Data (SO) | ✅ | 도구 종류, 사용 시간 |
+| Cook FSM 실구현 | ✅ | 메뉴.tools[] 순회 |
+| Order/Food 확장 | ✅ | menu 참조 보유, 실제 가격 흐름 |
+| Furniture/Counter/PassWindow SO | ✅ | 데이터화 |
+| Map Expansion (코드) | ✅ | `ExpansionStageData` + `ExpansionManager.ActivateCells` |
+| Settlement | ✅ | `MoneySystem.SettleMonthly` (재료/운영/일당) |
+| Marketing | ✅ | `MarketingData` SO + `MarketingManager`, ln-디미니싱, 개월 단위 |
+| Reputation | ✅ | `ReputationSystem` 1년 만족도 누적, 스폰 영향 X |
+| Ranking | ✅ | `RankingSystem` 연말 순위, `score = 매출/100 + 평판합` |
+| Staff 등급/근속/성장 | ✅ | `Staff` 추상 베이스, 매월 +3% 12개월 캡, `EffectiveX` 프로퍼티 |
+| Staff Upgrade | ✅ | 6/12개월 자격, `next.hireCost/2`, 누적치 유지 |
+| StaffCandidatePool | ✅ | 모집권(Normal/High/Rare), 2개월 지연, 풀 캡 5 FIFO, 영업일당 1회 |
+| Counter-Staff 귀속 제거 | ✅ | claim 시스템, 1:1은 채용 한도로만 |
+| Customer 자리 대기 큐 | ✅ | `WAIT_FOR_SEAT` 상태, patience 타임아웃 |
+| A* Pathfinding | 미진행 | 영역 zone 필터링 + 가구 회피 |
+| Satisfaction 페널티 분리 | 미진행 | 카운터 대기 / 음식 대기 분리 측정 |
+| 라이더 시스템 | 미진행 | 이슈 #52 (별도 진행 예정) |
+| DT 시스템 | 미진행 | 이슈 #53 (별도 진행 예정) |
 
 ### 12.3 3주차 (UI + 폴리시)
 | 시스템 | 책임 |
