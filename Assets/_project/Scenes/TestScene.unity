@@ -799,8 +799,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StaffManager
   cookStaffPrefab: {fileID: 2745432210784163718, guid: 5cfe7435734a8df438482e12b153b0a7, type: 3}
   serverStaffPrefab: {fileID: 7600616054015399713, guid: e5841e042147b5140b58d3e073d8886a, type: 3}
-  starterCookData: {fileID: 11400000, guid: 5d2eb3138119569498296b90770ca39e, type: 2}
-  starterServerData: {fileID: 11400000, guid: 8b9c81dbdfd53ba4fa9779c3119f5f42, type: 2}
+  starterCookData: {fileID: 11400000, guid: 0bd73b5a0e5c6ab4aab5bcbfd61c608e, type: 2}
+  starterServerData: {fileID: 11400000, guid: 9ec0cdf7aa2f6404c94c5e9943a0a76f, type: 2}
   kitchenIdlePos: {fileID: 2129540808}
 --- !u!114 &1118384917
 MonoBehaviour:
@@ -870,10 +870,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlacedObjectInit
   placementSystem: {fileID: 1118384909}
-  counterData: {fileID: 11400000, guid: 46c6b369273f93244b818a66677e1752, type: 2}
-  chairData: {fileID: 11400000, guid: 74de6b7a3626ae640897fd30ff46ae6d, type: 2}
-  grillData: {fileID: 11400000, guid: d19e3da870805a242a72292d0739cb8f, type: 2}
-  passWindowData: {fileID: 11400000, guid: 566169bc16ffb764399c096a70f75dac, type: 2}
+  layoutData: {fileID: 11400000, guid: eda5924d7f0734a4996ad8da489da3ed, type: 2}
 --- !u!114 &1118384922
 MonoBehaviour:
   m_ObjectHideFlags: 0

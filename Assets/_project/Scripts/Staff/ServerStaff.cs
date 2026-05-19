@@ -24,6 +24,7 @@ public class ServerStaff : MonoBehaviour
         _data = data;
         this.id = id;
         _assignedCounter = null;
+        GetComponent<SpriteRenderer>().sprite = data.sprite;
         ChangeState(ServerState.IDLE_AT_COUNTER);
     }
 

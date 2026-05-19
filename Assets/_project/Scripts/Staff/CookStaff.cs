@@ -23,6 +23,7 @@ public class CookStaff : MonoBehaviour
         _data = data;
         this.id = id;
         _kitchenIdlePos = kitchenIdlePos;
+        GetComponent<SpriteRenderer>().sprite = data.sprite;
         ChangeState(CookState.IDLE_AT_KITCHEN);
     }
 
