@@ -88,6 +88,11 @@ public class GridManager : MonoBehaviour
         if (!IsInBounds(pos)) return null;
         return _cells[pos.x, pos.y];
     }
+    public CellZone GetZone(Vector2Int pos)
+    {
+        var cell = GetCell(pos);
+        return cell.zone;
+    }
 
     public bool IsInBounds(Vector2Int pos)
     {
@@ -115,14 +120,14 @@ public class GridManager : MonoBehaviour
         return new Vector2Int(Mathf.FloorToInt(worldPos.x), Mathf.FloorToInt(worldPos.y));
     }
 
-    public bool CanPlace(Vector2Int origin, int width, int height)
+    public bool CanPlace(Vector2Int origin, int width, int height, CellZone zone)
     {
         for(int dx = 0; dx < width; dx++)
         {
             for (int dy = 0; dy < height; dy++)
             {
                 GridCell cell = GetCell(origin + new Vector2Int(dx, dy));
-                if (cell == null || cell.isOccupied || !cell.isActive || cell.isReserved) return false;
+                if (cell == null || cell.isOccupied || !cell.isActive || cell.isReserved || cell.zone != zone) return false;
             }
         }
         return true;
