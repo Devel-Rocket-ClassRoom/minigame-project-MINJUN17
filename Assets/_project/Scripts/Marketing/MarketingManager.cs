@@ -1,0 +1,77 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class MarketingManager : MonoBehaviour
+{
+    public static MarketingManager Instance;
+
+    [SerializeField] private CustomerManager customerManager;
+    [SerializeField] private TimeSystem timeSystem;
+
+    public event Action<MarketingData> OnMarketingPurchased;
+    public event Action OnActiveChanged;
+
+    private class ActiveCampaign
+    {
+        public MarketingData Data;
+        public int RemainingMonths;
+    }
+
+    private readonly List<ActiveCampaign> _active = new();
+    private readonly List<MarketingData> _pending = new();
+
+    public IReadOnlyList<MarketingData> PendingCampaigns => _pending;
+    public int ActiveCount => _active.Count;
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        Instance = this;
+    }
+
+    private void Start()
+    {
+        timeSystem.OnDayStarted += HandleDayStarted;
+    }
+
+    private void OnDestroy()
+    {
+        if (timeSystem != null) timeSystem.OnDayStarted -= HandleDayStarted;
+    }
+
+    public bool Apply(MarketingData data)
+    {
+        if (data == null) return false;
+        if (!SatisfactionSystem.Instance.Spend(data.satisfactionCost)) return false;
+
+        _pending.Add(data);
+        OnMarketingPurchased?.Invoke(data);
+        return true;
+    }
+
+    private void HandleDayStarted()
+    {
+        for (int i = _active.Count - 1; i >= 0; i--)
+        {
+            _active[i].RemainingMonths--;
+            if (_active[i].RemainingMonths <= 0) _active.RemoveAt(i);
+        }
+
+        foreach (var p in _pending)
+            _active.Add(new ActiveCampaign { Data = p, RemainingMonths = p.durationMonths });
+        _pending.Clear();
+
+        RecomputeMultiplier();
+        OnActiveChanged?.Invoke();
+    }
+
+    private void RecomputeMultiplier()
+    {
+        float sumBoost = 0f;
+        foreach (var c in _active) sumBoost += c.Data.spawnBoost;
+
+        float multiplier = 1f + Mathf.Log(1f + Mathf.Max(0f, sumBoost));
+        customerManager.SetMarketingMultiplier(multiplier);
+    }
+}

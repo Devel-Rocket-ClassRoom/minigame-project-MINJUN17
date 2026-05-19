@@ -104,6 +104,7 @@ public class Customer : MonoBehaviour
                 _targetSeat?.Release();
                 _targetSeat = null;
                 SatisfactionSystem.Instance.Earn(_satisfaction);
+                ReputationSystem.Instance?.Report(_satisfaction);
                 break;
         }
     }

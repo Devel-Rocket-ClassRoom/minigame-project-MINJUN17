@@ -652,7 +652,11 @@ GameObject:
   - component: {fileID: 1118384919}
   - component: {fileID: 1118384920}
   - component: {fileID: 1118384921}
+  - component: {fileID: 1118384929}
   - component: {fileID: 1118384925}
+  - component: {fileID: 1118384926}
+  - component: {fileID: 1118384928}
+  - component: {fileID: 1118384927}
   m_Layer: 0
   m_Name: Testmanager
   m_TagString: Untagged
@@ -815,7 +819,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1e88dfcfab5a604cb824b6a4a7aa54a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MoneySystem
+  gridManager: {fileID: 1118384910}
   startingMoney: 10000
+  PricePerSquareMeter: 500
 --- !u!114 &1118384918
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -929,6 +935,60 @@ MonoBehaviour:
   - {fileID: 11400000, guid: dfbcd1fc2eaf0a84fa00e0b1b0b5ba95, type: 2}
   - {fileID: 11400000, guid: 0e7ad8bc4f2887842b27275336ff4a1f, type: 2}
   gridManager: {fileID: 1118384910}
+--- !u!114 &1118384926
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1118384907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e477583ad811514fa376e3affe7db93, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SalesTracker
+--- !u!114 &1118384927
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1118384907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b96dfe5b74b6415fb7ae91f6b76d1284, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MarketingManager
+  customerManager: {fileID: 1118384915}
+  timeSystem: {fileID: 1118384919}
+--- !u!114 &1118384928
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1118384907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d97251b7ac2f42048c7fce03bac94b30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RankingSystem
+  timeSystem: {fileID: 1118384919}
+  minQualifyingScore: 100
+  revenueDivisor: 100
+  dummyTop100: 
+--- !u!114 &1118384929
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1118384907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9fcd5d2e24d4cadb6a5fd5714fbf66c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ReputationSystem
 --- !u!1 &1189613674
 GameObject:
   m_ObjectHideFlags: 0

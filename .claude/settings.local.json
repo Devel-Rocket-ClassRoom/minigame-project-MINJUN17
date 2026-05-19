@@ -8,7 +8,9 @@
       "Bash(gh project *)",
       "Bash(gh issue *)",
       "Bash(git add *)",
-      "mcp__GitHub__issue_write"
+      "mcp__GitHub__issue_write",
+      "Bash(findstr /i \"marketing ranking reputation\")",
+      "Bash(python -c \"import uuid; [print\\(uuid.uuid4\\(\\).hex\\) for _ in range\\(3\\)]\")"
     ]
   }
 }
