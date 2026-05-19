@@ -94,27 +94,29 @@ public class Customer : MonoBehaviour
             case CustomerState.WAIT_AT_COUNTER:
                 _targetCounter.OnCustomerArrived(this);
                 break;
-
-            case CustomerState.LEAVE:
+            case CustomerState.EAT:
                 float waitDuration = _waitStartTime > 0 ? Time.time - _waitStartTime : 0f;
                 if (waitDuration > _data.patience)
                     _satisfaction -= Mathf.FloorToInt((waitDuration - _data.patience) * waitPenaltyRate);
                 _satisfaction = Mathf.Max(0, _satisfaction);
-
+                break;
+            case CustomerState.LEAVE:
                 _targetSeat?.Release();
                 _targetSeat = null;
                 SatisfactionSystem.Instance.Earn(_satisfaction);
-
+                Debug.Log($"만족도: {_satisfaction} 얻음");
                 break;
         }
     }
 
-    public void OnOrderTaken()
+    public void OnOrderTaken(ServerStaff server)
     {
         if (_state == CustomerState.WAIT_AT_COUNTER)
         {
+            _satisfaction += Mathf.FloorToInt(server.Data.kindness);
             int totalPrice = OrderedMenus.Sum(m => m.price);
             _targetCounter.OnCustomerPaid(totalPrice);
+            Debug.Log($"{totalPrice} 결제");
             _targetCounter = null;
             ChangeState(CustomerState.WALK_TO_SEAT);
         }
@@ -122,7 +124,6 @@ public class Customer : MonoBehaviour
 
     private void EnterState()
     {
-
         MoveTowards(_queueManager.GetSlotPosition(this));
 
         if (!_queueManager.IsFront(this)) return;
@@ -147,10 +148,13 @@ public class Customer : MonoBehaviour
             ChangeState(CustomerState.WAIT_AT_SEAT);
     }
 
-    public void OnFoodDelivered()
+    public void OnFoodDelivered(ServerStaff server)
     {
         if (_state == CustomerState.WAIT_AT_SEAT)
+        {
+            _satisfaction += Mathf.FloorToInt(server.Data.kindness);
             ChangeState(CustomerState.EAT);
+        }
     }
 
     private void EatState()

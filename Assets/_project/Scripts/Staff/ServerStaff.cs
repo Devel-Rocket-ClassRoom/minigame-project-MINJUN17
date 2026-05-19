@@ -95,7 +95,7 @@ public class ServerStaff : MonoBehaviour
         };
         PassWindowManager.Instance.SubmitOrder(order);
 
-        customer.OnOrderTaken();
+        customer.OnOrderTaken(this);
 
         ChangeState(ServerState.IDLE_AT_COUNTER);
     }
@@ -121,7 +121,7 @@ public class ServerStaff : MonoBehaviour
 
         if (MoveTowards(customer.transform.position))
         {
-            customer.OnFoodDelivered();
+            customer.OnFoodDelivered(this);
             _carryingFood = null;
             ChangeState(ServerState.IDLE_AT_COUNTER);
         }
