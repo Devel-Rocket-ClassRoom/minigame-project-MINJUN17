@@ -9,7 +9,7 @@ public class TimeSystem : MonoBehaviour
     [SerializeField] private float _nightHourInterval = 0.5f;
     [SerializeField] private float _hourInterval = 15f;
     [SerializeField] private int _openHour = 8;
-    [SerializeField] private int _closeHour = 12;
+    [SerializeField] private int _closeHour = 24;
 
     private float _timer;
     private int _hour = 8;

@@ -52,7 +52,7 @@ public class Customer : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-
+        _waitStartTime = Time.time;
         ChangeState(CustomerState.Enter);
     }
 
@@ -62,9 +62,9 @@ public class Customer : MonoBehaviour
         {
             case CustomerState.Enter:            EnterState(); break;
             case CustomerState.WALK_TO_COUNTER:  WalkToCounterState(); break;
-            case CustomerState.WAIT_AT_COUNTER:  WaitAtCounterState(); break;
-            case CustomerState.PAY:              break;
+            case CustomerState.WAIT_AT_COUNTER:  break;
             case CustomerState.WALK_TO_SEAT:     WalkToSeatState(); break;
+            case CustomerState.WAIT_AT_SEAT:     break;
             case CustomerState.EAT:              EatState(); break;
             case CustomerState.LEAVE:            LeaveState(); break;
         }
@@ -84,15 +84,6 @@ public class Customer : MonoBehaviour
         {
             case CustomerState.WAIT_AT_COUNTER:
                 _targetCounter.OnCustomerArrived(this);
-                _waitStartTime = Time.time;
-                int dummyPrice = Random.Range(3000, 10000);   // 임시 (메뉴 시스템 별도 이슈)
-                _targetCounter.ReceiveOrder(dummyPrice);
-                break;
-
-            case CustomerState.PAY:
-                _targetCounter.OnCustomerPaid();
-                _targetCounter = null;
-                ChangeState(CustomerState.WALK_TO_SEAT);
                 break;
 
             case CustomerState.LEAVE:
@@ -106,6 +97,16 @@ public class Customer : MonoBehaviour
                 SatisfactionSystem.Instance.Earn(_satisfaction);
 
                 break;
+        }
+    }
+
+    public void OnOrderTaken()
+    {
+        if (_state == CustomerState.WAIT_AT_COUNTER)
+        {
+            _targetCounter.OnCustomerPaid(); // 결제 처리
+            _targetCounter = null;
+            ChangeState(CustomerState.WALK_TO_SEAT);
         }
     }
 
@@ -130,22 +131,15 @@ public class Customer : MonoBehaviour
         if (MoveTowards(_targetCounter.ServicePos.position))
             ChangeState(CustomerState.WAIT_AT_COUNTER);
     }
-
-    private void WaitAtCounterState()
-    {
-        // 직원이 OnFoodReady 호출할 때까지 대기
-    }
-
-    // === 외부 진입점 (Counter가 호출) ===
-    public void OnFoodReady()
-    {
-        if (_state == CustomerState.WAIT_AT_COUNTER)
-            ChangeState(CustomerState.PAY);
-    }
-
     private void WalkToSeatState()
     {
         if (MoveTowards(_targetSeat.transform.position))
+            ChangeState(CustomerState.WAIT_AT_SEAT);
+    }
+
+    public void OnFoodDelivered()
+    {
+        if (_state == CustomerState.WAIT_AT_SEAT)
             ChangeState(CustomerState.EAT);
     }
 
@@ -167,6 +161,5 @@ public class Customer : MonoBehaviour
     }
 
     private void OnDestroy() => OnDespawned?.Invoke(this);
-
     private bool MoveTowards(Vector3 target) => MoveUtil.MoveTowards(transform, target, _data.moveSpeed);
 }
