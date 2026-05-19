@@ -23,16 +23,19 @@ public class CounterManager : MonoBehaviour
     {
         foreach (var counter in counters)
         {
-            if (!counter.IsEmpty && !counter.IsOccupied)
-            {
-                return counter;
-            }
+            if (!counter.IsOccupied) return counter;
         }
         return null;
     }
-    public Counter GetFirstEmptyCounter()
+
+    public Counter GetCounterWithUnservedCustomer()
     {
-        return counters.FirstOrDefault(c => c.IsEmpty);
+        foreach (var counter in counters)
+        {
+            if (counter.WaitingCustomer != null && !counter.HasServicingServer)
+                return counter;
+        }
+        return null;
     }
 
     public void RegisterCounter(Counter counter)

@@ -1,35 +1,24 @@
 using UnityEngine;
 
-public class ServerStaff : MonoBehaviour
+public class ServerStaff : Staff
 {
-    private StaffData _data;
-    [SerializeField] private int id;
     private ServerState _state;
-
-    private Counter _assignedCounter;
 
     [Header("동작 시간 (더미)")]
     [SerializeField] private float takingOrderDuration = 1f;
 
     private Food _carryingFood;
-    private float _stateTimer;
 
-    public StaffData Data => _data;
-    public int Id => id;
-    public Counter AssignedCounter => _assignedCounter;
-    public bool IsAssigned => _assignedCounter != null;
+    private Counter _targetCounter;   // 응대 중인 카운터(claim 상태)
+    private Counter _idleHome;        // idle 시 머무를 staffPos 카운터
 
-    public void Init(StaffData data, int id)
+    public float EffectiveKindness => _data.kindness * (1f + _hireVariance) * _growthMultiplier;
+
+    public void Init(StaffData data, int id, float hireVariance = 0f)
     {
-        _data = data;
-        this.id = id;
-        _assignedCounter = null;
-        GetComponent<SpriteRenderer>().sprite = data.sprite;
+        InitBase(data, id, hireVariance);
         ChangeState(ServerState.IDLE_AT_COUNTER);
     }
-
-    public void AssignTo(Counter counter) => _assignedCounter = counter;
-    public void Unassign() => _assignedCounter = null;
 
     private void Update()
     {
@@ -49,12 +38,8 @@ public class ServerStaff : MonoBehaviour
         _stateTimer = 0f;
     }
 
-    // === 상태 핸들러 ===
     private void IdleAtCounterState()
     {
-        if (_assignedCounter == null) return;
-
-        // 1) 우선순위: 음식 있으면 즉시 큐에서 빼서 내 것으로 확보 → 픽업대로
         if (PassWindowManager.Instance.HasReadyFood())
         {
             _carryingFood = PassWindowManager.Instance.PickupFood();
@@ -62,31 +47,63 @@ public class ServerStaff : MonoBehaviour
             return;
         }
 
-        // 2) 카운터 손님 응대
-        if (_assignedCounter.WaitingCustomer != null)
+        var pending = CounterManager.Instance.GetCounterWithUnservedCustomer();
+        if (pending != null && pending.TryClaim(this))
         {
+            _targetCounter = pending;
             ChangeState(ServerState.TAKING_ORDER);
             return;
         }
 
-        // 3) 할 일 없으면 카운터로 복귀
-        MoveTowards(_assignedCounter.StaffPos.position);
+        _idleHome = PickClosestFreeIdleHome();
+        if (_idleHome != null)
+            MoveTowards(_idleHome.StaffPos.position);
+    }
+
+    private Counter PickClosestFreeIdleHome()
+    {
+        Counter best = null;
+        float bestDist = float.MaxValue;
+        var counters = CounterManager.Instance.Counters;
+        var servers = StaffManager.Instance.ServerStaffs;
+
+        foreach (var c in counters)
+        {
+            bool taken = false;
+            foreach (var s in servers)
+            {
+                if (s == this) continue;
+                if (s._idleHome == c) { taken = true; break; }
+            }
+            if (taken) continue;
+
+            float d = Vector3.Distance(transform.position, c.StaffPos.position);
+            if (d < bestDist) { bestDist = d; best = c; }
+        }
+
+        if (best == null && counters.Count > 0) best = counters[0];
+        return best;
     }
 
     private void TakingOrderState()
     {
-        // 카운터 위치 도착 보장
-        if (!MoveTowards(_assignedCounter.StaffPos.position)) return;
-
-        if (_stateTimer < takingOrderDuration) return;
-
-        Customer customer = _assignedCounter.WaitingCustomer;
-        if (customer == null)
+        if (_targetCounter == null)
         {
             ChangeState(ServerState.IDLE_AT_COUNTER);
             return;
         }
 
+        if (!MoveTowards(_targetCounter.StaffPos.position)) return;
+        if (_stateTimer < takingOrderDuration) return;
+
+        Customer customer = _targetCounter.WaitingCustomer;
+        if (customer == null)
+        {
+            _targetCounter.ReleaseClaim(this);
+            _targetCounter = null;
+            ChangeState(ServerState.IDLE_AT_COUNTER);
+            return;
+        }
 
         Order order = new Order
         {
@@ -94,9 +111,10 @@ public class ServerStaff : MonoBehaviour
             menus = customer.OrderedMenus
         };
         PassWindowManager.Instance.SubmitOrder(order);
-
         customer.OnOrderTaken(this);
 
+        _targetCounter.ReleaseClaim(this);
+        _targetCounter = null;
         ChangeState(ServerState.IDLE_AT_COUNTER);
     }
 
@@ -126,7 +144,4 @@ public class ServerStaff : MonoBehaviour
             ChangeState(ServerState.IDLE_AT_COUNTER);
         }
     }
-
-    private bool MoveTowards(Vector3 target) =>
-        MoveUtil.MoveTowards(transform, target, _data.moveSpeed);
 }

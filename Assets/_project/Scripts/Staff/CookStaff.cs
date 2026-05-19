@@ -1,10 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CookStaff : MonoBehaviour
+public class CookStaff : Staff
 {
-    private StaffData _data;
-    [SerializeField] private int id;
     private CookState _state;
 
     [Header("주방")]
@@ -12,18 +10,14 @@ public class CookStaff : MonoBehaviour
 
     private Order _currentOrder;
     private Queue<MenuData> _remainingMenus;
-    private Transform _currentToolTransform;   // 이번 사이클에 가야할 도구 위치
-    private float _stateTimer;
+    private Transform _currentToolTransform;
 
-    public StaffData Data => _data;
-    public int Id => id;
+    public float EffectiveSpeedMultiplier => _data.speedMultiplier * (1f + _hireVariance) * _growthMultiplier;
 
-    public void Init(StaffData data, int id, Transform kitchenIdlePos)
+    public void Init(StaffData data, int id, Transform kitchenIdlePos, float hireVariance = 0f)
     {
-        _data = data;
-        this.id = id;
+        InitBase(data, id, hireVariance);
         _kitchenIdlePos = kitchenIdlePos;
-        GetComponent<SpriteRenderer>().sprite = data.sprite;
         ChangeState(CookState.IDLE_AT_KITCHEN);
     }
 
@@ -45,10 +39,8 @@ public class CookStaff : MonoBehaviour
         _stateTimer = 0f;
     }
 
-    // === 상태 핸들러 ===
     private void IdleAtKitchenState()
     {
-        // 주문 있으면 큐 통째로 받아서 조리 시작
         if (PassWindowManager.Instance.HasPendingOrder())
         {
             _currentOrder = PassWindowManager.Instance.DequeueOrder();
@@ -63,8 +55,6 @@ public class CookStaff : MonoBehaviour
     {
         if (_currentToolTransform == null)
         {
-            // 도구가 씬에 없는 경우 방어 (배치 안 됐거나 삭제됨)
-            // → 큐 비우고 픽업대로 가서 그냥 끝내거나, IDLE로 복귀
             _remainingMenus.Clear();
             ChangeState(CookState.WALK_TO_PASS_WINDOW);
             return;
@@ -81,7 +71,6 @@ public class CookStaff : MonoBehaviour
 
         _remainingMenus.Dequeue();
 
-        // 남은 메뉴 있으면 다음 도구로, 없으면 픽업대로
         if (_remainingMenus.Count > 0)
             PrepareNextTool();
         else
@@ -104,14 +93,10 @@ public class CookStaff : MonoBehaviour
         }
     }
 
-    // === 헬퍼 ===
     private void PrepareNextTool()
     {
         MenuData nextMenu = _remainingMenus.Peek();
         _currentToolTransform = CookingToolManager.Instance.GetToolTransform(nextMenu.tool.toolType);
         ChangeState(CookState.WALK_TO_TOOL);
     }
-
-    private bool MoveTowards(Vector3 target) =>
-        MoveUtil.MoveTowards(transform, target, _data.moveSpeed);
 }

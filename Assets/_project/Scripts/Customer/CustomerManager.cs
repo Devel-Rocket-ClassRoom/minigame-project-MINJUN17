@@ -6,6 +6,8 @@ using Random = UnityEngine.Random;
 
 public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
 {
+    public static CustomerManager Instance;
+
     [SerializeField] private CounterManager counterManager;
     [SerializeField] private CustomerData[] pool;
     [SerializeField] private QueueManager queueManager;
@@ -14,11 +16,28 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
     [SerializeField] private Transform exitPoint;
     [SerializeField] private float _minSpawnInterval = 10f;
     [SerializeField] private float _maxSpawnInterval = 30f;
+    [SerializeField] private Transform[] waitingSlots;
 
     private readonly HashSet<Customer> _active = new();
+    private readonly List<Customer> _waitingForSeat = new();
     public int ActiveCount => _active.Count; // 남은 손님 없어야 영업종료
     public void Register(Customer c) => _active.Add(c);
-    public void Unregister(Customer c) => _active.Remove(c);
+    public void Unregister(Customer c) { _active.Remove(c); _waitingForSeat.Remove(c); }
+
+    public void RegisterWaitingForSeat(Customer c)
+    {
+        if (!_waitingForSeat.Contains(c)) _waitingForSeat.Add(c);
+    }
+
+    public void UnregisterWaitingForSeat(Customer c) => _waitingForSeat.Remove(c);
+
+    public Vector3 GetWaitingSlotPosition(Customer c)
+    {
+        int idx = _waitingForSeat.IndexOf(c);
+        if (waitingSlots == null || waitingSlots.Length == 0) return entryPoint.position;
+        int slot = Mathf.Clamp(idx, 0, waitingSlots.Length - 1);
+        return waitingSlots[slot].position;
+    }
 
     private float _spawnInterval;
     private float _spawnTimer;
@@ -35,6 +54,12 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
     {
         float baseInterval = Random.Range(_minSpawnInterval, _maxSpawnInterval);
         return baseInterval / _marketingMultiplier;
+    }
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        Instance = this;
     }
 
     private void Start()

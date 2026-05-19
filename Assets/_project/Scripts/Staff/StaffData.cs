@@ -6,13 +6,13 @@ public class StaffData : ScriptableObject
     public StaffRole role;           // Cook / Server / Rider 
     public StaffType grade;          // Junior / Senior / Manager 
 
-    [Header("¿ÜÇü")]
+    [Header("ì™¸í˜•")]
     public Sprite sprite;
 
-    [Header("´É·ÂÄ¡")]
+    [Header("ëŠ¥ë ¥ì¹˜")]
     public float moveSpeed;
     public float kindness;
-    public float speedMultiplier;    // Cook=Á¶¸®¼Óµµ, Server=¹è´Þ¼Óµµ, Rider=¹è´Þ¼Óµµ
+    public float speedMultiplier;   
     public long hireCost;
     public long salary;
 }

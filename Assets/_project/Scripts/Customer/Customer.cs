@@ -26,6 +26,7 @@ public class Customer : MonoBehaviour
 
     private float _stateTimer;
     private float _waitStartTime;
+    private float _spawnTime;
     private int _satisfaction;
 
     public List<MenuData> OrderedMenus { get; private set; }
@@ -37,38 +38,22 @@ public class Customer : MonoBehaviour
         _queueManager = queueManager;
         _exitPoint = exitPoint;
         _satisfaction = baseSatisfaction;
-
-        // 옵션 A: 자리 먼저 예약. 없으면 입장 거부
-        _targetSeat = _seatManager.GetFirstAvailableSeat();
-        
-        if (_targetSeat == null)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        _targetSeat.Occupy();
-
-        // 줄에 등록 (Spawner가 HasRoom 미리 체크하지만 방어적으로)
-        if (!_queueManager.TryEnqueue(this))
-        {
-            _targetSeat.Release();
-            Destroy(gameObject);
-            return;
-        }
+        _spawnTime = Time.time;
 
         int orderCount = Random.Range(_data.minOrderCount, _data.maxOrderCount + 1);
         OrderedMenus = new List<MenuData>();
         for (int i = 0; i < orderCount; i++)
             OrderedMenus.Add(MenuManager.Instance.PickRandomByWeight());
 
-        _waitStartTime = Time.time;
-        ChangeState(CustomerState.Enter);
+        CustomerManager.Instance.RegisterWaitingForSeat(this);
+        ChangeState(CustomerState.WAIT_FOR_SEAT);
     }
 
     private void Update()
     {
         switch (_state)
         {
+            case CustomerState.WAIT_FOR_SEAT:    WaitForSeatState(); break;
             case CustomerState.Enter:            EnterState(); break;
             case CustomerState.WALK_TO_COUNTER:  WalkToCounterState(); break;
             case CustomerState.WAIT_AT_COUNTER:  break;
@@ -78,6 +63,40 @@ public class Customer : MonoBehaviour
             case CustomerState.LEAVE:            LeaveState(); break;
         }
         _stateTimer += Time.deltaTime;
+    }
+
+    private void WaitForSeatState()
+    {
+        // 타임아웃: spawn 이후 patience 초과 → 만족도 0으로 떠남
+        if (Time.time - _spawnTime > _data.patience)
+        {
+            _satisfaction = 0;
+            CustomerManager.Instance.UnregisterWaitingForSeat(this);
+            ChangeState(CustomerState.LEAVE);
+            return;
+        }
+
+        // 자리 확보 시도
+        var seat = _seatManager.GetFirstAvailableSeat();
+        if (seat != null)
+        {
+            _targetSeat = seat;
+            _targetSeat.Occupy();
+
+            if (!_queueManager.TryEnqueue(this))
+            {
+                _targetSeat.Release();
+                _targetSeat = null;
+                return; // 다음 프레임 재시도
+            }
+
+            CustomerManager.Instance.UnregisterWaitingForSeat(this);
+            _waitStartTime = Time.time;
+            ChangeState(CustomerState.Enter);
+            return;
+        }
+
+        MoveTowards(CustomerManager.Instance.GetWaitingSlotPosition(this));
     }
 
     private void ChangeState(CustomerState next)
@@ -113,7 +132,7 @@ public class Customer : MonoBehaviour
     {
         if (_state == CustomerState.WAIT_AT_COUNTER)
         {
-            _satisfaction += Mathf.FloorToInt(server.Data.kindness);
+            _satisfaction += Mathf.FloorToInt(server.EffectiveKindness);
             int totalPrice = OrderedMenus.Sum(m => m.price);
 
             foreach (var menu in OrderedMenus)
@@ -156,7 +175,7 @@ public class Customer : MonoBehaviour
     {
         if (_state == CustomerState.WAIT_AT_SEAT)
         {
-            _satisfaction += Mathf.FloorToInt(server.Data.kindness);
+            _satisfaction += Mathf.FloorToInt(server.EffectiveKindness);
             ChangeState(CustomerState.EAT);
         }
     }
