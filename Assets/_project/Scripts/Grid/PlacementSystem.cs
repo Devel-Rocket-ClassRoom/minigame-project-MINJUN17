@@ -199,7 +199,7 @@ public class PlacementSystem : MonoBehaviour
     // ========== 내부 적용 로직 (성공 시 true, 실패 시 false) ==========
     private bool ApplyPlace()
     {
-        if (!gridManager.CanPlace(_currentOrigin, PreviewWidth, PreviewHeight)) return false;
+        if (!gridManager.CanPlace(_currentOrigin, PreviewWidth, PreviewHeight, gridManager.GetZone(_currentOrigin))) return false;
 
         GameObject instance = Instantiate(
             _previewData.prefab,
@@ -215,7 +215,7 @@ public class PlacementSystem : MonoBehaviour
     private bool ApplyMove()
     {
         // 못 놓는 위치면 아무것도 하지 않고 false (사용자가 계속 드래그하거나 Cancel)
-        if (!gridManager.CanPlace(_currentOrigin, PreviewWidth, PreviewHeight)) return false;
+        if (!gridManager.CanPlace(_currentOrigin, PreviewWidth, PreviewHeight, gridManager.GetZone(_currentOrigin))) return false;
 
         _movingOriginal.Origin = _currentOrigin;
         _movingOriginal.RotationStep = _previewRotationStep;
@@ -263,7 +263,7 @@ public class PlacementSystem : MonoBehaviour
         _previewInstance.transform.position =
             gridManager.CellToWorld(_currentOrigin, PreviewWidth, PreviewHeight);
         _previewRenderer.color =
-            gridManager.CanPlace(_currentOrigin, PreviewWidth, PreviewHeight) ? validColor : invalidColor;
+            gridManager.CanPlace(_currentOrigin, PreviewWidth, PreviewHeight, gridManager.GetZone(_currentOrigin)) ? validColor : invalidColor;
     }
 
     // ========== 유틸 ==========

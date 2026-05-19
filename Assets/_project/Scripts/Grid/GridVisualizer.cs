@@ -4,7 +4,8 @@ using UnityEngine;
 public class GridVisualizer : MonoBehaviour
 {
     public GridManager gridManager;
-    public Color activeColor = new Color(0f, 1f, 0f, 0.2f);
+    public Color hallColor = new Color(0f, 1f, 0f, 0.2f);
+    public Color kitchenColor = new Color(1f, 0.92f, 0f, 0.2f);
     public Color occupiedColor = new Color(0f, 0f, 1f, 0.3f);
     public Color reservedColor = new Color(0f, 0f, 1f, 0.3f);
     public Color inActiveColor = new Color(1f, 0f, 0f, 0.1f);
@@ -40,7 +41,6 @@ public class GridVisualizer : MonoBehaviour
 
     private Color GetCellColor(Vector2Int pos, bool isInStartArea)
     {
-        // 플레이 중에는 실제 셀 상태 반영
         if (Application.isPlaying)
         {
             GridCell cell = gridManager.GetCell(pos);
@@ -48,11 +48,11 @@ public class GridVisualizer : MonoBehaviour
             {
                 if (cell.isReserved) return reservedColor;
                 if (cell.isOccupied) return occupiedColor;
-                if (cell.isActive) return activeColor;
+                if (cell.isActive) return cell.zone == CellZone.Kitchen ? kitchenColor : hallColor;
                 return inActiveColor;
             }
         }
         // 에디터에서는 시작 활성 영역만 활성색으로
-        return isInStartArea ? activeColor : inActiveColor;
+        return isInStartArea ? hallColor : inActiveColor;
     }
 }
