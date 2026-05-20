@@ -12,7 +12,8 @@ public class StaffData : ScriptableObject
     [Header("능력치")]
     public float moveSpeed;
     public float kindness;
-    public float speedMultiplier;   
+    public float deliveryTime; // 라이더만 의미
+    public float speedMultiplier;
     public long hireCost;
     public long salary;
 }

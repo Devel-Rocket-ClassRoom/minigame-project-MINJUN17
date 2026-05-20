@@ -109,7 +109,9 @@ public class StaffCandidatePool : MonoBehaviour
 
     private StaffRole PickRole()
     {
-        if (!isDeliveryUnlocked)
+        bool riderUnlocked = isDeliveryUnlocked
+            || (StaffManager.Instance != null && StaffManager.Instance.IsRiderHiringUnlocked);
+        if (!riderUnlocked)
             return Random.value < 0.5f ? StaffRole.Cook : StaffRole.Server;
 
         int r = Random.Range(0, 3);
@@ -147,7 +149,7 @@ public class StaffCandidatePool : MonoBehaviour
         {
             StaffRole.Cook   => StaffManager.Instance.HireCookStaff(candidate.baseData, candidate.hireVariance) != null,
             StaffRole.Server => StaffManager.Instance.HireServerStaff(candidate.baseData, candidate.hireVariance) != null,
-            // Rider 채용은 RiderManager 구현 후 연결
+            StaffRole.Rider  => StaffManager.Instance.HireRiderStaff(candidate.baseData, candidate.hireVariance) != null,
             _ => false,
         };
 

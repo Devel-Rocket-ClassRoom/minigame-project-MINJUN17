@@ -6,11 +6,13 @@ public class ServerStaff : Staff
 
     [Header("동작 시간 (더미)")]
     [SerializeField] private float takingOrderDuration = 1f;
+    [SerializeField] private float takingDeliveryOrderDuration = 1f;
 
     private Food _carryingFood;
 
-    private Counter _targetCounter;   // 응대 중인 카운터(claim 상태)
-    private Counter _idleHome;        // idle 시 머무를 staffPos 카운터
+    private Counter _targetCounter;
+    private Counter _idleHome;
+    private Phone _targetPhone;
 
     public float EffectiveKindness => _data.kindness * (1f + _hireVariance) * _growthMultiplier;
 
@@ -29,10 +31,12 @@ public class ServerStaff : Staff
     {
         switch (_state)
         {
-            case ServerState.IDLE_AT_COUNTER:     IdleAtCounterState(); break;
-            case ServerState.TAKING_ORDER:        TakingOrderState(); break;
-            case ServerState.WALK_TO_PASS_WINDOW: WalkToPassWindowState(); break;
-            case ServerState.WALK_TO_SEAT:        WalkToSeatState(); break;
+            case ServerState.IDLE_AT_COUNTER:        IdleAtCounterState(); break;
+            case ServerState.TAKING_ORDER:           TakingOrderState(); break;
+            case ServerState.WALK_TO_PASS_WINDOW:    WalkToPassWindowState(); break;
+            case ServerState.WALK_TO_SEAT:           WalkToSeatState(); break;
+            case ServerState.WALK_TO_PHONE:          WalkToPhoneState(); break;
+            case ServerState.TAKING_DELIVERY_ORDER:  TakingDeliveryOrderState(); break;
         }
         _stateTimer += Time.deltaTime;
     }
@@ -45,19 +49,22 @@ public class ServerStaff : Staff
 
     private void IdleAtCounterState()
     {
-        // ① 픽업대에 음식 있으면 가장 가까운 idle 서버가 픽업
-        if (PassWindowManager.Instance.HasReadyFood())
+        // ① 홀 음식 픽업
+        if (PassWindowManager.Instance.HasReadyHallFood())
         {
             var passWindow = PassWindowManager.Instance.GetFirstPassWindowTransform();
             if (passWindow != null && IsClosestIdleServerTo(passWindow.position))
             {
-                _carryingFood = PassWindowManager.Instance.PickupFood();
-                ChangeState(ServerState.WALK_TO_PASS_WINDOW);
-                return;
+                _carryingFood = PassWindowManager.Instance.PickupHallFood();
+                if (_carryingFood != null)
+                {
+                    ChangeState(ServerState.WALK_TO_PASS_WINDOW);
+                    return;
+                }
             }
         }
 
-        // ② 대기 손님 있는 카운터 응대 — 가장 가까운 idle 서버가 우선
+        // ② 카운터 응대
         var pending = CounterManager.Instance.GetCounterWithUnservedCustomer();
         if (pending != null && IsClosestIdleServerTo(pending.StaffPos.position) && pending.TryClaim(this))
         {
@@ -66,7 +73,19 @@ public class ServerStaff : Staff
             return;
         }
 
-        // ③ idle home으로 이동
+        // ③ 홀 일감 다 비면 ringing 전화 응대
+        if (PhoneManager.Instance != null && PhoneManager.Instance.HasRingingPhone())
+        {
+            var phone = PhoneManager.Instance.GetRingingPhone();
+            if (phone != null && IsClosestIdleServerTo(phone.transform.position))
+            {
+                _targetPhone = phone;
+                ChangeState(ServerState.WALK_TO_PHONE);
+                return;
+            }
+        }
+
+        // ④ idle home으로 이동
         _idleHome = PickClosestFreeIdleHome();
         if (_idleHome != null)
         {
@@ -74,7 +93,6 @@ public class ServerStaff : Staff
         }
     }
 
-    // 나(this)가 idle 서버들 중 target에 가장 가까운지 (동률은 Id 낮은 쪽 우선)
     private bool IsClosestIdleServerTo(Vector3 target)
     {
         float myDist = Vector3.Distance(transform.position, target);
@@ -174,5 +192,37 @@ public class ServerStaff : Staff
             _carryingFood = null;
             ChangeState(ServerState.IDLE_AT_COUNTER);
         }
+    }
+
+    private void WalkToPhoneState()
+    {
+        // ring 종료(타임아웃/타직원 처리)되면 복귀
+        if (_targetPhone == null || !_targetPhone.IsRinging)
+        {
+            _targetPhone = null;
+            ChangeState(ServerState.IDLE_AT_COUNTER);
+            return;
+        }
+        Vector3 target = PhoneManager.Instance.GetPhoneApproachPosition(PathRole.Server);
+        if (target == Vector3.zero) return;
+
+        MoveTo(target);
+        if (HasArrived())
+            ChangeState(ServerState.TAKING_DELIVERY_ORDER);
+    }
+
+    private void TakingDeliveryOrderState()
+    {
+        if (_targetPhone == null || !_targetPhone.IsRinging)
+        {
+            _targetPhone = null;
+            ChangeState(ServerState.IDLE_AT_COUNTER);
+            return;
+        }
+        if (_stateTimer < takingDeliveryOrderDuration) return;
+
+        PhoneManager.Instance.AcceptCall(_targetPhone);
+        _targetPhone = null;
+        ChangeState(ServerState.IDLE_AT_COUNTER);
     }
 }

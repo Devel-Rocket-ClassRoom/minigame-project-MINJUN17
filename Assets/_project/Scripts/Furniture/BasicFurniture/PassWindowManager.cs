@@ -23,7 +23,6 @@ public class PassWindowManager : MonoBehaviour
 
     public void Unregister(PassWindow pw) => passWindows.Remove(pw);
 
-    // === 직원이 호출하는 API ===
     public bool HasPendingOrder()
     {
         foreach (var pw in passWindows)
@@ -38,6 +37,20 @@ public class PassWindowManager : MonoBehaviour
         return false;
     }
 
+    public bool HasReadyHallFood()
+    {
+        foreach (var pw in passWindows)
+            if (pw.HasReadyHallFood()) return true;
+        return false;
+    }
+
+    public bool HasReadyDeliveryFood()
+    {
+        foreach (var pw in passWindows)
+            if (pw.HasReadyDeliveryFood()) return true;
+        return false;
+    }
+
     public Order DequeueOrder()
     {
         foreach (var pw in passWindows)
@@ -45,16 +58,28 @@ public class PassWindowManager : MonoBehaviour
         return null;
     }
 
-    public Food PickupFood()
+    public Food PickupHallFood()
     {
         foreach (var pw in passWindows)
-            if (pw.HasReadyFood()) return pw.PickupFood();
+        {
+            var f = pw.PickupHallFood();
+            if (f != null) return f;
+        }
+        return null;
+    }
+
+    public Food PickupDeliveryFood()
+    {
+        foreach (var pw in passWindows)
+        {
+            var f = pw.PickupDeliveryFood();
+            if (f != null) return f;
+        }
         return null;
     }
 
     public void SubmitOrder(Order order)
     {
-        // 1주차: 첫 번째 픽업대에 제출. 2주차에 분배 정책 도입 (가까운 곳, 빈 곳 등)
         if (passWindows.Count == 0) return;
         passWindows[0].SubmitOrder(order);
     }
@@ -65,13 +90,11 @@ public class PassWindowManager : MonoBehaviour
         passWindows[0].PlaceFood(food);
     }
 
-    // 1주차 임시: 직원이 이동할 위치 (단일 픽업대 가정)
     public Transform GetFirstPassWindowTransform()
     {
         return passWindows.Count > 0 ? passWindows[0].transform : null;
     }
 
-    // PassWindow 인접 셀 중 해당 역할이 걸을 수 있는 위치 반환 (풋프린트 전체 고려)
     public Vector3 GetApproachPosition(PathRole role)
     {
         if (passWindows.Count == 0) return Vector3.zero;

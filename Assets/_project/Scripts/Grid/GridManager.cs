@@ -125,6 +125,7 @@ public class GridManager : MonoBehaviour
             case PathRole.Customer: return c.zone == CellZone.Hall;
             case PathRole.Cook:     return c.zone == CellZone.Kitchen;
             case PathRole.Server:   return true; // 주방/홀 둘 다 OK
+            case PathRole.Rider:    return c.zone == CellZone.Hall || c.zone == CellZone.RiderRoom;
             default: return true;
         }
     }
