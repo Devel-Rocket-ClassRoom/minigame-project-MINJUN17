@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class GridManager : MonoBehaviour
 {
+    public static GridManager Instance { get; private set; }
+
     [Header("Grid Size")]
     [SerializeField] private int _gridWidth = 9;
     [SerializeField] private int _gridHeight = 12;
@@ -39,6 +41,8 @@ public class GridManager : MonoBehaviour
 
     private void Awake()
     {
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        Instance = this;
         if (mainCamera == null) mainCamera = Camera.main;
         CreateGrid();
         CenterCameraOnActiveGrid();
@@ -106,6 +110,77 @@ public class GridManager : MonoBehaviour
         return pos.x >= 0 && pos.x < _gridWidth && pos.y >= 0 && pos.y < _gridHeight;
     }
 
+    // 길찾기용 walkability — 역할별 zone 필터 + 가구 회피 + 벽
+    public bool IsCellWalkable(Vector2Int pos, PathRole role)
+    {
+        var c = GetCell(pos);
+        if (c == null) return false;
+        if (!c.isActive) return false;
+        if (c.isWall) return false;     // 벽은 누구도 못 지남
+        if (c.isOccupied) return false; // 가구는 못 지남 (isReserved는 OK)
+
+        // 역할별 zone 제한
+        switch (role)
+        {
+            case PathRole.Customer: return c.zone == CellZone.Hall;
+            case PathRole.Cook:     return c.zone == CellZone.Kitchen;
+            case PathRole.Server:   return true; // 주방/홀 둘 다 OK
+            default: return true;
+        }
+    }
+
+    // 셀을 벽으로 마킹 (주방-홀 경계 등)
+    public void SetWall(Vector2Int pos, bool value = true)
+    {
+        var c = GetCell(pos);
+        if (c != null) c.isWall = value;
+    }
+
+    // 셀을 예약으로 마킹 (배치 불가, 통과 가능)
+    public void SetReserved(Vector2Int pos, bool value = true)
+    {
+        var c = GetCell(pos);
+        if (c != null) c.isReserved = value;
+    }
+
+    // PassWindow 영역 세팅: 4셀 reserved 처리 + 주방 측 셀만 벽 opening으로
+    public void SetupPassWindow(IEnumerable<Vector2Int> passWindowCells)
+    {
+        var openings = new List<Vector2Int>();
+        foreach (var pos in passWindowCells)
+        {
+            SetReserved(pos, true);
+            var c = GetCell(pos);
+            if (c != null && c.zone == CellZone.Kitchen)
+                openings.Add(pos);
+        }
+        BuildKitchenLWalls(openings);
+    }
+
+    // 주방을 L자로 둘러싸는 벽 (바닥 가로 + 우측 세로)
+    // openings에 포함된 셀은 벽 X (PassWindow 위치)
+    // 호출 예: BuildKitchenLWalls(new[] { new Vector2Int(1, 8) });
+    public void BuildKitchenLWalls(IEnumerable<Vector2Int> openings)
+    {
+        var openSet = new HashSet<Vector2Int>(openings);
+        int kitchenYStart = _gridHeight - 4; // 주방 바닥 행 (y=8)
+        int kitchenXEnd = 3;                 // 주방 우측 열 (x=3)
+
+        // 가로벽: 주방 바닥 (y=8), x=0..3
+        for (int x = 0; x <= kitchenXEnd; x++)
+        {
+            var pos = new Vector2Int(x, kitchenYStart);
+            if (!openSet.Contains(pos)) SetWall(pos);
+        }
+
+        // 세로벽: 주방 우측 (x=3), y=9..11 (y=8 코너는 위 루프에서 이미 처리)
+        for (int y = kitchenYStart + 1; y < _gridHeight; y++)
+        {
+            var pos = new Vector2Int(kitchenXEnd, y);
+            if (!openSet.Contains(pos)) SetWall(pos);
+        }
+    }
+
     // 가구 footprint(width × height)가 활성 영역 안에 들어오도록 origin을 클램프
     public Vector2Int ClampToActiveArea(Vector2Int origin, int width, int height)
     {
@@ -126,6 +201,57 @@ public class GridManager : MonoBehaviour
     public Vector2Int WorldToCell(Vector3 worldPos)
     {
         return new Vector2Int(Mathf.FloorToInt(worldPos.x), Mathf.FloorToInt(worldPos.y));
+    }
+
+    // 가구 풋프린트 전체 테두리를 기준으로 인접 walkable 셀 위치 반환
+    // 역할별 선호 zone 우선 (Cook→Kitchen, Server/Customer→Hall)
+    public Vector3 GetFurnitureApproachPosition(Vector3 worldPos, PathRole role)
+    {
+        Vector2Int anyCell = WorldToCell(worldPos);
+        var c = GetCell(anyCell);
+
+        // PlacedObject 풋프린트 파악
+        int ox, oy, w, h;
+        if (c?.placedObject != null)
+        {
+            ox = c.placedObject.Origin.x;
+            oy = c.placedObject.Origin.y;
+            w  = c.placedObject.Width;
+            h  = c.placedObject.Height;
+        }
+        else
+        {
+            ox = anyCell.x; oy = anyCell.y; w = 1; h = 1;
+        }
+
+        Vector2Int[] offsets = { new(0,1), new(0,-1), new(1,0), new(-1,0) };
+
+        // 후보 셀 수집
+        var candidates = new List<Vector2Int>();
+        for (int x = ox; x < ox + w; x++)
+        for (int y = oy; y < oy + h; y++)
+        {
+            foreach (var off in offsets)
+            {
+                Vector2Int adj = new Vector2Int(x, y) + off;
+                if (adj.x >= ox && adj.x < ox + w && adj.y >= oy && adj.y < oy + h) continue;
+                if (IsCellWalkable(adj, role))
+                    candidates.Add(adj);
+            }
+        }
+
+        if (candidates.Count == 0) return worldPos;
+
+        // 역할별 선호 zone: Cook은 Kitchen, 그 외는 Hall
+        CellZone preferred = role == PathRole.Cook ? CellZone.Kitchen : CellZone.Hall;
+        foreach (var cand in candidates)
+        {
+            var cc = GetCell(cand);
+            if (cc != null && cc.zone == preferred) return CellToWorld(cand);
+        }
+
+        // 선호 zone에 없으면 첫 후보
+        return CellToWorld(candidates[0]);
     }
 
     public bool CanPlace(Vector2Int origin, int width, int height, CellZone zone)

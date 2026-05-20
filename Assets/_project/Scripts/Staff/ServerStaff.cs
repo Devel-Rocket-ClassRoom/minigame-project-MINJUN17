@@ -14,11 +14,16 @@ public class ServerStaff : Staff
 
     public float EffectiveKindness => _data.kindness * (1f + _hireVariance) * _growthMultiplier;
 
+    public bool IsIdle => _state == ServerState.IDLE_AT_COUNTER;
+
     public void Init(StaffData data, int id, float hireVariance = 0f)
     {
         InitBase(data, id, hireVariance);
         ChangeState(ServerState.IDLE_AT_COUNTER);
     }
+
+    protected override PathRole GetPathRole() => PathRole.Server;
+
 
     private void Update()
     {
@@ -40,24 +45,48 @@ public class ServerStaff : Staff
 
     private void IdleAtCounterState()
     {
+        // ① 픽업대에 음식 있으면 가장 가까운 idle 서버가 픽업
         if (PassWindowManager.Instance.HasReadyFood())
         {
-            _carryingFood = PassWindowManager.Instance.PickupFood();
-            ChangeState(ServerState.WALK_TO_PASS_WINDOW);
-            return;
+            var passWindow = PassWindowManager.Instance.GetFirstPassWindowTransform();
+            if (passWindow != null && IsClosestIdleServerTo(passWindow.position))
+            {
+                _carryingFood = PassWindowManager.Instance.PickupFood();
+                ChangeState(ServerState.WALK_TO_PASS_WINDOW);
+                return;
+            }
         }
 
+        // ② 대기 손님 있는 카운터 응대 — 가장 가까운 idle 서버가 우선
         var pending = CounterManager.Instance.GetCounterWithUnservedCustomer();
-        if (pending != null && pending.TryClaim(this))
+        if (pending != null && IsClosestIdleServerTo(pending.StaffPos.position) && pending.TryClaim(this))
         {
             _targetCounter = pending;
             ChangeState(ServerState.TAKING_ORDER);
             return;
         }
 
+        // ③ idle home으로 이동
         _idleHome = PickClosestFreeIdleHome();
         if (_idleHome != null)
-            MoveTowards(_idleHome.StaffPos.position);
+        {
+            MoveTo(_idleHome.StaffPos.position);
+        }
+    }
+
+    // 나(this)가 idle 서버들 중 target에 가장 가까운지 (동률은 Id 낮은 쪽 우선)
+    private bool IsClosestIdleServerTo(Vector3 target)
+    {
+        float myDist = Vector3.Distance(transform.position, target);
+        foreach (var s in StaffManager.Instance.ServerStaffs)
+        {
+            if (s == this) continue;
+            if (!s.IsIdle) continue;
+            float d = Vector3.Distance(s.transform.position, target);
+            if (d < myDist) return false;
+            if (Mathf.Approximately(d, myDist) && s.Id < this.Id) return false;
+        }
+        return true;
     }
 
     private Counter PickClosestFreeIdleHome()
@@ -92,8 +121,8 @@ public class ServerStaff : Staff
             ChangeState(ServerState.IDLE_AT_COUNTER);
             return;
         }
-
-        if (!MoveTowards(_targetCounter.StaffPos.position)) return;
+        MoveTo(_targetCounter.StaffPos.position);
+        if (!HasArrived()) return;
         if (_stateTimer < takingOrderDuration) return;
 
         Customer customer = _targetCounter.WaitingCustomer;
@@ -120,10 +149,11 @@ public class ServerStaff : Staff
 
     private void WalkToPassWindowState()
     {
-        Transform target = PassWindowManager.Instance.GetFirstPassWindowTransform();
-        if (target == null) return;
+        Vector3 target = PassWindowManager.Instance.GetApproachPosition(PathRole.Server);
+        if (target == Vector3.zero) return;
 
-        if (MoveTowards(target.position))
+        MoveTo(target);
+        if (HasArrived())
             ChangeState(ServerState.WALK_TO_SEAT);
     }
 
@@ -137,7 +167,8 @@ public class ServerStaff : Staff
             return;
         }
 
-        if (MoveTowards(customer.transform.position))
+        MoveTo(customer.transform.position);
+        if (HasArrived())
         {
             customer.OnFoodDelivered(this);
             _carryingFood = null;

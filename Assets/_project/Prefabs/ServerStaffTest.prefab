@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2970410673500943458}
   - component: {fileID: 6015047695419634417}
   - component: {fileID: 7600616054015399713}
+  - component: {fileID: 1303822896688945942}
   m_Layer: 0
   m_Name: ServerStaffTest
   m_TagString: Untagged
@@ -106,3 +107,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ServerStaff
   id: 0
   takingOrderDuration: 1
+--- !u!114 &1303822896688945942
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7869814860750884972}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf7ecb0af80496b49bc2ad362b574a88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PathMover
+  role: 2
