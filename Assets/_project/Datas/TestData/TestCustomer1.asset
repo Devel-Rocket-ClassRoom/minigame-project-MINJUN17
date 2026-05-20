@@ -17,6 +17,7 @@ MonoBehaviour:
   icon: {fileID: 0}
   minOrderCount: 1
   maxOrderCount: 1
+  baseSatisfaction: 0
   moveSpeed: 2
   eatSpeed: 10
   patience: 20

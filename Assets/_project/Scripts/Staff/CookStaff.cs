@@ -69,7 +69,8 @@ public class CookStaff : Staff
     private void UsingToolState()
     {
         MenuData currentMenu = _remainingMenus.Peek();
-        if (_stateTimer < currentMenu.tool.usingDuration) return;
+        float effectiveDuration = currentMenu.tool.usingDuration / Mathf.Max(0.01f, EffectiveSpeedMultiplier);
+        if (_stateTimer < effectiveDuration) return;
 
         _remainingMenus.Dequeue();
 

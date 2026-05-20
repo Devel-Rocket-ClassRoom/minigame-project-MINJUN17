@@ -40,12 +40,21 @@ public class MoneySystem : MonoBehaviour
         OnMoneyChanged?.Invoke(_money);
     }
 
+    // 잔액 부족해도 강제로 차감 (마이너스 허용). 정산 등에서 사용.
+    public void ForceSpend(long amount)
+    {
+        _money -= amount;
+        OnMoneyChanged?.Invoke(_money);
+    }
+
     public void SettleMonthly()
     {
         long materialCost = SalesTracker.Instance.CalculateMaterialCost();
         long totalSalaryCost = StaffManager.Instance.CalculateTotalSalaryCost();
         long operationCost = gridManager.ActiveCellCount * PricePerSquareMeter;
-        Spend(materialCost + operationCost + totalSalaryCost);
+        long total = materialCost + operationCost + totalSalaryCost;
+        ForceSpend(total);
+        Debug.Log($"[정산] 재료비={materialCost} 급여={totalSalaryCost} 유지비={operationCost} 총={total} → 잔액={_money}");
         SalesTracker.Instance.ResetMonthly();
     }
 

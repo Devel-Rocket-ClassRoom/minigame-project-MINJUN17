@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.EnhancedTouch;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 using TouchPhase = UnityEngine.InputSystem.TouchPhase;
@@ -97,8 +99,19 @@ public class PlacementSystem : MonoBehaviour
         startOrigin = gridManager.ClampToActiveArea(startOrigin, data.width, data.height);
 
         GameObject preview = Instantiate(data.prefab);
+        StripLogicComponents(preview);
         BeginDragging(data, preview, startOrigin, 0);
         Mode = Mode.Place;
+    }
+
+    // Preview용: 매니저 자동등록되는 로직 컴포넌트 즉시 제거
+    // (Awake에서 이미 등록은 됐지만, OnDestroy/Unregister가 호출되도록 Destroy 처리)
+    private void StripLogicComponents(GameObject preview)
+    {
+        foreach (var c in preview.GetComponentsInChildren<Counter>(true))            Destroy(c);
+        foreach (var p in preview.GetComponentsInChildren<PassWindow>(true))         Destroy(p);
+        foreach (var s in preview.GetComponentsInChildren<Seat>(true))               Destroy(s);
+        foreach (var t in preview.GetComponentsInChildren<CookingToolInstance>(true)) Destroy(t);
     }
 
     public void StartMove()
@@ -139,6 +152,7 @@ public class PlacementSystem : MonoBehaviour
         target.Instance.SetActive(false);
 
         GameObject preview = Instantiate(target.Data.prefab);
+        StripLogicComponents(preview);
         BeginDragging(target.Data, preview, target.Origin, target.RotationStep);
     }
 
@@ -287,9 +301,22 @@ public class PlacementSystem : MonoBehaviour
         Touch touch = touches[0];
         if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled) return false;
 
+        // Canvas UI 위에서 발생한 터치는 무시 (버튼 클릭이 그리드 좌표로 변환 안되게)
+        if (IsPointerOverUI(touch)) return false;
+
         Vector3 worldPos = cam.ScreenToWorldPoint(touch.screenPosition);
         cell = gridManager.WorldToCell(worldPos);
         return true;
+    }
+
+    private static readonly List<RaycastResult> _uiRaycastResults = new();
+    private bool IsPointerOverUI(Touch touch)
+    {
+        if (EventSystem.current == null) return false;
+        var data = new PointerEventData(EventSystem.current) { position = touch.screenPosition };
+        _uiRaycastResults.Clear();
+        EventSystem.current.RaycastAll(data, _uiRaycastResults);
+        return _uiRaycastResults.Count > 0;
     }
 
     // 새 탭(Began 프레임) + 그 위치에 배치된 오브젝트가 있을 때만 반환
@@ -299,6 +326,9 @@ public class PlacementSystem : MonoBehaviour
         var touches = Touch.activeTouches;
         if (touches.Count == 0) return false;
         if (touches[0].phase != TouchPhase.Began) return false;
+
+        // Canvas UI 위 탭은 무시
+        if (IsPointerOverUI(touches[0])) return false;
 
         Vector3 worldPos = cam.ScreenToWorldPoint(touches[0].screenPosition);
         Vector2Int cellPos = gridManager.WorldToCell(worldPos);

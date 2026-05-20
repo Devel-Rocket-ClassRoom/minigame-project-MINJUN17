@@ -188,6 +188,18 @@ public class Customer : MonoBehaviour
             ChangeState(CustomerState.WAIT_AT_SEAT);
     }
 
+    // 영업 종료 시 강제 퇴장 (대기 상태 손님용)
+    public void ForceLeave()
+    {
+        if (_state == CustomerState.LEAVE) return;
+        _satisfaction = 0;
+        _queueManager?.Dequeue(this);
+        CustomerManager.Instance?.UnregisterWaitingForSeat(this);
+        _targetCounter?.OnCustomerPaid(0);
+        _targetCounter = null;
+        ChangeState(CustomerState.LEAVE);
+    }
+
     public void OnFoodDelivered(ServerStaff server)
     {
         if (_state == CustomerState.WAIT_AT_SEAT)
