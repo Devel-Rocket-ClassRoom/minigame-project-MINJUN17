@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlacedObjectInit : MonoBehaviour
@@ -14,6 +15,20 @@ public class PlacedObjectInit : MonoBehaviour
     {
         foreach (var e in layoutData.entries)
             placementSystem.PlaceInitial(e.furniture, e.position, e.rotationStep);
+
+        // PassWindow 위치 자동 감지 → 풋프린트 셀들 reserved + 주방측은 벽 opening 처리
+        var passWindowCells = new List<Vector2Int>();
+        foreach (var pw in PassWindowManager.Instance.PassWindows)
+        {
+            Vector2Int anyCell = GridManager.Instance.WorldToCell(pw.transform.position);
+            var c = GridManager.Instance.GetCell(anyCell);
+            if (c?.placedObject == null) continue;
+            var po = c.placedObject;
+            for (int x = po.Origin.x; x < po.Origin.x + po.Width; x++)
+                for (int y = po.Origin.y; y < po.Origin.y + po.Height; y++)
+                    passWindowCells.Add(new Vector2Int(x, y));
+        }
+        GridManager.Instance.SetupPassWindow(passWindowCells);
 
         StaffManager.Instance.Init();
         //placementSystem.PlaceInitial(counterData, new Vector2Int(1, 3));

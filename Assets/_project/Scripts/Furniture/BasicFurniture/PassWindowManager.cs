@@ -70,4 +70,11 @@ public class PassWindowManager : MonoBehaviour
     {
         return passWindows.Count > 0 ? passWindows[0].transform : null;
     }
+
+    // PassWindow 인접 셀 중 해당 역할이 걸을 수 있는 위치 반환 (풋프린트 전체 고려)
+    public Vector3 GetApproachPosition(PathRole role)
+    {
+        if (passWindows.Count == 0) return Vector3.zero;
+        return GridManager.Instance.GetFurnitureApproachPosition(passWindows[0].transform.position, role);
+    }
 }

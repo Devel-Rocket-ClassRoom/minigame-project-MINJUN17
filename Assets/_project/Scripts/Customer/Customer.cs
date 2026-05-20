@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
+[RequireComponent(typeof(PathMover))]
 public class Customer : MonoBehaviour
 {
     private CustomerData _data;
@@ -28,8 +29,24 @@ public class Customer : MonoBehaviour
     private float _waitStartTime;
     private float _spawnTime;
     private int _satisfaction;
+    private PathMover _mover;
 
     public List<MenuData> OrderedMenus { get; private set; }
+
+    private void Awake()
+    {
+        _mover = GetComponent<PathMover>();
+        if (_mover != null) _mover.Role = PathRole.Customer;
+    }
+
+    private void MoveTo(Vector3 destination)
+    {
+        _mover.SetDestination(destination);
+        _mover.Step(_data != null ? _data.moveSpeed : 1f);
+    }
+
+    private bool HasArrived() => _mover.HasArrived();
+
     public void Init(CustomerData data, CounterManager counterManager, SeatManager seatManager, QueueManager queueManager, Vector3 exitPoint)
     {
         _data = data;
@@ -67,7 +84,6 @@ public class Customer : MonoBehaviour
 
     private void WaitForSeatState()
     {
-        // 타임아웃: spawn 이후 patience 초과 → 만족도 0으로 떠남
         if (Time.time - _spawnTime > _data.patience)
         {
             _satisfaction = 0;
@@ -76,7 +92,6 @@ public class Customer : MonoBehaviour
             return;
         }
 
-        // 자리 확보 시도
         var seat = _seatManager.GetFirstAvailableSeat();
         if (seat != null)
         {
@@ -87,7 +102,7 @@ public class Customer : MonoBehaviour
             {
                 _targetSeat.Release();
                 _targetSeat = null;
-                return; // 다음 프레임 재시도
+                return;
             }
 
             CustomerManager.Instance.UnregisterWaitingForSeat(this);
@@ -96,7 +111,7 @@ public class Customer : MonoBehaviour
             return;
         }
 
-        MoveTowards(CustomerManager.Instance.GetWaitingSlotPosition(this));
+        MoveTo(CustomerManager.Instance.GetWaitingSlotPosition(this));
     }
 
     private void ChangeState(CustomerState next)
@@ -147,7 +162,7 @@ public class Customer : MonoBehaviour
 
     private void EnterState()
     {
-        MoveTowards(_queueManager.GetSlotPosition(this));
+        MoveTo(_queueManager.GetSlotPosition(this));
 
         if (!_queueManager.IsFront(this)) return;
 
@@ -155,19 +170,21 @@ public class Customer : MonoBehaviour
         if (ready == null) return;
 
         _targetCounter = ready;
-        _targetCounter.Reserve();   // 즉시 점유 표시 (다른 손님 못 가져가게)
+        _targetCounter.Reserve();
         _queueManager.Dequeue(this);
         ChangeState(CustomerState.WALK_TO_COUNTER);
     }
 
     private void WalkToCounterState()
     {
-        if (MoveTowards(_targetCounter.ServicePos.position))
+        MoveTo(_targetCounter.ServicePos.position);
+        if (HasArrived())
             ChangeState(CustomerState.WAIT_AT_COUNTER);
     }
     private void WalkToSeatState()
     {
-        if (MoveTowards(_targetSeat.transform.position))
+        MoveTo(_targetSeat.transform.position);
+        if (HasArrived())
             ChangeState(CustomerState.WAIT_AT_SEAT);
     }
 
@@ -182,7 +199,6 @@ public class Customer : MonoBehaviour
 
     private void EatState()
     {
-        // TODO: 인테리어/직원 능력치 보너스 곱셈으로 반영
         _satisfaction += Mathf.FloorToInt(Time.deltaTime * eatGainRate);
 
         if (_stateTimer >= _data.eatSpeed)
@@ -191,12 +207,10 @@ public class Customer : MonoBehaviour
 
     private void LeaveState()
     {
-        if (MoveTowards(_exitPoint))
-        {
+        MoveTo(_exitPoint);
+        if (HasArrived())
             Destroy(gameObject);
-        }
     }
 
     private void OnDestroy() => OnDespawned?.Invoke(this);
-    private bool MoveTowards(Vector3 target) => MoveUtil.MoveTowards(transform, target, _data.moveSpeed);
 }

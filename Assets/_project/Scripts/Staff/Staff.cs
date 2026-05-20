@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[RequireComponent(typeof(PathMover))]
 public abstract class Staff : MonoBehaviour
 {
     protected StaffData _data;
@@ -11,6 +12,8 @@ public abstract class Staff : MonoBehaviour
     protected float _growthMultiplier = 1f;
     protected float _hireVariance;
 
+    protected PathMover _mover;
+
     public StaffData Data => _data;
     public int Id => id;
     public int TenureMonths => _tenureMonths;
@@ -21,6 +24,15 @@ public abstract class Staff : MonoBehaviour
     public float EffectiveMoveSpeed => _data.moveSpeed * (1f + _hireVariance);
     public long EffectiveSalary => (long)(_data.salary * (1f + _hireVariance));
 
+    protected virtual void Awake()
+    {
+        _mover = GetComponent<PathMover>();
+        if (_mover != null) _mover.Role = GetPathRole();
+    }
+
+    // 자식 클래스가 자기 역할 지정 (Cook/Server)
+    protected abstract PathRole GetPathRole();
+
     public bool CanUpgrade
     {
         get
@@ -28,7 +40,7 @@ public abstract class Staff : MonoBehaviour
             if (_data.grade == StaffType.Manager) return false;
             var next = StaffManager.Instance.GetNextGrade(_data);
             if (next == null) return false;
-            if (next.grade == StaffType.Senior)  return _tenureMonths >= 6;
+            if (next.grade == StaffType.Senior) return _tenureMonths >= 6;
             if (next.grade == StaffType.Manager) return _tenureMonths >= 12;
             return false;
         }
@@ -61,6 +73,15 @@ public abstract class Staff : MonoBehaviour
         _growthMultiplier = 1f;
     }
 
-    protected bool MoveTowards(Vector3 target) =>
-        MoveUtil.MoveTowards(transform, target, EffectiveMoveSpeed);
+    // FSM이 호출하는 이동 API. 매 프레임 호출 OK (재계산은 안 함).
+    protected void MoveTo(Vector3 destination)
+    {
+        _mover.SetDestination(destination);
+        _mover.Step(EffectiveMoveSpeed);
+    }
+
+    protected bool HasArrived()
+    {
+        return _mover.HasArrived();
+    }
 }

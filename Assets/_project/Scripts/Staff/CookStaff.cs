@@ -10,7 +10,7 @@ public class CookStaff : Staff
 
     private Order _currentOrder;
     private Queue<MenuData> _remainingMenus;
-    private Transform _currentToolTransform;
+    private Vector3? _currentToolTargetPos;
 
     public float EffectiveSpeedMultiplier => _data.speedMultiplier * (1f + _hireVariance) * _growthMultiplier;
 
@@ -33,6 +33,8 @@ public class CookStaff : Staff
         _stateTimer += Time.deltaTime;
     }
 
+    protected override PathRole GetPathRole() => PathRole.Cook;
+
     private void ChangeState(CookState next)
     {
         _state = next;
@@ -48,19 +50,19 @@ public class CookStaff : Staff
             PrepareNextTool();
             return;
         }
-        MoveTowards(_kitchenIdlePos.position);
+        MoveTo(_kitchenIdlePos.position);
     }
 
     private void WalkToToolState()
     {
-        if (_currentToolTransform == null)
+        if (_currentToolTargetPos == null)
         {
             _remainingMenus.Clear();
             ChangeState(CookState.WALK_TO_PASS_WINDOW);
             return;
         }
-
-        if (MoveTowards(_currentToolTransform.position))
+        MoveTo(_currentToolTargetPos.Value);
+        if (HasArrived())
             ChangeState(CookState.USING_TOOL);
     }
 
@@ -79,16 +81,16 @@ public class CookStaff : Staff
 
     private void WalkToPassWindowState()
     {
-        Transform target = PassWindowManager.Instance.GetFirstPassWindowTransform();
-        if (target == null) return;
-
-        if (MoveTowards(target.position))
+        Vector3 target = PassWindowManager.Instance.GetApproachPosition(PathRole.Cook);
+        if (target == Vector3.zero) return;
+        MoveTo(target);
+        if (HasArrived())
         {
             Food food = new Food { order = _currentOrder };
             PassWindowManager.Instance.PlaceFood(food);
             _currentOrder = null;
             _remainingMenus = null;
-            _currentToolTransform = null;
+            _currentToolTargetPos = null;
             ChangeState(CookState.IDLE_AT_KITCHEN);
         }
     }
@@ -96,7 +98,8 @@ public class CookStaff : Staff
     private void PrepareNextTool()
     {
         MenuData nextMenu = _remainingMenus.Peek();
-        _currentToolTransform = CookingToolManager.Instance.GetToolTransform(nextMenu.tool.toolType);
+        Vector3 approachPos = CookingToolManager.Instance.GetToolApproachPosition(nextMenu.tool.toolType);
+        _currentToolTargetPos = approachPos != Vector3.zero ? approachPos : (Vector3?)null;
         ChangeState(CookState.WALK_TO_TOOL);
     }
 }

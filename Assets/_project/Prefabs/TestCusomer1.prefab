@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1062219651586497013}
   - component: {fileID: 3691542285361809143}
   - component: {fileID: 42578807536942053}
+  - component: {fileID: 705796654090117799}
   m_Layer: 0
   m_Name: TestCusomer1
   m_TagString: Untagged
@@ -107,3 +108,16 @@ MonoBehaviour:
   baseSatisfaction: 50
   eatGainRate: 5
   waitPenaltyRate: 3
+--- !u!114 &705796654090117799
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7120179047670830194}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf7ecb0af80496b49bc2ad362b574a88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PathMover
+  role: 0
