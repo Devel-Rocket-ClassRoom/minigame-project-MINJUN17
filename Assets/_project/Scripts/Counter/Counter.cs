@@ -23,6 +23,12 @@ public class Counter : MonoBehaviour
         CounterManager.Instance.RegisterCounter(this);
     }
 
+    private void OnDestroy()
+    {
+        if (CounterManager.Instance != null)
+            CounterManager.Instance.UnregisterCounter(this);
+    }
+
     public void Reserve()
     {
         _isOccupied = true;

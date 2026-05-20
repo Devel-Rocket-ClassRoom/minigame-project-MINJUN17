@@ -42,6 +42,7 @@ public class DayCycleController : MonoBehaviour
     private void HandleClose()
     {
         customerManager.StopSpawning();
+        customerManager.ForceLeaveWaitingCustomers(); // 줄 서 있던 손님 즉시 퇴장
         _waitingToClear = true;
 
         // 영업 종료 순간 이미 손님이 0이면 바로 정산

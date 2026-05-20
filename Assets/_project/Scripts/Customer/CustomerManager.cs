@@ -76,6 +76,16 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
 
     public void StopSpawning() => _spawning = false;
 
+    // 영업 종료 시 호출 - 아직 자리 못 받은 대기 손님 전원 강제 퇴장
+    // (큐/주문/식사 중인 손님은 정상 흐름 유지)
+    public void ForceLeaveWaitingCustomers()
+    {
+        // _waitingForSeat 복사 후 순회 (ForceLeave에서 리스트 변경됨)
+        var snapshot = new List<Customer>(_waitingForSeat);
+        foreach (var c in snapshot)
+            if (c != null) c.ForceLeave();
+    }
+
     private void Update()
     {
         if (!_spawning) return;

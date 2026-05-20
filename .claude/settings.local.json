@@ -10,7 +10,12 @@
       "Bash(git add *)",
       "mcp__GitHub__issue_write",
       "Bash(findstr /i \"marketing ranking reputation\")",
-      "Bash(python -c \"import uuid; [print\\(uuid.uuid4\\(\\).hex\\) for _ in range\\(3\\)]\")"
+      "Bash(python -c \"import uuid; [print\\(uuid.uuid4\\(\\).hex\\) for _ in range\\(3\\)]\")",
+      "Bash(xargs grep -l \"Settlement\\\\|SettleMonthly\")",
+      "Bash(xargs grep -l \"DayCycleController\\\\|GameManager\\\\|GameController\")",
+      "Bash(xargs grep -l \"Debug\\\\|Button\\\\|UI\")",
+      "Bash(xargs grep -l \"OnDayStarted\\\\|OnYearEnded\\\\|OnHourChanged\")",
+      "Bash(grep -E \"\\\\.\\(cs|scene\\)$\")"
     ]
   }
 }
