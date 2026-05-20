@@ -4343,8 +4343,8 @@ MonoBehaviour:
   seatManager: {fileID: 1118384912}
   entryPoint: {fileID: 1270251427}
   exitPoint: {fileID: 1510811181}
-  _minSpawnInterval: 10
-  _maxSpawnInterval: 30
+  _minSpawnInterval: 3
+  _maxSpawnInterval: 15
   waitingSlots: []
 --- !u!114 &1118384916
 MonoBehaviour:

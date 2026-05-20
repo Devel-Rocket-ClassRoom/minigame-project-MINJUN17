@@ -15,3 +15,10 @@ public enum ServerState
     WALK_TO_SEAT,
     DELIVER,
 }
+public enum RiderState
+{
+    IDLE_AT_RIDERPOS,
+    WALK_TO_PASSWINDOW,
+    WALK_TO_EXIT,
+    DELIVER,
+}

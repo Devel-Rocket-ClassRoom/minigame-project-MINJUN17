@@ -15,7 +15,11 @@
       "Bash(xargs grep -l \"DayCycleController\\\\|GameManager\\\\|GameController\")",
       "Bash(xargs grep -l \"Debug\\\\|Button\\\\|UI\")",
       "Bash(xargs grep -l \"OnDayStarted\\\\|OnYearEnded\\\\|OnHourChanged\")",
-      "Bash(grep -E \"\\\\.\\(cs|scene\\)$\")"
+      "Bash(grep -E \"\\\\.\\(cs|scene\\)$\")",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\dbals\\\\minigame\\\\minigame-project-MINJUN17\" -Recurse -Force)",
+      "Bash(Select-Object -First 50)",
+      "Bash(Format-Table FullName)",
+      "mcp__Windows-MCP__FileSystem"
     ]
   }
 }
