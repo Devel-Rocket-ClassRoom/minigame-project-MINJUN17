@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// 3개월 압축 플레이 테스트용 디버그 패널.
@@ -47,6 +48,16 @@ public class TestDebugPanel : MonoBehaviour
     [Header("월 스킵 사이 대기 (초)")]
     [SerializeField] private float skipDelay = 1.5f;
 
+    [Header("로그 화면 표시 (빌드용)")]
+    [Tooltip("Debug.Log/Warning/Error를 화면에 토스트로 띄움")]
+    [SerializeField] private bool showLogsOnScreen = true;
+    [SerializeField] private float toastDuration = 6f;
+    [SerializeField] private int maxToasts = 10;
+
+    private struct LogToast { public string msg; public LogType type; public float until; }
+    private readonly System.Collections.Generic.List<LogToast> _logToasts = new();
+    private Vector2 _toastScroll;
+
     private void Awake()
     {
         if (panelRoot != null) panelRoot.SetActive(false);
@@ -55,6 +66,35 @@ public class TestDebugPanel : MonoBehaviour
         if (dayCycle == null)         dayCycle         = FindFirstObjectByType<DayCycleController>();
         if (customerManager == null)  customerManager  = FindFirstObjectByType<CustomerManager>();
         if (placementSystem == null)  placementSystem  = FindFirstObjectByType<PlacementSystem>();
+    }
+
+    private void OnEnable()
+    {
+        if (showLogsOnScreen) Application.logMessageReceived += OnAppLog;
+    }
+
+    private void OnDisable()
+    {
+        Application.logMessageReceived -= OnAppLog;
+    }
+
+    private void OnAppLog(string condition, string stackTrace, LogType type)
+    {
+        string msg = string.IsNullOrEmpty(condition) ? "(empty)" : condition;
+        if (msg.Length > 600) msg = msg.Substring(0, 600) + "...";
+        _logToasts.Add(new LogToast { msg = msg, type = type, until = Time.time + toastDuration });
+        while (_logToasts.Count > maxToasts) _logToasts.RemoveAt(0);
+    }
+
+    /// <summary>화면의 토스트 전부 지우기. UI 버튼 연결용.</summary>
+    public void ClearToasts() => _logToasts.Clear();
+
+    /// <summary>현재 씬 리로드 — 처음 상태로 리셋. UI 버튼 연결용.</summary>
+    public void ResetGame()
+    {
+        Time.timeScale = 1f; // 일시정지 상태였더라도 정상 진행되게
+        var scene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(scene.buildIndex);
     }
 
     private void Start()
@@ -101,12 +141,75 @@ public class TestDebugPanel : MonoBehaviour
 
     private void OnGUI()
     {
-        if (Time.time > _onGuiShowUntil || string.IsNullOrEmpty(_lastRankingMessage)) return;
+        // 연말 결산 팝업 (기존)
+        if (Time.time <= _onGuiShowUntil && !string.IsNullOrEmpty(_lastRankingMessage))
+        {
+            var style = new GUIStyle(GUI.skin.box) { fontSize = 24, alignment = TextAnchor.MiddleCenter };
+            style.normal.textColor = Color.white;
+            float w = 400, h = 240;
+            GUI.Box(new Rect(Screen.width / 2 - w / 2, Screen.height / 2 - h / 2, w, h), _lastRankingMessage, style);
+        }
 
-        var style = new GUIStyle(GUI.skin.box) { fontSize = 24, alignment = TextAnchor.MiddleCenter };
-        style.normal.textColor = Color.white;
-        float w = 400, h = 240;
-        GUI.Box(new Rect(Screen.width / 2 - w / 2, Screen.height / 2 - h / 2, w, h), _lastRankingMessage, style);
+        // 로그 토스트 (빌드에서도 보이는 디버그 메시지)
+        if (showLogsOnScreen) DrawLogToasts();
+    }
+
+    private void DrawLogToasts()
+    {
+        // 만료된 토스트 제거
+        for (int i = _logToasts.Count - 1; i >= 0; i--)
+            if (Time.time > _logToasts[i].until) _logToasts.RemoveAt(i);
+        if (_logToasts.Count == 0) return;
+
+        float padding = 8f;
+        float width = Mathf.Min(520f, Screen.width - padding * 2);
+        float lineHeight = 18f;
+        float gap = 4f;
+
+        float totalH = 0f;
+        var heights = new float[_logToasts.Count];
+        for (int i = 0; i < _logToasts.Count; i++)
+        {
+            int lines = Mathf.Max(1, _logToasts[i].msg.Split('\n').Length);
+            heights[i] = lineHeight * lines + 10f;
+            totalH += heights[i] + gap;
+        }
+
+        float maxH = Screen.height * 0.6f;
+        bool needScroll = totalH > maxH;
+        float viewH = needScroll ? maxH : totalH;
+
+        var areaRect = new Rect(padding, padding, width + 16f, viewH);
+        GUILayout.BeginArea(areaRect);
+        _toastScroll = GUILayout.BeginScrollView(_toastScroll, GUILayout.Width(width + 16f), GUILayout.Height(viewH));
+
+        for (int i = 0; i < _logToasts.Count; i++)
+        {
+            var t = _logToasts[i];
+            var style = new GUIStyle(GUI.skin.box)
+            {
+                fontSize = 13,
+                alignment = TextAnchor.UpperLeft,
+                wordWrap = true,
+                padding = new RectOffset(6, 6, 4, 4)
+            };
+            switch (t.type)
+            {
+                case LogType.Error:
+                case LogType.Exception:
+                case LogType.Assert:
+                    style.normal.textColor = new Color(1f, 0.55f, 0.55f); break;
+                case LogType.Warning:
+                    style.normal.textColor = new Color(1f, 0.9f, 0.5f); break;
+                default:
+                    style.normal.textColor = Color.white; break;
+            }
+            GUILayout.Box(t.msg, style, GUILayout.Width(width), GUILayout.Height(heights[i]));
+            GUILayout.Space(gap);
+        }
+
+        GUILayout.EndScrollView();
+        GUILayout.EndArea();
     }
 
     // ============================== 패널 토글 ==============================
