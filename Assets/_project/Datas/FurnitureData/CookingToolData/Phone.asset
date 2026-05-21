@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f0cc6336acd53945a1d4307bb60037e, type: 3}
+  m_Name: Phone
+  m_EditorClassIdentifier: Assembly-CSharp::FurnitureData
+  prefab: {fileID: 4131420335292935860, guid: 41387187e0da0c24eaa4cb0cb8fd5513, type: 3}
+  zone: 1
+  width: 1
+  height: 1
+  anchorX: 0
+  anchorY: 0
+  deliveryBonus: 0

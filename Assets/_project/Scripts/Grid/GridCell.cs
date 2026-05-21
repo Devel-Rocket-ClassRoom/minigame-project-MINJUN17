@@ -1,5 +1,5 @@
 using UnityEngine;
-public enum CellZone { Kitchen, Hall }
+public enum CellZone { Kitchen, Hall, RiderRoom }
 public class GridCell
 {
     public CellZone zone;

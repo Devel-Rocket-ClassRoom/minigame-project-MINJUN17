@@ -37,3 +37,6 @@ MonoBehaviour:
   - furniture: {fileID: 11400000, guid: 46c6b369273f93244b818a66677e1752, type: 2}
     position: {x: 2, y: 6}
     rotationStep: 0
+  - furniture: {fileID: 11400000, guid: 4cbb382ac7f7bc341b2122f807ba56df, type: 2}
+    position: {x: 5, y: 6}
+    rotationStep: 0

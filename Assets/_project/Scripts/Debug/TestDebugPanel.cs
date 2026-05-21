@@ -218,7 +218,76 @@ public class TestDebugPanel : MonoBehaviour
         }
     }
 
+    // ============================== 돈 ==============================
+
+    [Header("돈")]
+    [SerializeField] private long addMoneyAmount = 10000;
+
+    /// <summary>설정된 금액(기본 10000) 즉시 획득.</summary>
+    public void AddMoney()
+    {
+        if (MoneySystem.Instance == null) { Debug.LogWarning("[TestDebugPanel] MoneySystem 없음"); return; }
+        MoneySystem.Instance.Earn(addMoneyAmount);
+        Debug.Log($"[TestDebugPanel] +{addMoneyAmount:N0}원 → 현재 {MoneySystem.Instance.Money:N0}");
+    }
+
     // ============================== 직원 ==============================
+
+    [Header("라이더 테스트")]
+    [SerializeField] private StaffData testRiderData;
+
+    /// <summary>만족도 무시하고 Phone 카탈로그 해금.</summary>
+    public void ForceUnlockPhone()
+    {
+        if (PhoneManager.Instance == null) { Debug.LogWarning("[TestDebugPanel] PhoneManager 없음"); return; }
+        var bf = BindingFlags.NonPublic | BindingFlags.Instance;
+        var f = typeof(PhoneManager).GetField("unlocked", bf);
+        if (f == null) { Debug.LogWarning("[TestDebugPanel] unlocked 필드 못 찾음"); return; }
+        if ((bool)f.GetValue(PhoneManager.Instance)) { Debug.Log("[TestDebugPanel] Phone 이미 해금됨"); return; }
+        f.SetValue(PhoneManager.Instance, true);
+        var ev = typeof(PhoneManager).GetField("OnUnlocked", bf);
+        (ev?.GetValue(PhoneManager.Instance) as Action)?.Invoke();
+        Debug.Log("[TestDebugPanel] Phone 강제 해금");
+    }
+
+    /// <summary>라이더 1명 즉시 고용 (비용 자동 충전).</summary>
+    public void HireRider()
+    {
+        if (StaffManager.Instance == null) { Debug.LogWarning("[TestDebugPanel] StaffManager 없음"); return; }
+        if (testRiderData == null) { Debug.LogWarning("[TestDebugPanel] testRiderData 미지정"); return; }
+
+        // 모든 사전 조건을 한 번에 점검 (어디서 막히는지 보이도록)
+        var sm = StaffManager.Instance;
+        var bf = BindingFlags.NonPublic | BindingFlags.Instance;
+        var prefabField = typeof(StaffManager).GetField("riderStaffPrefab", bf);
+        var prefab = prefabField?.GetValue(sm);
+        bool prefabOK   = prefab != null && !prefab.Equals(null);
+        bool unlockOK   = sm.IsRiderHiringUnlocked;
+        bool roomOK     = RiderRoomManager.Instance == null || RiderRoomManager.Instance.HasRiderRoom();
+        bool underCap   = sm.RiderCount < sm.MaxRiderCount;
+        long money      = MoneySystem.Instance != null ? MoneySystem.Instance.Money : 0;
+
+        Debug.Log(
+            $"[HireRider 사전점검]\n" +
+            $"  riderStaffPrefab 인스펙터 할당 = {prefabOK}\n" +
+            $"  IsRiderHiringUnlocked (Phone 해금+설치) = {unlockOK}\n" +
+            $"  HasRiderRoom (RiderRoom zone 존재) = {roomOK}\n" +
+            $"  RiderCount {sm.RiderCount}/{sm.MaxRiderCount} (상한 미만? {underCap})\n" +
+            $"  현재 돈 = {money:N0}, 고용비 = {testRiderData.hireCost:N0}");
+
+        if (!prefabOK) { Debug.LogError("[TestDebugPanel] ← StaffManager 인스펙터의 riderStaffPrefab 슬롯 비어있음"); return; }
+        if (!unlockOK) { Debug.LogError("[TestDebugPanel] ← Phone 미설치 또는 미해금 (ForceUnlockPhone + Phone 가구 배치 확인)"); return; }
+        if (!roomOK)   { Debug.LogError("[TestDebugPanel] ← RiderRoom zone 없음 (확장 단계 적용 필요)"); return; }
+        if (!underCap) { Debug.LogError($"[TestDebugPanel] ← 라이더 상한 도달 ({sm.RiderCount}/{sm.MaxRiderCount})"); return; }
+
+        // 비용 자동 충전 후 고용
+        if (MoneySystem.Instance != null) MoneySystem.Instance.Earn(testRiderData.hireCost);
+        var rider = sm.HireRiderStaff(testRiderData);
+        if (rider != null)
+            Debug.Log($"[TestDebugPanel] 라이더 고용 OK (현재 {sm.RiderCount}명)");
+        else
+            Debug.LogError("[TestDebugPanel] 사전점검 통과했으나 HireRiderStaff 실패 — StaffData 자체 이슈 가능");
+    }
 
     /// <summary>모든 직원에게 1개월 tenure 부여 (성장 + 승급 조건 체크용).</summary>
     public void TickAllStaffMonth()

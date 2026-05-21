@@ -3,21 +3,19 @@ using UnityEngine;
 
 public class CookStaff : Staff
 {
+    private const float kRestBlockRadius = 0.5f;
+
     private CookState _state;
-
-    [Header("주방")]
-    [SerializeField] private Transform _kitchenIdlePos;
-
     private Order _currentOrder;
     private Queue<MenuData> _remainingMenus;
     private Vector3? _currentToolTargetPos;
+    private Vector3? _currentRestTarget;
 
     public float EffectiveSpeedMultiplier => _data.speedMultiplier * (1f + _hireVariance) * _growthMultiplier;
 
-    public void Init(StaffData data, int id, Transform kitchenIdlePos, float hireVariance = 0f)
+    public void Init(StaffData data, int id, float hireVariance = 0f)
     {
         InitBase(data, id, hireVariance);
-        _kitchenIdlePos = kitchenIdlePos;
         ChangeState(CookState.IDLE_AT_KITCHEN);
     }
 
@@ -39,6 +37,7 @@ public class CookStaff : Staff
     {
         _state = next;
         _stateTimer = 0f;
+        if (next != CookState.IDLE_AT_KITCHEN) _currentRestTarget = null;
     }
 
     private void IdleAtKitchenState()
@@ -50,7 +49,37 @@ public class CookStaff : Staff
             PrepareNextTool();
             return;
         }
-        MoveTo(_kitchenIdlePos.position);
+
+        // 한 번 정한 휴식지는 다른 Cook이 차지하기 전까진 유지 (흔들림 방지)
+        if (_currentRestTarget == null
+            || IsRestTargetTakenByOther(_currentRestTarget.Value))
+        {
+            Vector3 picked = PickRestSpot();
+            _currentRestTarget = picked != Vector3.zero ? picked : (Vector3?)null;
+        }
+        if (_currentRestTarget.HasValue) MoveTo(_currentRestTarget.Value);
+    }
+
+    private Vector3 PickRestSpot()
+    {
+        var candidates = GridManager.Instance.GetWalkableCellsInZone(CellZone.Kitchen);
+        var occupiers = new List<Vector3>();
+        foreach (var c in StaffManager.Instance.CookStaffs)
+            if (c != this) occupiers.Add(c.transform.position);
+        return RestSpotPicker.PickClosestFree(
+            transform.position, candidates, occupiers, kRestBlockRadius);
+    }
+
+    private bool IsRestTargetTakenByOther(Vector3 target)
+    {
+        if (Vector3.Distance(transform.position, target) < kRestBlockRadius) return false;
+        foreach (var c in StaffManager.Instance.CookStaffs)
+        {
+            if (c == this) continue;
+            if (Vector3.Distance(c.transform.position, target) < kRestBlockRadius)
+                return true;
+        }
+        return false;
     }
 
     private void WalkToToolState()
@@ -82,7 +111,7 @@ public class CookStaff : Staff
 
     private void WalkToPassWindowState()
     {
-        Vector3 target = PassWindowManager.Instance.GetApproachPosition(PathRole.Cook);
+        Vector3 target = PassWindowManager.Instance.GetApproachPosition(PathRole.Cook, transform.position);
         if (target == Vector3.zero) return;
         MoveTo(target);
         if (HasArrived())
@@ -99,7 +128,7 @@ public class CookStaff : Staff
     private void PrepareNextTool()
     {
         MenuData nextMenu = _remainingMenus.Peek();
-        Vector3 approachPos = CookingToolManager.Instance.GetToolApproachPosition(nextMenu.tool.toolType);
+        Vector3 approachPos = CookingToolManager.Instance.GetToolApproachPosition(nextMenu.tool.toolType, transform.position);
         _currentToolTargetPos = approachPos != Vector3.zero ? approachPos : (Vector3?)null;
         ChangeState(CookState.WALK_TO_TOOL);
     }

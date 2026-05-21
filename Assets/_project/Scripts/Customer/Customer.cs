@@ -19,6 +19,7 @@ public class Customer : MonoBehaviour
     private CustomerState _state;
     private Counter _targetCounter;
     private Seat _targetSeat;
+    public Seat AssignedSeat => _targetSeat;
 
     [Header("만족도")]
     [SerializeField] private int baseSatisfaction = 50;

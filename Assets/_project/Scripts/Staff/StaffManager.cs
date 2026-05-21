@@ -7,9 +7,9 @@ public class StaffManager : MonoBehaviour
 
     [SerializeField] private CookStaff cookStaffPrefab;
     [SerializeField] private ServerStaff serverStaffPrefab;
+    [SerializeField] private RiderStaff riderStaffPrefab;
     [SerializeField] private StaffData starterCookData;
     [SerializeField] private StaffData starterServerData;
-    [SerializeField] private Transform kitchenIdlePos;
     [SerializeField] private TimeSystem timeSystem;
 
     [Header("등급별 SO (Junior, Senior, Manager 순)")]
@@ -17,15 +17,25 @@ public class StaffManager : MonoBehaviour
     [SerializeField] private List<StaffData> serverGrades;
     [SerializeField] private List<StaffData> riderGrades;
 
+    [Header("라이더 상한")]
+    [SerializeField] private int maxRiderCount = 3;
+
     private int nextId = 1;
     private readonly List<CookStaff> cookStaffs = new();
     private readonly List<ServerStaff> serverStaffs = new();
+    private readonly List<RiderStaff> riderStaffs = new();
 
     public IReadOnlyList<CookStaff> CookStaffs => cookStaffs;
     public IReadOnlyList<ServerStaff> ServerStaffs => serverStaffs;
+    public IReadOnlyList<RiderStaff> RiderStaffs => riderStaffs;
+    public int RiderCount => riderStaffs.Count;
 
     public int MaxServerCount => CounterManager.Instance.CounterCount;
     public int MaxCookCount => CounterManager.Instance.CounterCount;
+    public int MaxRiderCount => maxRiderCount;
+
+    public bool IsRiderHiringUnlocked =>
+        PhoneManager.Instance != null && PhoneManager.Instance.IsRiderHiringUnlocked;
 
     private void Awake()
     {
@@ -47,6 +57,7 @@ public class StaffManager : MonoBehaviour
     {
         foreach (var c in cookStaffs)   c.TickMonth();
         foreach (var s in serverStaffs) s.TickMonth();
+        foreach (var r in riderStaffs)  r.TickMonth();
     }
 
     public void Init()
@@ -67,7 +78,7 @@ public class StaffManager : MonoBehaviour
         MoneySystem.Instance.Spend(data.hireCost);
         var staff = Instantiate(cookStaffPrefab);
         staff.gameObject.name = $"Cook_{nextId}";
-        staff.Init(data, nextId, kitchenIdlePos, hireVariance);
+        staff.Init(data, nextId, hireVariance);
         nextId++;
         cookStaffs.Add(staff);
         return staff;
@@ -85,6 +96,32 @@ public class StaffManager : MonoBehaviour
         staff.Init(data, nextId, hireVariance);
         nextId++;
         serverStaffs.Add(staff);
+        return staff;
+    }
+
+    public RiderStaff HireRiderStaff(StaffData data, float hireVariance = 0f)
+    {
+        if (data == null || riderStaffPrefab == null) return null;
+        if (!IsRiderHiringUnlocked) return null;
+        if (RiderRoomManager.Instance != null && !RiderRoomManager.Instance.HasRiderRoom()) return null;
+        if (riderStaffs.Count >= MaxRiderCount) return null;
+        if (!CanAfford(data.hireCost)) return null;
+
+        MoneySystem.Instance.Spend(data.hireCost);
+        var staff = Instantiate(riderStaffPrefab);
+        staff.gameObject.name = $"Rider_{nextId}";
+
+        // 라이더룸 빈 셀에 초기 배치
+        var candidates = GridManager.Instance.GetWalkableCellsInZone(CellZone.RiderRoom);
+        var occupiers = new List<Vector3>();
+        foreach (var r in riderStaffs) occupiers.Add(r.transform.position);
+        Vector3 spawnPos = RestSpotPicker.PickClosestFree(
+            staff.transform.position, candidates, occupiers, 0.5f);
+        if (spawnPos != Vector3.zero) staff.transform.position = spawnPos;
+
+        staff.Init(data, nextId, hireVariance);
+        nextId++;
+        riderStaffs.Add(staff);
         return staff;
     }
 
@@ -112,15 +149,27 @@ public class StaffManager : MonoBehaviour
         return true;
     }
 
+    public bool FireRiderStaff(RiderStaff staff)
+    {
+        if (staff == null || !riderStaffs.Contains(staff)) return false;
+        long severance = staff.EffectiveSalary;
+        if (!CanAfford(severance)) return false;
+
+        MoneySystem.Instance.Spend(severance);
+        riderStaffs.Remove(staff);
+        Destroy(staff.gameObject);
+        return true;
+    }
+
     public long CalculateTotalSalaryCost()
     {
         long salary = 0;
-        foreach (var cook in cookStaffs)   salary += cook.EffectiveSalary;
+        foreach (var cook in cookStaffs)     salary += cook.EffectiveSalary;
         foreach (var server in serverStaffs) salary += server.EffectiveSalary;
+        foreach (var rider in riderStaffs)   salary += rider.EffectiveSalary;
         return salary;
     }
 
-    // === 등급 조회 ===
     public StaffData GetGrade(StaffRole role, StaffType grade)
     {
         var list = GetGradeList(role);
@@ -144,7 +193,6 @@ public class StaffManager : MonoBehaviour
         _ => null,
     };
 
-    // === 업그레이드(승급) ===
     public bool UpgradeCook(CookStaff staff)
     {
         if (staff == null || !staff.CanUpgrade) return false;
@@ -160,6 +208,20 @@ public class StaffManager : MonoBehaviour
     }
 
     public bool UpgradeServer(ServerStaff staff)
+    {
+        if (staff == null || !staff.CanUpgrade) return false;
+        var next = GetNextGrade(staff.Data);
+        if (next == null) return false;
+
+        long cost = next.hireCost / 2;
+        if (!CanAfford(cost)) return false;
+
+        MoneySystem.Instance.Spend(cost);
+        staff.SetData(next);
+        return true;
+    }
+
+    public bool UpgradeRider(RiderStaff staff)
     {
         if (staff == null || !staff.CanUpgrade) return false;
         var next = GetNextGrade(staff.Data);

@@ -9,4 +9,5 @@ public class FurnitureData : ScriptableObject
     public int height = 1;
     public int anchorX;
     public int anchorY;
+    public float deliveryBonus; // 라이더룸 가구만 의미 있음
 }

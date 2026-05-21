@@ -14,9 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StaffData
   role: 2
   grade: 0
-  sprite: {fileID: 0}
+  sprite: {fileID: -4412258300649235245, guid: b16ecb8d2ff403a42b0b0d466e4726c2, type: 3}
   moveSpeed: 3
   kindness: 1
+  deliveryTime: 0
   speedMultiplier: 1
   hireCost: 2000
   salary: 800

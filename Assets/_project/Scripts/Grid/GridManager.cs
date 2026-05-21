@@ -47,33 +47,48 @@ public class GridManager : MonoBehaviour
         CreateGrid();
         CenterCameraOnActiveGrid();
 
-        // ※ 좌표계 변경(좌상단 시작) 후 통로/예약 셀 정책 미정.
-        //    필요해지면 새 좌표 기준으로 다시 작성.
-        //
-        // for (int x = 0; x < _gridWidth; x++)
-        // {
-        //     for (int y = 0; y < _gridHeight; y++)
-        //     {
-        //         if (/* 새 좌표 기준 조건 */)
-        //             _reservedCells.Add(new Vector2Int(x, y));
-        //     }
-        // }
     }
 
-    // 활성 영역(_startGridWidth × _startGridHeight) 중앙으로 카메라 정렬
-    // 활성 영역이 확장될 때마다 다시 호출하면 됨
+    // 실제 활성화된 셀들의 bounding box 중앙으로 카메라 정렬 + ortho size 자동 조정
+    // 확장될 때마다 자동 호출됨 (ActivateCells 내부에서)
     public void CenterCameraOnActiveGrid()
     {
         if (mainCamera == null) return;
+        if (_cells == null) return;
 
-        float centerX = _startGridWidth / 2f;
-        float centerY = _gridHeight - _startGridHeight / 2f;   // 좌상단 기준
+        // 활성 셀 bounds 계산
+        int minX = int.MaxValue, minY = int.MaxValue;
+        int maxX = int.MinValue, maxY = int.MinValue;
+        bool anyActive = false;
+        for (int x = 0; x < _gridWidth; x++)
+        for (int y = 0; y < _gridHeight; y++)
+        {
+            if (!_cells[x, y].isActive) continue;
+            anyActive = true;
+            if (x < minX) minX = x;
+            if (y < minY) minY = y;
+            if (x > maxX) maxX = x;
+            if (y > maxY) maxY = y;
+        }
+        if (!anyActive) return;
+
+        // 활성 영역 너비/높이 (셀 단위, 양 끝 포함이라 +1)
+        float w = (maxX - minX + 1);
+        float h = (maxY - minY + 1);
+        float centerX = (minX + maxX + 1) * 0.5f;
+        float centerY = (minY + maxY + 1) * 0.5f;
 
         Vector3 pos = mainCamera.transform.position;
         mainCamera.transform.position = new Vector3(centerX, centerY, pos.z);
 
         if (mainCamera.orthographic)
-            mainCamera.orthographicSize = 6f;
+        {
+            // ortho size = 절반 높이. 가로/세로 모두 화면에 들어오도록 큰 쪽 기준
+            float aspect = mainCamera.aspect > 0.01f ? mainCamera.aspect : 1f;
+            float halfH = h * 0.5f;
+            float halfW = (w * 0.5f) / aspect;
+            mainCamera.orthographicSize = Mathf.Max(halfH, halfW) + cameraPadding;
+        }
     }
 
     private void CreateGrid()
@@ -125,6 +140,7 @@ public class GridManager : MonoBehaviour
             case PathRole.Customer: return c.zone == CellZone.Hall;
             case PathRole.Cook:     return c.zone == CellZone.Kitchen;
             case PathRole.Server:   return true; // 주방/홀 둘 다 OK
+            case PathRole.Rider:    return c.zone == CellZone.Hall || c.zone == CellZone.RiderRoom;
             default: return true;
         }
     }
@@ -205,7 +221,8 @@ public class GridManager : MonoBehaviour
 
     // 가구 풋프린트 전체 테두리를 기준으로 인접 walkable 셀 위치 반환
     // 역할별 선호 zone 우선 (Cook→Kitchen, Server/Customer→Hall)
-    public Vector3 GetFurnitureApproachPosition(Vector3 worldPos, PathRole role)
+    // from: 요청자 위치. 선호 zone 내에서 from과 가장 가까운 후보를 반환 (방향 우선순위 X)
+    public Vector3 GetFurnitureApproachPosition(Vector3 worldPos, PathRole role, Vector3 from)
     {
         Vector2Int anyCell = WorldToCell(worldPos);
         var c = GetCell(anyCell);
@@ -244,14 +261,46 @@ public class GridManager : MonoBehaviour
 
         // 역할별 선호 zone: Cook은 Kitchen, 그 외는 Hall
         CellZone preferred = role == PathRole.Cook ? CellZone.Kitchen : CellZone.Hall;
+
+        // 선호 zone 우선, 그 안에서 from과의 거리로 정렬
+        Vector2Int best = candidates[0];
+        float bestDist = float.MaxValue;
+        bool foundPreferred = false;
+
         foreach (var cand in candidates)
         {
             var cc = GetCell(cand);
-            if (cc != null && cc.zone == preferred) return CellToWorld(cand);
+            bool inPreferred = cc != null && cc.zone == preferred;
+            if (foundPreferred && !inPreferred) continue;          // 이미 선호 후보 있으면 비선호 무시
+            if (!foundPreferred && inPreferred)                    // 처음 선호 후보 발견
+            {
+                best = cand;
+                bestDist = Vector3.Distance(CellToWorld(cand), from);
+                foundPreferred = true;
+                continue;
+            }
+            float d = Vector3.Distance(CellToWorld(cand), from);
+            if (d < bestDist) { best = cand; bestDist = d; }
         }
+        return CellToWorld(best);
+    }
 
-        // 선호 zone에 없으면 첫 후보
-        return CellToWorld(candidates[0]);
+    public List<Vector3> GetWalkableCellsInZone(CellZone zone)
+    {
+        var list = new List<Vector3>();
+        for (int x = 0; x < _gridWidth; x++)
+            for (int y = 0; y < _gridHeight; y++)
+            {
+                var pos = new Vector2Int(x, y);
+                var cell = GetCell(pos);
+                if (cell == null) continue;
+                if (!cell.isActive) continue;
+                if (cell.zone != zone) continue;
+                if (cell.isWall) continue;
+                if (cell.isOccupied) continue;
+                list.Add(CellToWorld(pos));
+            }
+        return list;
     }
 
     public bool CanPlace(Vector2Int origin, int width, int height, CellZone zone)
@@ -306,5 +355,7 @@ public class GridManager : MonoBehaviour
                 cell.zone = stage.newZone;
             }
         }
+        // 확장 후 카메라 자동 재정렬
+        CenterCameraOnActiveGrid();
     }
 }

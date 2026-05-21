@@ -14,4 +14,14 @@ public enum ServerState
     WALK_TO_PASS_WINDOW,
     WALK_TO_SEAT,
     DELIVER,
+    WALK_TO_PHONE,
+    TAKING_DELIVERY_ORDER,
+}
+public enum RiderState
+{
+    IDLE_AT_RIDERPOS,
+    WALK_TO_PASSWINDOW,
+    WALK_TO_EXIT,
+    DELIVER,
+    RETURN_TO_ENTRY,
 }

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum PathRole { Customer, Cook, Server }
+public enum PathRole { Customer, Cook, Server, Rider }
 
 public static class Pathfinder
 {
