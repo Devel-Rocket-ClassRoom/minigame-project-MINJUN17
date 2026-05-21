@@ -149,7 +149,7 @@ public class PhoneManager : MonoBehaviour
         {
             customer = null,
             menus = menus,
-            isDelivery = true,
+            type = OrderType.Delivery,
         };
 
         PassWindowManager.Instance.SubmitOrder(order);

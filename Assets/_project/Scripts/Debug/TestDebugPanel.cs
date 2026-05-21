@@ -426,6 +426,63 @@ public class TestDebugPanel : MonoBehaviour
             Debug.Log($"[LastRank] Rank={RankingSystem.Instance.LastResult.Rank} Score={RankingSystem.Instance.LastResult.Score}");
     }
 
+    // ============================== 드라이브 쓰루 ==============================
+
+    /// <summary>만족도 무시하고 DTSystem 강제 해금.</summary>
+    public void ForceUnlockDT()
+    {
+        if (DTSystem.Instance == null) { Debug.LogWarning("[TestDebugPanel] DTSystem 없음"); return; }
+        var bf = BindingFlags.NonPublic | BindingFlags.Instance;
+        var f = typeof(DTSystem).GetField("unlocked", bf);
+        if (f == null) { Debug.LogWarning("[TestDebugPanel] DTSystem.unlocked 필드 못 찾음"); return; }
+        if ((bool)f.GetValue(DTSystem.Instance)) { Debug.Log("[TestDebugPanel] DT 이미 해금됨"); return; }
+        f.SetValue(DTSystem.Instance, true);
+        var ev = typeof(DTSystem).GetField("OnUnlocked", bf);
+        (ev?.GetValue(DTSystem.Instance) as Action)?.Invoke();
+        Debug.Log("[TestDebugPanel] DT 강제 해금");
+    }
+
+    /// <summary>만족도 차감으로 정상 해금 시도.</summary>
+    public void TryUnlockDT()
+    {
+        if (DTSystem.Instance == null) { Debug.LogWarning("[TestDebugPanel] DTSystem 없음"); return; }
+        bool ok = DTSystem.Instance.Unlock();
+        Debug.Log($"[TestDebugPanel] DT Unlock 결과: {ok} (현재 만족도: {SatisfactionSystem.Instance?.Satisfaction})");
+    }
+
+    public void StartDTSpawning()
+    {
+        if (DTSystem.Instance == null) return;
+        DTSystem.Instance.StartSpawning();
+        Debug.Log("[TestDebugPanel] DT 스폰 시작");
+    }
+
+    public void StopDTSpawning()
+    {
+        if (DTSystem.Instance == null) return;
+        DTSystem.Instance.StopSpawning();
+        Debug.Log("[TestDebugPanel] DT 스폰 중지");
+    }
+
+    /// <summary>차 1대 즉시 스폰 (해금/시간/풀 조건 무시는 아님, 차로/창구/프리팹은 있어야 함).</summary>
+    public void SpawnOneCar()
+    {
+        if (DTSystem.Instance == null) { Debug.LogWarning("[TestDebugPanel] DTSystem 없음"); return; }
+        DTSystem.Instance.DebugForceSpawnOne();
+    }
+
+    /// <summary>현재 DT 상태 한번에 로그.</summary>
+    public void LogDTStatus()
+    {
+        if (DTSystem.Instance == null) { Debug.Log("[DT] DTSystem 없음"); return; }
+        int cars = DTSystem.Instance.ActiveCarCount;
+        int orderWin = DTWindowManager.Instance != null ? DTWindowManager.Instance.OrderWindowCount : 0;
+        int pickupWin = DTWindowManager.Instance != null ? DTWindowManager.Instance.PickupWindowCount : 0;
+        int lanePts = DTLane.Instance != null ? DTLane.Instance.WaypointCount : 0;
+        Debug.Log($"[DT] Unlocked={DTSystem.Instance.IsUnlocked} Spawning={DTSystem.Instance.IsSpawning} " +
+                  $"ActiveCars={cars} OrderWindows={orderWin} PickupWindows={pickupWin} Waypoints={lanePts}");
+    }
+
     // ============================== 맵 확장 ==============================
 
     /// <summary>다음 확장 단계 활성화. Button.OnClick에 연결.</summary>

@@ -16,6 +16,9 @@ public enum ServerState
     DELIVER,
     WALK_TO_PHONE,
     TAKING_DELIVERY_ORDER,
+    WALK_TO_DT_ORDER,
+    TAKING_DT_ORDER,
+    WALK_TO_DT_PICKUP,
 }
 public enum RiderState
 {

@@ -24,27 +24,19 @@ public class PassWindow : MonoBehaviour
     public bool HasPendingOrder() => pendingOrders.Count > 0;
     public bool HasReadyFood() => readyFoods.Count > 0;
 
-    // claim 안 된 음식만 카운트 (다른 직원이 가져가기로 한 음식은 제외)
-    public bool HasReadyHallFood()
+    // ===== type별 generic 헬퍼 (claim 안 된 것만) =====
+    public bool HasReadyFood(OrderType type)
     {
         foreach (var f in readyFoods)
-            if (f != null && f.order != null && !f.order.isDelivery && f.claimedBy == null) return true;
+            if (f != null && f.order != null && f.order.type == type && f.claimedBy == null) return true;
         return false;
     }
 
-    public bool HasReadyDeliveryFood()
-    {
-        foreach (var f in readyFoods)
-            if (f != null && f.order != null && f.order.isDelivery && f.claimedBy == null) return true;
-        return false;
-    }
-
-    // 클레임만: 큐에 그대로 두고 claimedBy만 표시 (시각은 픽업대 위 유지)
-    public Food ClaimHallFood(Staff claimer)
+    public Food ClaimFood(OrderType type, Staff claimer)
     {
         foreach (var f in readyFoods)
         {
-            if (f != null && f.order != null && !f.order.isDelivery && f.claimedBy == null)
+            if (f != null && f.order != null && f.order.type == type && f.claimedBy == null)
             {
                 f.claimedBy = claimer;
                 return f;
@@ -53,18 +45,11 @@ public class PassWindow : MonoBehaviour
         return null;
     }
 
-    public Food ClaimDeliveryFood(Staff claimer)
-    {
-        foreach (var f in readyFoods)
-        {
-            if (f != null && f.order != null && f.order.isDelivery && f.claimedBy == null)
-            {
-                f.claimedBy = claimer;
-                return f;
-            }
-        }
-        return null;
-    }
+    // ===== 기존 호환 메서드 (점진 제거) =====
+    public bool HasReadyHallFood() => HasReadyFood(OrderType.Hall);
+    public bool HasReadyDeliveryFood() => HasReadyFood(OrderType.Delivery);
+    public Food ClaimHallFood(Staff claimer) => ClaimFood(OrderType.Hall, claimer);
+    public Food ClaimDeliveryFood(Staff claimer) => ClaimFood(OrderType.Delivery, claimer);
 
     // 클레임된 음식을 실제로 들기: 큐에서 dequeue + 슬롯 재정렬
     public Food TakeFood(Food food)

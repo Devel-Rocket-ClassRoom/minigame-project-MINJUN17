@@ -37,19 +37,27 @@ public class PassWindowManager : MonoBehaviour
         return false;
     }
 
-    public bool HasReadyHallFood()
+    // ===== type별 generic 헬퍼 =====
+    public bool HasReadyFood(OrderType type)
     {
         foreach (var pw in passWindows)
-            if (pw.HasReadyHallFood()) return true;
+            if (pw.HasReadyFood(type)) return true;
         return false;
     }
 
-    public bool HasReadyDeliveryFood()
+    public Food ClaimFood(OrderType type, Staff claimer)
     {
         foreach (var pw in passWindows)
-            if (pw.HasReadyDeliveryFood()) return true;
-        return false;
+        {
+            var f = pw.ClaimFood(type, claimer);
+            if (f != null) return f;
+        }
+        return null;
     }
+
+    // ===== 기존 호환 메서드 =====
+    public bool HasReadyHallFood() => HasReadyFood(OrderType.Hall);
+    public bool HasReadyDeliveryFood() => HasReadyFood(OrderType.Delivery);
 
     public Order DequeueOrder()
     {
