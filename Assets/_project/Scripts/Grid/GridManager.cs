@@ -51,6 +51,7 @@ public class GridManager : MonoBehaviour
 
     // 실제 활성화된 셀들의 bounding box 중앙으로 카메라 정렬 + ortho size 자동 조정
     // 확장될 때마다 자동 호출됨 (ActivateCells 내부에서)
+    // DTLane이 존재하면 그 bbox도 합집합으로 포함 (DT 차로가 그리드 바깥에 있어도 화면에 들어옴)
     public void CenterCameraOnActiveGrid()
     {
         if (mainCamera == null) return;
@@ -72,21 +73,23 @@ public class GridManager : MonoBehaviour
         }
         if (!anyActive) return;
 
-        // 활성 영역 너비/높이 (셀 단위, 양 끝 포함이라 +1)
-        float w = (maxX - minX + 1);
-        float h = (maxY - minY + 1);
-        float centerX = (minX + maxX + 1) * 0.5f;
-        float centerY = (minY + maxY + 1) * 0.5f;
+        // 셀 bbox → world bounds 변환 (셀 좌표 corner-origin, 1셀=1유닛)
+        Bounds combined = new Bounds(
+            new Vector3((minX + maxX + 1) * 0.5f, (minY + maxY + 1) * 0.5f, 0f),
+            new Vector3(maxX - minX + 1, maxY - minY + 1, 0f));
+
+        // DT 차로가 존재하면 합집합으로 확장
+        if (DTLane.Instance != null && DTLane.Instance.WaypointCount > 0)
+            combined.Encapsulate(DTLane.Instance.GetVisibleBounds());
 
         Vector3 pos = mainCamera.transform.position;
-        mainCamera.transform.position = new Vector3(centerX, centerY, pos.z);
+        mainCamera.transform.position = new Vector3(combined.center.x, combined.center.y, pos.z);
 
         if (mainCamera.orthographic)
         {
-            // ortho size = 절반 높이. 가로/세로 모두 화면에 들어오도록 큰 쪽 기준
             float aspect = mainCamera.aspect > 0.01f ? mainCamera.aspect : 1f;
-            float halfH = h * 0.5f;
-            float halfW = (w * 0.5f) / aspect;
+            float halfH = combined.extents.y;
+            float halfW = combined.extents.x / aspect;
             mainCamera.orthographicSize = Mathf.Max(halfH, halfW) + cameraPadding;
         }
     }

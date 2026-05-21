@@ -14,6 +14,7 @@ public class ServerStaff : Staff
 
     private Counter _targetCounter;
     private Phone _targetPhone;
+    private DTOrderWindow _targetDTOrderWindow;
     private Vector3? _currentRestTarget;
 
     public float EffectiveKindness => _data.kindness * (1f + _hireVariance) * _growthMultiplier;
@@ -39,6 +40,9 @@ public class ServerStaff : Staff
             case ServerState.WALK_TO_SEAT:           WalkToSeatState(); break;
             case ServerState.WALK_TO_PHONE:          WalkToPhoneState(); break;
             case ServerState.TAKING_DELIVERY_ORDER:  TakingDeliveryOrderState(); break;
+            case ServerState.WALK_TO_DT_ORDER:       WalkToDTOrderState(); break;
+            case ServerState.TAKING_DT_ORDER:        TakingDTOrderState(); break;
+            case ServerState.WALK_TO_DT_PICKUP:      WalkToDTPickupState(); break;
         }
         _stateTimer += Time.deltaTime;
     }
@@ -53,12 +57,12 @@ public class ServerStaff : Staff
     private void IdleAtCounterState()
     {
         // ① 홀 음식 클레임 (실제 픽업은 픽업대 도착 시점에)
-        if (PassWindowManager.Instance.HasReadyHallFood())
+        if (PassWindowManager.Instance.HasReadyFood(OrderType.Hall))
         {
             var passWindow = PassWindowManager.Instance.GetFirstPassWindowTransform();
             if (passWindow != null && IsClosestIdleServerTo(passWindow.position))
             {
-                _claimedFood = PassWindowManager.Instance.ClaimHallFood(this);
+                _claimedFood = PassWindowManager.Instance.ClaimFood(OrderType.Hall, this);
                 if (_claimedFood != null)
                 {
                     ChangeState(ServerState.WALK_TO_PASS_WINDOW);
@@ -67,7 +71,22 @@ public class ServerStaff : Staff
             }
         }
 
-        // ② 카운터 응대
+        // ② DT 음식 클레임 (PassWindow에 DT 음식 ready → 픽업창구로 운반)
+        if (PassWindowManager.Instance.HasReadyFood(OrderType.DT))
+        {
+            var passWindow = PassWindowManager.Instance.GetFirstPassWindowTransform();
+            if (passWindow != null && IsClosestIdleServerTo(passWindow.position))
+            {
+                _claimedFood = PassWindowManager.Instance.ClaimFood(OrderType.DT, this);
+                if (_claimedFood != null)
+                {
+                    ChangeState(ServerState.WALK_TO_PASS_WINDOW);
+                    return;
+                }
+            }
+        }
+
+        // ③ 카운터 응대
         var pending = CounterManager.Instance.GetCounterWithUnservedCustomer();
         if (pending != null && IsClosestIdleServerTo(pending.StaffPos.position) && pending.TryClaim(this))
         {
@@ -76,7 +95,21 @@ public class ServerStaff : Staff
             return;
         }
 
-        // ③ 홀 일감 다 비면 ringing 전화 응대 (한 명만 가도록 Claim)
+        // ④ DT 주문 응대 (차가 OrderWindow에서 대기 중)
+        if (DTWindowManager.Instance != null)
+        {
+            var dtOrder = DTWindowManager.Instance.GetOrderWindowWithUnservedCar();
+            if (dtOrder != null && dtOrder.StaffPos != null
+                && IsClosestIdleServerTo(dtOrder.StaffPos.position)
+                && dtOrder.TryClaim(this))
+            {
+                _targetDTOrderWindow = dtOrder;
+                ChangeState(ServerState.WALK_TO_DT_ORDER);
+                return;
+            }
+        }
+
+        // ⑤ 홀 일감 다 비면 ringing 전화 응대 (한 명만 가도록 Claim)
         if (PhoneManager.Instance != null && PhoneManager.Instance.HasRingingPhone())
         {
             var phone = PhoneManager.Instance.GetRingingPhone();
@@ -167,7 +200,8 @@ public class ServerStaff : Staff
         Order order = new Order
         {
             customer = customer,
-            menus = customer.OrderedMenus
+            menus = customer.OrderedMenus,
+            type = OrderType.Hall,
         };
         PassWindowManager.Instance.SubmitOrder(order);
         customer.OnOrderTaken(this);
@@ -192,7 +226,12 @@ public class ServerStaff : Staff
                 _claimedFood = null;
                 if (_carryingFood != null) AttachFood(_carryingFood);
             }
-            ChangeState(ServerState.WALK_TO_SEAT);
+
+            // 음식 종류에 따라 다음 상태 분기
+            var nextType = _carryingFood?.order?.type ?? OrderType.Hall;
+            ChangeState(nextType == OrderType.DT
+                ? ServerState.WALK_TO_DT_PICKUP
+                : ServerState.WALK_TO_SEAT);
         }
     }
 
@@ -261,5 +300,91 @@ public class ServerStaff : Staff
         PhoneManager.Instance.AcceptCall(_targetPhone);   // 내부에서 StopRinging → claimer null로 정리
         _targetPhone = null;
         ChangeState(ServerState.IDLE_AT_COUNTER);
+    }
+
+    // ===== DT 응대 =====
+    private void WalkToDTOrderState()
+    {
+        if (_targetDTOrderWindow == null || _targetDTOrderWindow.StaffPos == null)
+        {
+            _targetDTOrderWindow?.ReleaseClaim(this);
+            _targetDTOrderWindow = null;
+            ChangeState(ServerState.IDLE_AT_COUNTER);
+            return;
+        }
+        MoveTo(_targetDTOrderWindow.StaffPos.position);
+        if (HasArrived()) ChangeState(ServerState.TAKING_DT_ORDER);
+    }
+
+    private void TakingDTOrderState()
+    {
+        if (_targetDTOrderWindow == null)
+        {
+            ChangeState(ServerState.IDLE_AT_COUNTER);
+            return;
+        }
+        if (_stateTimer < takingOrderDuration) return;
+
+        DTCustomer car = _targetDTOrderWindow.WaitingCar;
+        if (car == null)
+        {
+            _targetDTOrderWindow.ReleaseClaim(this);
+            _targetDTOrderWindow = null;
+            ChangeState(ServerState.IDLE_AT_COUNTER);
+            return;
+        }
+
+        // 매출/판매 기록 (DT는 주문 시점에 결제 — 전화 배달과 동일 패턴)
+        int totalPrice = 0;
+        foreach (var menu in car.OrderedMenus)
+        {
+            totalPrice += menu.price;
+            SalesTracker.Instance?.RecordSale(menu);
+        }
+        MoneySystem.Instance?.Earn(totalPrice);
+
+        var order = new Order
+        {
+            customer = null,
+            dtCustomer = car,
+            menus = new List<MenuData>(car.OrderedMenus),
+            type = OrderType.DT,
+        };
+        PassWindowManager.Instance.SubmitOrder(order);
+
+        car.OnOrderTaken(this);
+
+        _targetDTOrderWindow.ReleaseClaim(this);
+        _targetDTOrderWindow = null;
+        ChangeState(ServerState.IDLE_AT_COUNTER);
+    }
+
+    private void WalkToDTPickupState()
+    {
+        DTCustomer car = _carryingFood?.order?.dtCustomer;
+        DTPickupWindow pw = car != null ? car.PickupWindow : null;
+        if (pw == null && DTWindowManager.Instance != null)
+            pw = DTWindowManager.Instance.FirstPickupWindow;
+
+        if (pw == null || pw.StaffPos == null)
+        {
+            // 픽업창구 사라짐 → 음식 폐기
+            if (_carryingFood != null) Destroy(_carryingFood.gameObject);
+            _carryingFood = null;
+            ChangeState(ServerState.IDLE_AT_COUNTER);
+            return;
+        }
+
+        Vector3 target = GridManager.Instance.GetFurnitureApproachPosition(
+            pw.StaffPos.position, PathRole.Server, transform.position);
+        if (target == Vector3.zero) target = pw.StaffPos.position;
+
+        MoveTo(target);
+        if (HasArrived())
+        {
+            if (_carryingFood != null) pw.PlaceFood(_carryingFood);
+            _carryingFood = null;
+            ChangeState(ServerState.IDLE_AT_COUNTER);
+        }
     }
 }
