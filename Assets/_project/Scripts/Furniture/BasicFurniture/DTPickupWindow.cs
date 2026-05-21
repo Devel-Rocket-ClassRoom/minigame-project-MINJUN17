@@ -1,8 +1,9 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
 /// 드라이브 쓰루 픽업 창구. 직원이 음식 가져다 놓고, 차가 와서 받아감.
-/// Seat의 FoodDropOff와 PassWindow의 PlaceFood 패턴을 합친 형태.
+/// 차마다 별도 슬롯을 가지므로 음식이 차보다 먼저 여러 개 도착해도 안 꼬임.
 /// </summary>
 public class DTPickupWindow : MonoBehaviour
 {
@@ -21,9 +22,10 @@ public class DTPickupWindow : MonoBehaviour
     public DTCustomer WaitingCar => _waitingCar;
     public bool HasWaitingCar => _waitingCar != null;
 
-    private Food _placedFood;
-    public Food PlacedFood => _placedFood;
-    public bool HasReadyFood => _placedFood != null;
+    // 차별 음식 슬롯 — 음식이 어느 차 소유인지 추적
+    private readonly Dictionary<DTCustomer, Food> _placedFoods = new();
+    public int PlacedFoodCount => _placedFoods.Count;
+    public bool HasReadyFoodFor(DTCustomer car) => car != null && _placedFoods.ContainsKey(car);
 
     private void Awake()
     {
@@ -37,30 +39,48 @@ public class DTPickupWindow : MonoBehaviour
             DTWindowManager.Instance.UnregisterPickup(this);
     }
 
-    public void OnCarArrived(DTCustomer car)
-    {
-        _waitingCar = car;
-    }
+    public void OnCarArrived(DTCustomer car) { _waitingCar = car; }
+    public void OnCarLeft() { _waitingCar = null; }
 
-    public void OnCarLeft()
-    {
-        _waitingCar = null;
-    }
-
-    // ServerStaff가 PassWindow에서 가져온 음식을 여기 놓을 때 호출
+    /// <summary>ServerStaff가 PassWindow에서 가져온 음식을 여기 놓을 때 호출.</summary>
     public void PlaceFood(Food food)
     {
         if (food == null) return;
-        _placedFood = food;
+
+        var car = food.order?.dtCustomer;
+        if (car == null)
+        {
+            Debug.LogWarning("[DTPickupWindow] PlaceFood: food.order.dtCustomer가 null — 폐기");
+            Destroy(food.gameObject);
+            return;
+        }
+
+        // 같은 차의 음식이 이미 있다면(비정상) 기존 것 폐기
+        if (_placedFoods.TryGetValue(car, out var existing) && existing != null && existing != food)
+            Destroy(existing.gameObject);
+
+        _placedFoods[car] = food;
         food.transform.SetParent(FoodDropOff, false);
         food.transform.localPosition = Vector3.zero;
     }
 
-    // DTCustomer가 음식 가져갈 때 호출 (LEAVE 진입 시점)
-    public Food TakeFood()
+    /// <summary>DTCustomer가 자기 음식 가져갈 때 호출.</summary>
+    public Food TakeFoodFor(DTCustomer car)
     {
-        var f = _placedFood;
-        _placedFood = null;
+        if (car == null) return null;
+        if (!_placedFoods.TryGetValue(car, out var f)) return null;
+        _placedFoods.Remove(car);
         return f;
+    }
+
+    /// <summary>차가 destroy될 때 남은 음식 정리(누수 방지).</summary>
+    public void ClearFor(DTCustomer car)
+    {
+        if (car == null) return;
+        if (_placedFoods.TryGetValue(car, out var f))
+        {
+            if (f != null) Destroy(f.gameObject);
+            _placedFoods.Remove(car);
+        }
     }
 }

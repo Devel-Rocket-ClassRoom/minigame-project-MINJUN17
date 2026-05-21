@@ -32,6 +32,7 @@ public class DayCycleController : MonoBehaviour
     private void HandleDayStarted()
     {
         customerManager.StartSpawning();
+        DTSystem.Instance?.StartSpawning();
     }
     private void AutoConfirm() // 임시
     {
@@ -42,6 +43,7 @@ public class DayCycleController : MonoBehaviour
     private void HandleClose()
     {
         customerManager.StopSpawning();
+        DTSystem.Instance?.StopSpawning();
         customerManager.ForceLeaveWaitingCustomers(); // 줄 서 있던 손님 즉시 퇴장
         _waitingToClear = true;
 

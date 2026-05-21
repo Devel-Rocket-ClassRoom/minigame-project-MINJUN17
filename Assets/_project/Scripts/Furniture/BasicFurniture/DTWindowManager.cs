@@ -58,7 +58,7 @@ public class DTWindowManager : MonoBehaviour
     public bool HasAnyPickupWindowWithReadyFood()
     {
         foreach (var w in pickupWindows)
-            if (w.HasReadyFood) return true;
+            if (w.PlacedFoodCount > 0) return true;
         return false;
     }
 }

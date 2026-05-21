@@ -78,8 +78,9 @@ public class GridManager : MonoBehaviour
             new Vector3((minX + maxX + 1) * 0.5f, (minY + maxY + 1) * 0.5f, 0f),
             new Vector3(maxX - minX + 1, maxY - minY + 1, 0f));
 
-        // DT 차로가 존재하면 합집합으로 확장
-        if (DTLane.Instance != null && DTLane.Instance.WaypointCount > 0)
+        // DT 해금 후에만 차로 영역을 카메라에 포함 (전엔 그리드 기준만)
+        if (DTLane.Instance != null && DTLane.Instance.WaypointCount > 0
+            && DTSystem.Instance != null && DTSystem.Instance.IsUnlocked)
             combined.Encapsulate(DTLane.Instance.GetVisibleBounds());
 
         Vector3 pos = mainCamera.transform.position;

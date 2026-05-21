@@ -131,7 +131,17 @@ public class DTSystem : MonoBehaviour
     {
         if (!CanSpawn())
         {
-            Debug.LogWarning("[DTSystem] CanSpawn=false — Lane/Window/Prefab/Pool/Time 확인");
+            Debug.LogWarning($"[DTSystem] CanSpawn=false\n" +
+                $"  DTLane.Instance={DTLane.Instance != null}\n" +
+                $"  WaypointCount={DTLane.Instance?.WaypointCount ?? 0}\n" +
+                $"  IsFull={DTLane.Instance?.IsFull}\n" +
+                $"  DTWindowManager.Instance={DTWindowManager.Instance != null}\n" +
+                $"  FirstOrderWindow={DTWindowManager.Instance?.FirstOrderWindow != null}\n" +
+                $"  FirstPickupWindow={DTWindowManager.Instance?.FirstPickupWindow != null}\n" +
+                $"  dtCustomerPrefab={dtCustomerPrefab != null}\n" +
+                $"  pool.Length={pool?.Length ?? 0}\n" +
+                $"  timeSystem.IsOpen={timeSystem?.IsOpen}\n" +
+                $"  timeSystem.Hour={timeSystem?.Hour}  cutoff={newSpawnCutoffHour}");
             return;
         }
         Spawn();

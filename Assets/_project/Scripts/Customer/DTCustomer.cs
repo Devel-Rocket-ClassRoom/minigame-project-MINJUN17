@@ -181,15 +181,16 @@ public class DTCustomer : MonoBehaviour
 
     private void PickupCheck()
     {
-        if (_pickupWindow != null && _pickupWindow.HasReadyFood)
+        if (_pickupWindow != null && _pickupWindow.HasReadyFoodFor(this))
         {
-            _receivedFood = _pickupWindow.TakeFood();
-            if (_receivedFood != null)
-            {
-                // 차에 부착: 시각적으로 차가 음식 들고 가는 것처럼
-                _receivedFood.transform.SetParent(transform, false);
-                _receivedFood.transform.localPosition = Vector3.zero;
-            }
+            _receivedFood = _pickupWindow.TakeFoodFor(this);
+            Destroy(_receivedFood.gameObject);
+            //if (_receivedFood != null)
+            //{
+            //    // 차에 부착: 시각적으로 차가 음식 들고 가는 것처럼
+            //    _receivedFood.transform.SetParent(transform, false);
+            //    _receivedFood.transform.localPosition = Vector3.zero;
+            //}
             _pickupWindow.OnCarLeft();
             _state = DTState.DRIVE;
             TryAdvance();
@@ -202,6 +203,7 @@ public class DTCustomer : MonoBehaviour
         // patience 초과 시 강제 퇴장 (큐에서 즉시 제거 — 다른 차에 영향 X)
         if (_orderWindow != null && _orderWindow.WaitingCar == this) _orderWindow.OnCarLeft();
         if (_pickupWindow != null && _pickupWindow.WaitingCar == this) _pickupWindow.OnCarLeft();
+        _pickupWindow?.ClearFor(this);
         if (_receivedFood != null) Destroy(_receivedFood.gameObject);
         _receivedFood = null;
         Despawn();
@@ -212,7 +214,7 @@ public class DTCustomer : MonoBehaviour
         SatisfactionSystem.Instance?.Earn(_satisfaction);
         ReputationSystem.Instance?.Report(_satisfaction);
 
-        if (_receivedFood != null) Destroy(_receivedFood.gameObject);
+        _pickupWindow?.ClearFor(this);
         _lane.UnregisterCar(this);
         Destroy(gameObject);
     }
