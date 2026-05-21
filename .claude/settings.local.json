@@ -19,7 +19,8 @@
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\dbals\\\\minigame\\\\minigame-project-MINJUN17\" -Recurse -Force)",
       "Bash(Select-Object -First 50)",
       "Bash(Format-Table FullName)",
-      "mcp__Windows-MCP__FileSystem"
+      "mcp__Windows-MCP__FileSystem",
+      "Bash(gh label *)"
     ]
   }
 }

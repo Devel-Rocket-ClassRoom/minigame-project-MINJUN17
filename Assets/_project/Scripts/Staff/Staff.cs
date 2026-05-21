@@ -23,7 +23,6 @@ public abstract class Staff : MonoBehaviour
 
     public float EffectiveMoveSpeed => _data.moveSpeed * (1f + _hireVariance);
     public long EffectiveSalary => (long)(_data.salary * (1f + _hireVariance));
-    public float EffectiveDeliverySpeed => _data.deliveryTime * (1f + _hireVariance);
 
     protected virtual void Awake()
     {
