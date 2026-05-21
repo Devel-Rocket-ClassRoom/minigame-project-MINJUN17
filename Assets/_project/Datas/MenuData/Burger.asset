@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Burger
   m_EditorClassIdentifier: Assembly-CSharp::MenuData
   menuName: "\uD584\uBC84\uAC70"
+  foodSprite: {fileID: -8887790750134936684, guid: 42b3767372e8b434fbdc37c5196fc2dc, type: 3}
   price: 5000
   cost: 2000
   tool: {fileID: 11400000, guid: d19e3da870805a242a72292d0739cb8f, type: 2}

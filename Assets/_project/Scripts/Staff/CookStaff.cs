@@ -11,6 +11,10 @@ public class CookStaff : Staff
     private Vector3? _currentToolTargetPos;
     private Vector3? _currentRestTarget;
 
+    [Header("음식")]
+    [SerializeField] private GameObject foodPrefab;
+    private Food _carryingFood;
+
     public float EffectiveSpeedMultiplier => _data.speedMultiplier * (1f + _hireVariance) * _growthMultiplier;
 
     public void Init(StaffData data, int id, float hireVariance = 0f)
@@ -104,9 +108,20 @@ public class CookStaff : Staff
         _remainingMenus.Dequeue();
 
         if (_remainingMenus.Count > 0)
+        {
             PrepareNextTool();
+        }
         else
+        {
+            // 조리 완료: 음식 생성 후 요리사가 들고 픽업대로
+            if (foodPrefab != null)
+            {
+                _carryingFood = Instantiate(foodPrefab).GetComponent<Food>();
+                _carryingFood.SetUp(_currentOrder);
+                AttachFood(_carryingFood);   // Staff 베이스 헬퍼
+            }
             ChangeState(CookState.WALK_TO_PASS_WINDOW);
+        }
     }
 
     private void WalkToPassWindowState()
@@ -116,8 +131,12 @@ public class CookStaff : Staff
         MoveTo(target);
         if (HasArrived())
         {
-            Food food = new Food { order = _currentOrder };
-            PassWindowManager.Instance.PlaceFood(food);
+            if (_carryingFood != null)
+            {
+                // PassWindow.PlaceFood가 SetParent + 슬롯 정렬 처리
+                PassWindowManager.Instance.PlaceFood(_carryingFood);
+                _carryingFood = null;
+            }
             _currentOrder = null;
             _remainingMenus = null;
             _currentToolTargetPos = null;

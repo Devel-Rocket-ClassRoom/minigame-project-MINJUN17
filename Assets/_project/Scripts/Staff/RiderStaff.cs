@@ -5,6 +5,7 @@ public class RiderStaff : Staff
 {
     private RiderState _state;
     private Food _carryingFood;
+    private Food _claimedFood;   // 픽업대에 시각적으로 남아있으나 클레임만 한 음식
     private float _deliverDurationCache;
     private Vector3? _currentRestTarget;
     private const float kRestBlockRadius = 0.5f;
@@ -54,14 +55,14 @@ public class RiderStaff : Staff
 
     private void IdleAtRiderPosState()
     {
-        // 배달 음식 있으면 픽업 (가장 가까운 idle 라이더 우선)
+        // 배달 음식 있으면 클레임 (실제 픽업은 픽업대 도착 시점에)
         if (PassWindowManager.Instance.HasReadyDeliveryFood())
         {
             var pwTransform = PassWindowManager.Instance.GetFirstPassWindowTransform();
             if (pwTransform != null && IsClosestIdleRiderTo(pwTransform.position))
             {
-                _carryingFood = PassWindowManager.Instance.PickupDeliveryFood();
-                if (_carryingFood != null)
+                _claimedFood = PassWindowManager.Instance.ClaimDeliveryFood(this);
+                if (_claimedFood != null)
                 {
                     ChangeState(RiderState.WALK_TO_PASSWINDOW);
                     return;
@@ -98,16 +99,27 @@ public class RiderStaff : Staff
 
     private void WalkToPassWindowState()
     {
-        // 음식 픽업은 IdleAt에서 했으니 여기선 PassWindow 인접 위치로 걸어가는 연출만
         Vector3 target = PassWindowManager.Instance.GetApproachPosition(PathRole.Rider, transform.position);
         if (target == Vector3.zero)
         {
+            // 픽업대 접근 불가: 클레임만 해제하고 음식은 픽업대에 그대로 둠
+            if (_claimedFood != null) _claimedFood.claimedBy = null;
+            _claimedFood = null;
             ChangeState(RiderState.WALK_TO_EXIT);
             return;
         }
         MoveTo(target);
         if (HasArrived())
+        {
+            // 픽업대 도착: 클레임한 음식 실제로 들기
+            if (_claimedFood != null)
+            {
+                _carryingFood = PassWindowManager.Instance.TakeFood(_claimedFood);
+                _claimedFood = null;
+                if (_carryingFood != null) AttachFood(_carryingFood);
+            }
             ChangeState(RiderState.WALK_TO_EXIT);
+        }
     }
 
     private void WalkToExitState()
@@ -118,6 +130,7 @@ public class RiderStaff : Staff
         MoveTo(exit);
         if (HasArrived())
         {
+            Destroy(_carryingFood.gameObject);
             // 배달 시간 캐시 후 시각만 가림 (Update는 계속 돌아야 _stateTimer가 증가)
             _deliverDurationCache = EffectiveDeliveryDuration;
             SetVisible(false);
@@ -129,9 +142,9 @@ public class RiderStaff : Staff
     {
         if (_stateTimer < _deliverDurationCache) return;
 
+        
         _carryingFood = null;
         if (PhoneManager.Instance != null) PhoneManager.Instance.OnDeliveryCompleted();
-
         // entryPoint에 재배치 후 다시 보이게
         if (CustomerManager.Instance != null)
             transform.position = CustomerManager.Instance.EntryPosition;

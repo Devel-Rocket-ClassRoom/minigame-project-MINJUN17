@@ -20,7 +20,7 @@ public class PlacementSystem : MonoBehaviour
     // Place / Move 공통: 드래그 중인 preview
     private FurnitureData _previewData;
     private GameObject _previewInstance;
-    private SpriteRenderer _previewRenderer;
+    private SpriteRenderer[] _previewRenderers;   // 부모 + 자식 SpriteRenderer 전부 (TableSet 같이 자식에만 sprite 있는 케이스 지원)
     private Vector2Int _currentOrigin;
     private int _previewRotationStep;
 
@@ -263,7 +263,7 @@ public class PlacementSystem : MonoBehaviour
     {
         _previewData = data;
         _previewInstance = preview;
-        _previewRenderer = preview.GetComponent<SpriteRenderer>();
+        _previewRenderers = preview.GetComponentsInChildren<SpriteRenderer>(true);
         _previewRotationStep = rotationStep;
         _currentOrigin = startOrigin;
 
@@ -285,8 +285,13 @@ public class PlacementSystem : MonoBehaviour
     {
         _previewInstance.transform.position =
             gridManager.CellToWorld(_currentOrigin, PreviewWidth, PreviewHeight);
-        _previewRenderer.color =
-            gridManager.CanPlace(_currentOrigin, PreviewWidth, PreviewHeight, gridManager.GetZone(_currentOrigin)) ? validColor : invalidColor;
+        Color color = gridManager.CanPlace(_currentOrigin, PreviewWidth, PreviewHeight, gridManager.GetZone(_currentOrigin))
+            ? validColor : invalidColor;
+        if (_previewRenderers != null)
+        {
+            foreach (var sr in _previewRenderers)
+                if (sr != null) sr.color = color;
+        }
     }
 
     // ========== 유틸 ==========
@@ -343,7 +348,7 @@ public class PlacementSystem : MonoBehaviour
     {
         _previewData = null;
         _previewInstance = null;
-        _previewRenderer = null;
+        _previewRenderers = null;
         _previewRotationStep = 0;
         _movingOriginal = null;
         _removeTarget = null;

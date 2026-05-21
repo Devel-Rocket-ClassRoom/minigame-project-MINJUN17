@@ -197,15 +197,32 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    // 가구 footprint(width × height)가 활성 영역 안에 들어오도록 origin을 클램프
+    // 가구 footprint(width × height)가 활성 영역(현재 활성 셀들의 bounding box) 안에 들어오도록 origin을 클램프
+    // 확장될 때마다 활성 셀이 늘어나면 클램프 범위도 자동으로 늘어남
     public Vector2Int ClampToActiveArea(Vector2Int origin, int width, int height)
     {
-        int maxX = Mathf.Max(0, _startGridWidth - width);
-        int minY = _gridHeight - _startGridHeight;                  // 3
-        int maxY = Mathf.Max(minY, _gridHeight - height);           // 12 - h
+        // 현재 활성 셀들의 bounding box 계산
+        int minX = int.MaxValue, minY = int.MaxValue;
+        int maxX = int.MinValue, maxY = int.MinValue;
+        bool any = false;
+        for (int x = 0; x < _gridWidth; x++)
+        for (int y = 0; y < _gridHeight; y++)
+        {
+            if (_cells[x, y] == null || !_cells[x, y].isActive) continue;
+            any = true;
+            if (x < minX) minX = x;
+            if (y < minY) minY = y;
+            if (x > maxX) maxX = x;
+            if (y > maxY) maxY = y;
+        }
+        if (!any) return origin;
+
+        // footprint가 bbox 안에 들어오도록 origin 상한 조정
+        int clampMaxX = Mathf.Max(minX, maxX - width + 1);
+        int clampMaxY = Mathf.Max(minY, maxY - height + 1);
         return new Vector2Int(
-            Mathf.Clamp(origin.x, 0, maxX),
-            Mathf.Clamp(origin.y, minY, maxY)
+            Mathf.Clamp(origin.x, minX, clampMaxX),
+            Mathf.Clamp(origin.y, minY, clampMaxY)
         );
     }
 

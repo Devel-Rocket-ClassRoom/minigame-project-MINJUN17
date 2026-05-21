@@ -31,6 +31,7 @@ public class Customer : MonoBehaviour
     private float _spawnTime;
     private int _satisfaction;
     private PathMover _mover;
+    private Food _servedFood;
 
     public List<MenuData> OrderedMenus { get; private set; }
 
@@ -184,7 +185,11 @@ public class Customer : MonoBehaviour
     }
     private void WalkToSeatState()
     {
-        MoveTo(_targetSeat.transform.position);
+        // Seat의 transform.position이 의자 sprite 정렬용으로 셀 중앙에서 어긋날 수 있어서
+        // 손님은 그 위치가 속한 셀의 중앙으로 이동
+        Vector2Int seatCell = GridManager.Instance.WorldToCell(_targetSeat.transform.position);
+        Vector3 target = GridManager.Instance.CellToWorld(seatCell);
+        MoveTo(target);
         if (HasArrived())
             ChangeState(CustomerState.WAIT_AT_SEAT);
     }
@@ -201,10 +206,11 @@ public class Customer : MonoBehaviour
         ChangeState(CustomerState.LEAVE);
     }
 
-    public void OnFoodDelivered(ServerStaff server)
+    public void OnFoodDelivered(ServerStaff server, Food food)
     {
         if (_state == CustomerState.WAIT_AT_SEAT)
         {
+            _servedFood = food;
             _satisfaction += Mathf.FloorToInt(server.EffectiveKindness);
             ChangeState(CustomerState.EAT);
         }
@@ -215,7 +221,14 @@ public class Customer : MonoBehaviour
         _satisfaction += Mathf.FloorToInt(Time.deltaTime * eatGainRate);
 
         if (_stateTimer >= _data.eatSpeed)
+        {
+            if (_servedFood != null)
+            {
+                Destroy(_servedFood.gameObject);
+                _servedFood = null;
+            }
             ChangeState(CustomerState.LEAVE);
+        }
     }
 
     private void LeaveState()

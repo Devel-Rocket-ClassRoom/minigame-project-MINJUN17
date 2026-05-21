@@ -14,6 +14,9 @@ public abstract class Staff : MonoBehaviour
 
     protected PathMover _mover;
 
+    [Header("운반 위치 (자식 Transform — 인스펙터에서 위치 조정)")]
+    [SerializeField] protected Transform carryPoint;
+
     public StaffData Data => _data;
     public int Id => id;
     public int TenureMonths => _tenureMonths;
@@ -83,5 +86,16 @@ public abstract class Staff : MonoBehaviour
     protected bool HasArrived()
     {
         return _mover.HasArrived();
+    }
+
+    /// <summary>
+    /// 음식을 직원의 carryPoint 자식으로 부착. carryPoint 없으면 직원 transform 자체로 폴백.
+    /// </summary>
+    public void AttachFood(Food food)
+    {
+        if (food == null) return;
+        Transform parent = carryPoint != null ? carryPoint : transform;
+        food.transform.SetParent(parent, false);
+        food.transform.localPosition = Vector3.zero;
     }
 }

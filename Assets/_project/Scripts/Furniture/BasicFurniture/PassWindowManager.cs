@@ -78,6 +78,37 @@ public class PassWindowManager : MonoBehaviour
         return null;
     }
 
+    // 클레임/실제 픽업 분리: 시각은 픽업대에 머물고, 직원이 픽업대 도착 시 TakeFood로 들기
+    public Food ClaimHallFood(Staff claimer)
+    {
+        foreach (var pw in passWindows)
+        {
+            var f = pw.ClaimHallFood(claimer);
+            if (f != null) return f;
+        }
+        return null;
+    }
+
+    public Food ClaimDeliveryFood(Staff claimer)
+    {
+        foreach (var pw in passWindows)
+        {
+            var f = pw.ClaimDeliveryFood(claimer);
+            if (f != null) return f;
+        }
+        return null;
+    }
+
+    public Food TakeFood(Food food)
+    {
+        foreach (var pw in passWindows)
+        {
+            var taken = pw.TakeFood(food);
+            if (taken != null) return taken;
+        }
+        return null;
+    }
+
     public void SubmitOrder(Order order)
     {
         if (passWindows.Count == 0) return;

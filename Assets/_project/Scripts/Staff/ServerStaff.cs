@@ -10,6 +10,7 @@ public class ServerStaff : Staff
     [SerializeField] private float takingDeliveryOrderDuration = 1f;
 
     private Food _carryingFood;
+    private Food _claimedFood;   // 픽업대에 시각적으로 남아있으나 내가 가져갈 거라고 클레임만 한 음식
 
     private Counter _targetCounter;
     private Phone _targetPhone;
@@ -51,14 +52,14 @@ public class ServerStaff : Staff
 
     private void IdleAtCounterState()
     {
-        // ① 홀 음식 픽업
+        // ① 홀 음식 클레임 (실제 픽업은 픽업대 도착 시점에)
         if (PassWindowManager.Instance.HasReadyHallFood())
         {
             var passWindow = PassWindowManager.Instance.GetFirstPassWindowTransform();
             if (passWindow != null && IsClosestIdleServerTo(passWindow.position))
             {
-                _carryingFood = PassWindowManager.Instance.PickupHallFood();
-                if (_carryingFood != null)
+                _claimedFood = PassWindowManager.Instance.ClaimHallFood(this);
+                if (_claimedFood != null)
                 {
                     ChangeState(ServerState.WALK_TO_PASS_WINDOW);
                     return;
@@ -183,7 +184,16 @@ public class ServerStaff : Staff
 
         MoveTo(target);
         if (HasArrived())
+        {
+            // 픽업대 도착: 클레임한 음식 실제로 들기 (SetParent 자기 자신으로)
+            if (_claimedFood != null)
+            {
+                _carryingFood = PassWindowManager.Instance.TakeFood(_claimedFood);
+                _claimedFood = null;
+                if (_carryingFood != null) AttachFood(_carryingFood);
+            }
             ChangeState(ServerState.WALK_TO_SEAT);
+        }
     }
 
     private void WalkToSeatState()
@@ -191,21 +201,29 @@ public class ServerStaff : Staff
         Customer customer = _carryingFood?.order?.customer;
         if (customer == null)
         {
+            if (_carryingFood != null) Destroy(_carryingFood.gameObject);
             _carryingFood = null;
             ChangeState(ServerState.IDLE_AT_COUNTER);
             return;
         }
 
-        // 의자 자체가 아닌, 의자 인접 walkable 셀까지만 이동 (의자 위로 진입 방지)
+        // 음식 놓을 위치 = 의자가 속한 테이블 세트의 FoodDropOff (의자 단독이면 의자 자체)
         Seat seat = customer.AssignedSeat;
-        Vector3 target = seat != null
-            ? GridManager.Instance.GetFurnitureApproachPosition(seat.transform.position, PathRole.Server, transform.position)
+        Transform dropOff = seat != null ? seat.FoodDropOff : null;
+        Vector3 target = dropOff != null
+            ? GridManager.Instance.GetFurnitureApproachPosition(dropOff.position, PathRole.Server, transform.position)
             : customer.transform.position;   // 좌석 정보 없으면 fallback
 
         MoveTo(target);
         if (HasArrived())
         {
-            customer.OnFoodDelivered(this);
+            // 음식 테이블 위에 놓기
+            if (_carryingFood != null && dropOff != null)
+            {
+                _carryingFood.transform.SetParent(dropOff, false);
+                _carryingFood.transform.localPosition = Vector3.zero;
+            }
+            customer.OnFoodDelivered(this, _carryingFood);
             _carryingFood = null;
             ChangeState(ServerState.IDLE_AT_COUNTER);
         }

@@ -136,6 +136,15 @@ public class PhoneManager : MonoBehaviour
         for (int i = 0; i < orderCount; i++)
             menus.Add(MenuManager.Instance.PickRandomByWeight());
 
+        // ★ 배달 매출/판매 통계 기록 (전화 응대 시점)
+        int totalPrice = 0;
+        foreach (var menu in menus)
+        {
+            totalPrice += menu.price;
+            SalesTracker.Instance.RecordSale(menu);
+        }
+        MoneySystem.Instance.Earn(totalPrice);   // ← MoneySystem API 이름 확인 필요
+
         var order = new Order
         {
             customer = null,

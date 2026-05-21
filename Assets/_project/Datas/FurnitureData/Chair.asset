@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f0cc6336acd53945a1d4307bb60037e, type: 3}
   m_Name: Chair
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureData
-  prefab: {fileID: 1139064332399026504, guid: 4d55ad1fb11082b4aa3b5fc39e4ec450, type: 3}
+  prefab: {fileID: 5182720186777033002, guid: 414cd04a4db30d34e8ee519973d13726, type: 3}
   zone: 1
   width: 1
   height: 1
   anchorX: 0
   anchorY: 0
+  deliveryBonus: 0
