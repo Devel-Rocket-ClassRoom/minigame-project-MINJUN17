@@ -20,7 +20,8 @@
       "Bash(Select-Object -First 50)",
       "Bash(Format-Table FullName)",
       "mcp__Windows-MCP__FileSystem",
-      "Bash(gh label *)"
+      "Bash(gh label *)",
+      "Bash(gh pr *)"
     ]
   }
 }
