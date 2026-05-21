@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class RiderStaff : Staff
@@ -5,7 +6,8 @@ public class RiderStaff : Staff
     private RiderState _state;
     private Food _carryingFood;
     private float _deliverDurationCache;
-    private int _restSlotIndex;
+    private Vector3? _currentRestTarget;
+    private const float kRestBlockRadius = 0.5f;
 
     public bool IsIdle => _state == RiderState.IDLE_AT_RIDERPOS;
     public float EffectiveDeliveryDuration
@@ -21,10 +23,9 @@ public class RiderStaff : Staff
         }
     }
 
-    public void Init(StaffData data, int id, int restSlotIndex, float hireVariance = 0f)
+    public void Init(StaffData data, int id, float hireVariance = 0f)
     {
         InitBase(data, id, hireVariance);
-        _restSlotIndex = restSlotIndex;
         ChangeState(RiderState.IDLE_AT_RIDERPOS);
     }
 
@@ -47,6 +48,8 @@ public class RiderStaff : Staff
     {
         _state = next;
         _stateTimer = 0f;
+        if (next != RiderState.IDLE_AT_RIDERPOS && next != RiderState.RETURN_TO_ENTRY)
+            _currentRestTarget = null;
     }
 
     private void IdleAtRiderPosState()
@@ -66,12 +69,16 @@ public class RiderStaff : Staff
             }
         }
 
-        // 라이더룸 휴식 위치로 이동
+        // 라이더룸 휴식 위치로 이동 (한 번 정한 목표는 다른 라이더가 차지하기 전까진 유지)
         if (RiderRoomManager.Instance != null)
         {
-            Vector3 restPos = RiderRoomManager.Instance.GetRestPosition(_restSlotIndex);
-            if (restPos != Vector3.zero)
-                MoveTo(restPos);
+            if (_currentRestTarget == null
+                || IsRestTargetTakenByOther(_currentRestTarget.Value))
+            {
+                Vector3 picked = PickRestSpot();
+                _currentRestTarget = picked != Vector3.zero ? picked : (Vector3?)null;
+            }
+            if (_currentRestTarget.HasValue) MoveTo(_currentRestTarget.Value);
         }
     }
 
@@ -92,7 +99,7 @@ public class RiderStaff : Staff
     private void WalkToPassWindowState()
     {
         // 음식 픽업은 IdleAt에서 했으니 여기선 PassWindow 인접 위치로 걸어가는 연출만
-        Vector3 target = PassWindowManager.Instance.GetApproachPosition(PathRole.Rider);
+        Vector3 target = PassWindowManager.Instance.GetApproachPosition(PathRole.Rider, transform.position);
         if (target == Vector3.zero)
         {
             ChangeState(RiderState.WALK_TO_EXIT);
@@ -141,20 +148,41 @@ public class RiderStaff : Staff
 
     private void ReturnToEntryState()
     {
-        // entry → 라이더룸으로 복귀
-        if (RiderRoomManager.Instance == null)
+        if (_currentRestTarget == null
+            || IsRestTargetTakenByOther(_currentRestTarget.Value))
+        {
+            Vector3 picked = PickRestSpot();
+            _currentRestTarget = picked != Vector3.zero ? picked : (Vector3?)null;
+        }
+        if (!_currentRestTarget.HasValue)
         {
             ChangeState(RiderState.IDLE_AT_RIDERPOS);
             return;
         }
-        Vector3 restPos = RiderRoomManager.Instance.GetRestPosition(_restSlotIndex);
-        if (restPos == Vector3.zero)
-        {
-            ChangeState(RiderState.IDLE_AT_RIDERPOS);
-            return;
-        }
-        MoveTo(restPos);
+        MoveTo(_currentRestTarget.Value);
         if (HasArrived())
             ChangeState(RiderState.IDLE_AT_RIDERPOS);
+    }
+
+    private Vector3 PickRestSpot()
+    {
+        var candidates = GridManager.Instance.GetWalkableCellsInZone(CellZone.RiderRoom);
+        var occupiers = new List<Vector3>();
+        foreach (var r in StaffManager.Instance.RiderStaffs)
+            if (r != this) occupiers.Add(r.transform.position);
+        return RestSpotPicker.PickClosestFree(
+            transform.position, candidates, occupiers, kRestBlockRadius);
+    }
+
+    private bool IsRestTargetTakenByOther(Vector3 target)
+    {
+        if (Vector3.Distance(transform.position, target) < kRestBlockRadius) return false;
+        foreach (var r in StaffManager.Instance.RiderStaffs)
+        {
+            if (r == this) continue;
+            if (Vector3.Distance(r.transform.position, target) < kRestBlockRadius)
+                return true;
+        }
+        return false;
     }
 }

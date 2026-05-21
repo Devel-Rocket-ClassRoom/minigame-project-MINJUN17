@@ -40,33 +40,6 @@ public class RiderRoomManager : MonoBehaviour
     {
         return Mathf.Max(minDeliveryDuration, baseDuration - TotalDeliveryBonus());
     }
-
-    // 라이더룸 zone 안의 walkable 셀 중 첫 번째 (휴식 위치)
-    // 여러 라이더면 각자 다른 셀로 분산 (slotIndex 활용)
-    public Vector3 GetRestPosition(int slotIndex)
-    {
-        var grid = GridManager.Instance;
-        if (grid == null) return Vector3.zero;
-
-        var candidates = new List<Vector2Int>();
-        for (int y = 0; y < grid.GridHeight; y++)
-        for (int x = 0; x < grid.GridWidth; x++)
-        {
-            var pos = new Vector2Int(x, y);
-            var cell = grid.GetCell(pos);
-            if (cell == null) continue;
-            if (cell.zone != CellZone.RiderRoom) continue;
-            if (!cell.isActive) continue;
-            if (cell.isWall) continue;
-            if (cell.isOccupied) continue;
-            candidates.Add(pos);
-        }
-
-        if (candidates.Count == 0) return Vector3.zero;
-        int idx = Mathf.Clamp(slotIndex, 0, candidates.Count - 1);
-        return grid.CellToWorld(candidates[idx]);
-    }
-
     public bool HasRiderRoom()
     {
         var grid = GridManager.Instance;

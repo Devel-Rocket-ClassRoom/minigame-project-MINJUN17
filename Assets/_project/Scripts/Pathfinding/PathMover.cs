@@ -14,7 +14,7 @@ public class PathMover : MonoBehaviour
     private bool _hasDest;
 
     private const float CELL_ARRIVE = 0.05f;
-    private const float FINAL_ARRIVE = 0.1f;
+    private const float FINAL_ARRIVE = 0.001f;
 
     public PathRole Role { get => role; set => role = value; }
 

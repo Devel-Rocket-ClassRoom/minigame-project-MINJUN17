@@ -95,9 +95,9 @@ public class PassWindowManager : MonoBehaviour
         return passWindows.Count > 0 ? passWindows[0].transform : null;
     }
 
-    public Vector3 GetApproachPosition(PathRole role)
+    public Vector3 GetApproachPosition(PathRole role, Vector3 from)
     {
         if (passWindows.Count == 0) return Vector3.zero;
-        return GridManager.Instance.GetFurnitureApproachPosition(passWindows[0].transform.position, role);
+        return GridManager.Instance.GetFurnitureApproachPosition(passWindows[0].transform.position, role, from);
     }
 }

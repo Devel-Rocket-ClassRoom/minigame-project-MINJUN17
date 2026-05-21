@@ -119,10 +119,10 @@ public class PhoneManager : MonoBehaviour
 
     public bool HasRingingPhone() => GetRingingPhone() != null;
 
-    public Vector3 GetPhoneApproachPosition(PathRole role)
+    public Vector3 GetPhoneApproachPosition(PathRole role, Vector3 from)
     {
         if (phones.Count == 0) return Vector3.zero;
-        return GridManager.Instance.GetFurnitureApproachPosition(phones[0].transform.position, role);
+        return GridManager.Instance.GetFurnitureApproachPosition(phones[0].transform.position, role, from);
     }
 
     // 서버가 도착해서 ring 받은 시점에 호출 → 배달 Order 생성하여 PassWindow에 제출

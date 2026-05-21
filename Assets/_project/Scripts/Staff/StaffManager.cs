@@ -10,7 +10,6 @@ public class StaffManager : MonoBehaviour
     [SerializeField] private RiderStaff riderStaffPrefab;
     [SerializeField] private StaffData starterCookData;
     [SerializeField] private StaffData starterServerData;
-    [SerializeField] private Transform kitchenIdlePos;
     [SerializeField] private TimeSystem timeSystem;
 
     [Header("등급별 SO (Junior, Senior, Manager 순)")]
@@ -79,7 +78,7 @@ public class StaffManager : MonoBehaviour
         MoneySystem.Instance.Spend(data.hireCost);
         var staff = Instantiate(cookStaffPrefab);
         staff.gameObject.name = $"Cook_{nextId}";
-        staff.Init(data, nextId, kitchenIdlePos, hireVariance);
+        staff.Init(data, nextId, hireVariance);
         nextId++;
         cookStaffs.Add(staff);
         return staff;
@@ -112,14 +111,15 @@ public class StaffManager : MonoBehaviour
         var staff = Instantiate(riderStaffPrefab);
         staff.gameObject.name = $"Rider_{nextId}";
 
-        // 라이더룸 휴식 슬롯에 배치 후 Init
-        int slotIndex = riderStaffs.Count;
-        if (RiderRoomManager.Instance != null)
-        {
-            Vector3 restPos = RiderRoomManager.Instance.GetRestPosition(slotIndex);
-            if (restPos != Vector3.zero) staff.transform.position = restPos;
-        }
-        staff.Init(data, nextId, slotIndex, hireVariance);
+        // 라이더룸 빈 셀에 초기 배치
+        var candidates = GridManager.Instance.GetWalkableCellsInZone(CellZone.RiderRoom);
+        var occupiers = new List<Vector3>();
+        foreach (var r in riderStaffs) occupiers.Add(r.transform.position);
+        Vector3 spawnPos = RestSpotPicker.PickClosestFree(
+            staff.transform.position, candidates, occupiers, 0.5f);
+        if (spawnPos != Vector3.zero) staff.transform.position = spawnPos;
+
+        staff.Init(data, nextId, hireVariance);
         nextId++;
         riderStaffs.Add(staff);
         return staff;
