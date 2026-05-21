@@ -426,6 +426,20 @@ public class TestDebugPanel : MonoBehaviour
             Debug.Log($"[LastRank] Rank={RankingSystem.Instance.LastResult.Rank} Score={RankingSystem.Instance.LastResult.Score}");
     }
 
+    // ============================== 맵 확장 ==============================
+
+    /// <summary>다음 확장 단계 활성화. Button.OnClick에 연결.</summary>
+    public void ExpandMap()
+    {
+        if (ExpansionManager.Instance == null) { Debug.LogWarning("[TestDebugPanel] ExpansionManager 없음"); return; }
+        if (!ExpansionManager.Instance.CanExpand) { Debug.LogWarning("[TestDebugPanel] 더 이상 확장 단계 없음 (최종 상태)"); return; }
+
+        var next = ExpansionManager.Instance.NextStage;
+        bool ok = ExpansionManager.Instance.TryExpand();
+        if (ok) Debug.Log($"[TestDebugPanel] 맵 확장 성공: {next?.name ?? "stage"}");
+        else    Debug.LogWarning($"[TestDebugPanel] 맵 확장 실패 (자금 부족? 비용={next?.unlockCost})");
+    }
+
     // ============================== 가구 배치 ==============================
 
     /// <summary>testFurnitures 중 랜덤 하나로 설치 모드 시작.</summary>

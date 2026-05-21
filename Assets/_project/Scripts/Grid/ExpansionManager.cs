@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class ExpansionManager : MonoBehaviour
 {
@@ -19,6 +18,7 @@ public class ExpansionManager : MonoBehaviour
         Instance = this;
     }
 
+    // UI Button.OnClick에서 직접 호출하거나 TestDebugPanel.ExpandMap 경유
     public bool TryExpand()
     {
         if (!CanExpand) return false;
@@ -29,13 +29,5 @@ public class ExpansionManager : MonoBehaviour
         gridManager.ActivateCells(stage);  // GridManager 싱글톤이 아니면 SerializeField로 참조
         _currentStage++;
         return true;
-    }
-    private void Update()
-    {
-        if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
-        {
-            Debug.Log("[Expansion] 스페이스 감지");
-            TryExpand();
-        }
     }
 }
