@@ -6,7 +6,16 @@ using UnityEngine;
 /// </summary>
 public class DTWindowManager : MonoBehaviour
 {
-    public static DTWindowManager Instance;
+    private static DTWindowManager _instance;
+    public static DTWindowManager Instance
+    {
+        get
+        {
+            if (_instance == null)
+                _instance = FindObjectOfType<DTWindowManager>();
+            return _instance;
+        }
+    }
 
     private readonly List<DTOrderWindow> orderWindows = new();
     private readonly List<DTPickupWindow> pickupWindows = new();
@@ -22,8 +31,8 @@ public class DTWindowManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
-        Instance = this;
+        if (_instance != null && _instance != this) { Destroy(gameObject); return; }
+        _instance = this;
     }
 
     public void RegisterOrder(DTOrderWindow w)

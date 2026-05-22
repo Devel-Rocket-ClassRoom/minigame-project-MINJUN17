@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 public class GridManager : MonoBehaviour
 {
@@ -14,6 +15,9 @@ public class GridManager : MonoBehaviour
     [Header("Camera")]
     [SerializeField] private Camera mainCamera;
     [SerializeField] private float cameraPadding = 1f;
+
+    [Header("Floor Tilemap")]
+    [SerializeField] private Tilemap floorTilemap;
 
     public int GridWidth => _gridWidth;
     public int GridHeight => _gridHeight;
@@ -45,6 +49,7 @@ public class GridManager : MonoBehaviour
         Instance = this;
         if (mainCamera == null) mainCamera = Camera.main;
         CreateGrid();
+        HideInactiveFloorTiles();
         CenterCameraOnActiveGrid();
 
     }
@@ -229,7 +234,24 @@ public class GridManager : MonoBehaviour
             Mathf.Clamp(origin.y, minY, clampMaxY)
         );
     }
-
+    // 시작 시 호출: 비활성 셀의 Tilemap 타일을 캐싱하고 화면에서 제거
+    private void HideInactiveFloorTiles()
+    {
+        if (floorTilemap == null)
+        {
+            Debug.LogWarning("[GridManager] floorTilemap 미할당 — 인스펙터에서 Floor Tilemap 슬롯에 Tilemap을 드래그하세요");
+            return;
+        }
+        for (int x = 0; x < _gridWidth; x++)
+        for (int y = 0; y < _gridHeight; y++)
+        {
+            var cell = _cells[x, y];
+            var pos = new Vector3Int(x, y, 0);
+            cell.cachedTile = floorTilemap.GetTile(pos);
+            if (!cell.isActive)
+                floorTilemap.SetTile(pos, null);
+        }
+    }
     public Vector3 CellToWorld(Vector2Int pos, int width = 1, int height = 1)
     {
         return new Vector3(pos.x + width * 0.5f, pos.y + height * 0.5f, 0);
@@ -374,6 +396,8 @@ public class GridManager : MonoBehaviour
                 var cell = _cells[pos.x, pos.y];
                 cell.isActive = true;
                 cell.zone = stage.newZone;
+                if (floorTilemap != null && cell.cachedTile != null)
+                    floorTilemap.SetTile(new Vector3Int(pos.x, pos.y, 0), cell.cachedTile);
             }
         }
         // 확장 후 카메라 자동 재정렬

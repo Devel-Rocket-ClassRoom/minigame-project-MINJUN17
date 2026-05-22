@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Tilemaps;
 public enum CellZone { Kitchen, Hall, RiderRoom }
 public class GridCell
 {
@@ -10,6 +11,8 @@ public class GridCell
     public bool isReserved; // 활성화 되면 지나다닐수는 있지만 물건 배치는 못하는 타일 (ex - 입구, 음식 픽업 장소)
     public bool isWall;     // 벽, 누구도 못 지나감 (주방-홀 경계 등)
     public PlacedObject placedObject; // 타일 위에 올라와 있는 배치 인스턴스
+
+    public TileBase cachedTile; // 비활성 상태일 때 보관할 원본 Tilemap 타일
 
     public GridCell(int x, int y, bool isActive, bool isReserved, CellZone zone)
     {

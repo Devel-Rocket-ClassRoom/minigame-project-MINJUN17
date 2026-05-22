@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// 3개월 압축 플레이 테스트용 디버그 패널.
@@ -47,6 +48,25 @@ public class TestDebugPanel : MonoBehaviour
     [Header("월 스킵 사이 대기 (초)")]
     [SerializeField] private float skipDelay = 1.5f;
 
+    [Header("로그 화면 표시 (빌드용)")]
+    [Tooltip("Debug.Log/Warning/Error를 화면에 토스트로 띄움")]
+    [SerializeField] private bool showLogsOnScreen = true;
+    [SerializeField] private float toastDuration = 6f;
+    [SerializeField] private int maxToasts = 6;
+
+    [Header("로그 UI (옵션 - 연결 시 OnGUI 대신 사용. 연말랭킹과 동일 패턴)")]
+    [Tooltip("로그 표시할 패널 (Show/Hide). null이면 OnGUI 폴백.")]
+    [SerializeField] private GameObject logPanel;
+    [SerializeField] private TMPro.TMP_Text logTextTMP;
+    [SerializeField] private UnityEngine.UI.Text logText;
+
+    [Header("OnGUI 폴백 스타일")]
+    [Tooltip("OnGUI 폴백 사용 시 폰트 크기 (모바일 가독성).")]
+    [SerializeField] private int onGuiLogFontSize = 28;
+
+    private struct LogToast { public string msg; public LogType type; public float until; }
+    private readonly System.Collections.Generic.List<LogToast> _logToasts = new();
+
     private void Awake()
     {
         if (panelRoot != null) panelRoot.SetActive(false);
@@ -55,6 +75,79 @@ public class TestDebugPanel : MonoBehaviour
         if (dayCycle == null)         dayCycle         = FindFirstObjectByType<DayCycleController>();
         if (customerManager == null)  customerManager  = FindFirstObjectByType<CustomerManager>();
         if (placementSystem == null)  placementSystem  = FindFirstObjectByType<PlacementSystem>();
+    }
+
+    private void OnEnable()
+    {
+        if (showLogsOnScreen) Application.logMessageReceived += OnAppLog;
+    }
+
+    private void OnDisable()
+    {
+        Application.logMessageReceived -= OnAppLog;
+    }
+
+    private void OnAppLog(string condition, string stackTrace, LogType type)
+    {
+        string msg = string.IsNullOrEmpty(condition) ? "(empty)" : condition;
+        if (msg.Length > 600) msg = msg.Substring(0, 600) + "...";
+        _logToasts.Add(new LogToast { msg = msg, type = type, until = Time.time + toastDuration });
+        while (_logToasts.Count > maxToasts) _logToasts.RemoveAt(0);
+        RefreshLogUI();
+    }
+
+    private void Update()
+    {
+        if (!showLogsOnScreen) return;
+        // 만료된 토스트 정리 + UI 갱신
+        bool changed = false;
+        for (int i = _logToasts.Count - 1; i >= 0; i--)
+            if (Time.time > _logToasts[i].until) { _logToasts.RemoveAt(i); changed = true; }
+        if (changed) RefreshLogUI();
+    }
+
+    private bool HasLogUI => logPanel != null || logTextTMP != null || logText != null;
+
+    private void RefreshLogUI()
+    {
+        if (!HasLogUI) return;
+
+        var sb = new System.Text.StringBuilder();
+        bool hasAny = false;
+        for (int i = 0; i < _logToasts.Count; i++)
+        {
+            var t = _logToasts[i];
+            if (Time.time > t.until) continue;
+            hasAny = true;
+            string color = t.type switch
+            {
+                LogType.Error or LogType.Exception or LogType.Assert => "#FF8C8C",
+                LogType.Warning => "#FFE680",
+                _ => "#FFFFFF",
+            };
+            if (sb.Length > 0) sb.Append('\n');
+            sb.Append("<color=").Append(color).Append('>').Append(t.msg).Append("</color>");
+        }
+
+        string text = sb.ToString();
+        if (logTextTMP != null) logTextTMP.text = text;
+        if (logText    != null) logText.text    = text;
+        if (logPanel   != null) logPanel.SetActive(hasAny);
+    }
+
+    /// <summary>화면의 토스트 전부 지우기. UI 버튼 연결용.</summary>
+    public void ClearToasts()
+    {
+        _logToasts.Clear();
+        RefreshLogUI();
+    }
+
+    /// <summary>현재 씬 리로드 — 처음 상태로 리셋. UI 버튼 연결용.</summary>
+    public void ResetGame()
+    {
+        Time.timeScale = 1f; // 일시정지 상태였더라도 정상 진행되게
+        var scene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(scene.buildIndex);
     }
 
     private void Start()
@@ -101,12 +194,70 @@ public class TestDebugPanel : MonoBehaviour
 
     private void OnGUI()
     {
-        if (Time.time > _onGuiShowUntil || string.IsNullOrEmpty(_lastRankingMessage)) return;
+        // 연말 결산 팝업 (UI 슬롯 비어있을 때만 OnGUI로 표시)
+        if (rankingPanel == null && rankingText == null && rankingTextTMP == null
+            && Time.time <= _onGuiShowUntil && !string.IsNullOrEmpty(_lastRankingMessage))
+        {
+            var style = new GUIStyle(GUI.skin.box) { fontSize = 28, alignment = TextAnchor.MiddleCenter, wordWrap = true };
+            style.normal.textColor = Color.white;
+            float w = Mathf.Min(600, Screen.width * 0.8f);
+            float h = Mathf.Min(400, Screen.height * 0.6f);
+            GUI.Box(new Rect(Screen.width / 2 - w / 2, Screen.height / 2 - h / 2, w, h), _lastRankingMessage, style);
+        }
 
-        var style = new GUIStyle(GUI.skin.box) { fontSize = 24, alignment = TextAnchor.MiddleCenter };
-        style.normal.textColor = Color.white;
-        float w = 400, h = 240;
-        GUI.Box(new Rect(Screen.width / 2 - w / 2, Screen.height / 2 - h / 2, w, h), _lastRankingMessage, style);
+        // 로그 토스트 폴백 — 중앙 배치 (UI 슬롯 연결돼있으면 스킵)
+        if (showLogsOnScreen && !HasLogUI) DrawLogToastsCentered();
+    }
+
+    private void DrawLogToastsCentered()
+    {
+        if (_logToasts.Count == 0) return;
+
+        float width = Mathf.Min(700f, Screen.width * 0.85f);
+        float padX = 14f, padY = 10f, gap = 6f;
+
+        // 박스 높이 측정용 임시 스타일 (실측치 기반)
+        var measure = new GUIStyle(GUI.skin.box)
+        {
+            fontSize = onGuiLogFontSize,
+            alignment = TextAnchor.MiddleCenter,
+            wordWrap = true,
+            padding = new RectOffset((int)padX, (int)padX, (int)padY, (int)padY),
+        };
+
+        // 각 토스트 높이 계산
+        var heights = new float[_logToasts.Count];
+        float totalH = 0f;
+        for (int i = 0; i < _logToasts.Count; i++)
+        {
+            heights[i] = measure.CalcHeight(new GUIContent(_logToasts[i].msg), width);
+            totalH += heights[i];
+            if (i < _logToasts.Count - 1) totalH += gap;
+        }
+
+        // 화면 정중앙에서 위쪽으로 시작
+        float startY = (Screen.height - totalH) * 0.5f;
+        float x = (Screen.width - width) * 0.5f;
+        float y = startY;
+
+        for (int i = 0; i < _logToasts.Count; i++)
+        {
+            var t = _logToasts[i];
+            var style = new GUIStyle(measure);
+            switch (t.type)
+            {
+                case LogType.Error:
+                case LogType.Exception:
+                case LogType.Assert:
+                    style.normal.textColor = new Color(1f, 0.55f, 0.55f); break;
+                case LogType.Warning:
+                    style.normal.textColor = new Color(1f, 0.9f, 0.5f); break;
+                default:
+                    style.normal.textColor = Color.white; break;
+            }
+            GUI.Box(new Rect(x, y, width, heights[i]), t.msg, style);
+            y += heights[i] + gap;
+        }
     }
 
     // ============================== 패널 토글 ==============================
@@ -253,6 +404,9 @@ public class TestDebugPanel : MonoBehaviour
     /// <summary>라이더 1명 즉시 고용 (비용 자동 충전).</summary>
     public void HireRider()
     {
+        // 라이더룸 없으면 조용히 무시 (테스트 버튼 안전장치)
+        if (RiderRoomManager.Instance == null || !RiderRoomManager.Instance.HasRiderRoom()) return;
+
         if (StaffManager.Instance == null) { Debug.LogWarning("[TestDebugPanel] StaffManager 없음"); return; }
         if (testRiderData == null) { Debug.LogWarning("[TestDebugPanel] testRiderData 미지정"); return; }
 
