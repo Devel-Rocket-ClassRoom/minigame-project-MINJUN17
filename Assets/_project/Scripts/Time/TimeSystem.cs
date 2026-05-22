@@ -13,7 +13,7 @@ public class TimeSystem : MonoBehaviour
 
     private float _timer;
     private int _hour = 8;
-    private int _month = 0;
+    private int _month = 1;
     private int _year = 0;
     private bool _ticking = true;
 
