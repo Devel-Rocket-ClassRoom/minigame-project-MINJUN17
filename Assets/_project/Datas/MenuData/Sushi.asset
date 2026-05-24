@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 88ad3a3536494ba42ac37b1a58e4863e, type: 3}
-  m_Name: Burger
+  m_Name: Sushi
   m_EditorClassIdentifier: Assembly-CSharp::MenuData
-  menuName: "\uD584\uBC84\uAC70"
-  foodSprite: {fileID: 109503038894596790, guid: d7fe7e5fa5c9dc240ac2312866a613d1, type: 3}
-  price: 5000
-  cost: 2000
-  tool: {fileID: 11400000, guid: d19e3da870805a242a72292d0739cb8f, type: 2}
+  menuName: "\uCD08\uBC25"
+  foodSprite: {fileID: 609855222940722255, guid: f179e6dbb1269d747b1e69da011cc606, type: 3}
+  price: 10000
+  cost: 4000
+  tool: {fileID: 0}
   satisfactionUnlock: 0
   spawnWeight: 0
