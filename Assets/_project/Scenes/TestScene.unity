@@ -9933,6 +9933,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1118384911}
   - component: {fileID: 1118384922}
+  - component: {fileID: 1118384934}
   - component: {fileID: 1118384910}
   - component: {fileID: 1118384916}
   - component: {fileID: 1118384915}
@@ -10202,8 +10203,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0db94f50554026c42892a41b8fec5ca2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CookingToolManager
-  startingTools:
-  - {fileID: 11400000, guid: d19e3da870805a242a72292d0739cb8f, type: 2}
 --- !u!114 &1118384924
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10216,8 +10215,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78fe5e24305a4224a85c40289ea36af7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenuManager
-  startingMenus:
-  - {fileID: 11400000, guid: cad2bcd7068434a4c87ce76c10ec4dda, type: 2}
 --- !u!114 &1118384925
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10319,8 +10316,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5259d3ec72ab5f4aacb31f00eb430b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PhoneManager
-  unlockSatisfactionCost: 500
-  unlocked: 0
+  phoneCatalogData: {fileID: 0}
   ringTimeout: 10
   minOrderCount: 1
   maxOrderCount: 3
@@ -10350,8 +10346,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a19a6f580ab7394cb978b44f709b5c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DTSystem
-  unlockSatisfactionCost: 800
-  unlocked: 0
+  dtCatalogData: {fileID: 0}
   dtCustomerPrefab: {fileID: 5237820646862101244, guid: 25dcf26a650c72e4dafb9bdfe4142ca1, type: 3}
   pool:
   - {fileID: 11400000, guid: a93b104a10714034187c86a764c1c7d8, type: 2}
@@ -10359,6 +10354,33 @@ MonoBehaviour:
   maxSpawnInterval: 14
   newSpawnCutoffHour: 22
   timeSystem: {fileID: 1118384919}
+--- !u!114 &1118384934
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1118384907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 156667f1a85acb24d9a962367b6fba74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CatalogManager
+  allFurniture:
+  - {fileID: 11400000, guid: d19e3da870805a242a72292d0739cb8f, type: 2}
+  - {fileID: 11400000, guid: 74de6b7a3626ae640897fd30ff46ae6d, type: 2}
+  - {fileID: 11400000, guid: 46c6b369273f93244b818a66677e1752, type: 2}
+  - {fileID: 11400000, guid: 566169bc16ffb764399c096a70f75dac, type: 2}
+  - {fileID: 11400000, guid: 4cbb382ac7f7bc341b2122f807ba56df, type: 2}
+  allMenus:
+  - {fileID: 11400000, guid: cad2bcd7068434a4c87ce76c10ec4dda, type: 2}
+  - {fileID: 11400000, guid: 801b94b30f6766b4f89691e15b836e5c, type: 2}
+  startingFurniture:
+  - {fileID: 11400000, guid: 566169bc16ffb764399c096a70f75dac, type: 2}
+  - {fileID: 11400000, guid: 74de6b7a3626ae640897fd30ff46ae6d, type: 2}
+  - {fileID: 11400000, guid: d19e3da870805a242a72292d0739cb8f, type: 2}
+  startingMenus:
+  - {fileID: 11400000, guid: cad2bcd7068434a4c87ce76c10ec4dda, type: 2}
 --- !u!1 &1121342472
 GameObject:
   m_ObjectHideFlags: 0

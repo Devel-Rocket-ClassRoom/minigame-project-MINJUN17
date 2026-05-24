@@ -1,0 +1,464 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
+  m_Name: StringTable Shared Data
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.SharedTableData
+  m_TableCollectionName: StringTable
+  m_TableCollectionNameGuidString: e8a326a4f684cfd4f828350fbb7606b2
+  m_Entries:
+  - m_Id: 1715356631040
+    m_Key: furniture.seat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715402768384
+    m_Key: furniture.counter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715402768385
+    m_Key: furniture.passWindow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715402768386
+    m_Key: furniture.grill
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962688
+    m_Key: furniture.phone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962689
+    m_Key: furniture.dtOrderWindow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962690
+    m_Key: furniture.dtPickupWindow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962691
+    m_Key: menu.burger
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962692
+    m_Key: menu.sushi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962693
+    m_Key: ui.common.confirm
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962694
+    m_Key: ui.common.cancel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962695
+    m_Key: ui.common.close
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962696
+    m_Key: ui.common.save
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962697
+    m_Key: ui.common.yes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962698
+    m_Key: ui.common.no
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962699
+    m_Key: ui.common.ok
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962700
+    m_Key: ui.common.back
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962701
+    m_Key: ui.common.next
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962702
+    m_Key: ui.common.buy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962703
+    m_Key: ui.common.sell
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962704
+    m_Key: ui.common.unlock
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962705
+    m_Key: ui.common.locked
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962706
+    m_Key: ui.common.price
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962707
+    m_Key: ui.common.cost
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962708
+    m_Key: ui.dropdown.install
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962709
+    m_Key: ui.dropdown.move
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962710
+    m_Key: ui.dropdown.remove
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962711
+    m_Key: ui.dropdown.customer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962712
+    m_Key: ui.dropdown.marketing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962713
+    m_Key: ui.dropdown.info
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962714
+    m_Key: ui.dropdown.settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962715
+    m_Key: ui.dropdown.menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962716
+    m_Key: ui.shop.tab.hall
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962717
+    m_Key: ui.shop.tab.kitchen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962718
+    m_Key: ui.shop.tab.riderRoom
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962719
+    m_Key: ui.shop.tab.dt
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962720
+    m_Key: ui.shop.tab.menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962721
+    m_Key: ui.shop.empty
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962722
+    m_Key: ui.hud.money
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962723
+    m_Key: ui.hud.satisfaction
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962724
+    m_Key: ui.hud.reputation
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962725
+    m_Key: ui.hud.year
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962726
+    m_Key: ui.hud.month
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962727
+    m_Key: ui.hud.day
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962728
+    m_Key: ui.hud.time
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962729
+    m_Key: ui.placement.confirm
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962730
+    m_Key: ui.placement.cancel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962731
+    m_Key: ui.placement.rotate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962732
+    m_Key: ui.placement.cannotPlace
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962733
+    m_Key: ui.staff.cook
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962734
+    m_Key: ui.staff.server
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962735
+    m_Key: ui.staff.rider
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962736
+    m_Key: ui.staff.hire
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962737
+    m_Key: ui.staff.fire
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962738
+    m_Key: ui.staff.grade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962739
+    m_Key: ui.staff.salary
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962740
+    m_Key: ui.staff.tenure
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962741
+    m_Key: ui.staff.upgrade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962742
+    m_Key: ui.marketing.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962743
+    m_Key: ui.marketing.apply
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962744
+    m_Key: ui.marketing.satisfactionCost
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962745
+    m_Key: ui.marketing.duration
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962746
+    m_Key: ui.expansion.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962747
+    m_Key: ui.expansion.expand
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962748
+    m_Key: ui.expansion.cost
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962749
+    m_Key: ui.expansion.maxed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962750
+    m_Key: ui.ranking.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962751
+    m_Key: ui.ranking.revenue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962752
+    m_Key: ui.ranking.score
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962753
+    m_Key: ui.ranking.rank
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962754
+    m_Key: ui.ranking.notQualified
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962755
+    m_Key: ui.settings.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962756
+    m_Key: ui.settings.language
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962757
+    m_Key: ui.settings.sound
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962758
+    m_Key: ui.settings.bgm
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962759
+    m_Key: ui.settings.sfx
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962760
+    m_Key: ui.settings.reset
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962761
+    m_Key: ui.info.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962762
+    m_Key: ui.info.version
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962763
+    m_Key: ui.info.credits
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962764
+    m_Key: msg.gameStart
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962765
+    m_Key: msg.gameEnd
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962766
+    m_Key: msg.notEnoughMoney
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962767
+    m_Key: msg.notEnoughSatisfaction
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962768
+    m_Key: msg.unlocked
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962769
+    m_Key: msg.purchased
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962770
+    m_Key: msg.saved
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962771
+    m_Key: msg.error
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880874020864
+    m_Key: marketing.test
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880878215168
+    m_Key: marketing.test.desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880878215169
+    m_Key: marketing.flyer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409472
+    m_Key: marketing.flyer.desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409473
+    m_Key: marketing.snsAd
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409474
+    m_Key: marketing.snsAd.desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409475
+    m_Key: marketing.tvAd
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409476
+    m_Key: marketing.tvAd.desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409477
+    m_Key: expansion.hall1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409478
+    m_Key: expansion.hall2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409479
+    m_Key: expansion.kitchen1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409480
+    m_Key: expansion.riderRoom
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409481
+    m_Key: customer.regular
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409482
+    m_Key: customer.test1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409483
+    m_Key: customer.dt.default
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409484
+    m_Key: staff.role.cook
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409485
+    m_Key: staff.role.server
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409486
+    m_Key: staff.role.rider
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409487
+    m_Key: staff.grade.junior
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409488
+    m_Key: staff.grade.senior
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409489
+    m_Key: staff.grade.manager
+    m_Metadata:
+      m_Items: []
+  m_Metadata:
+    m_Items: []
+  m_KeyGenerator:
+    rid: 5837324268269469966
+  references:
+    version: 2
+    RefIds:
+    - rid: 5837324268269469966
+      type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables, asm: Unity.Localization}
+      data:
+        m_CustomEpoch: 1779600204905

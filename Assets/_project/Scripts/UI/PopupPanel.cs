@@ -1,0 +1,95 @@
+using DG.Tweening;
+using UnityEngine;
+using UnityEngine.UI;
+
+/// <summary>
+/// 단일 팝업 패널의 열기/닫기 (페이드 + 살짝 슬라이드).
+/// 외부 버튼(드롭다운의 설치 버튼 등) → Open()
+/// 패널 내 닫기 버튼 → Close()
+/// </summary>
+public class PopupPanel : MonoBehaviour
+{
+    [Header("References")]
+    [SerializeField] private RectTransform panel;        // 애니메이션 대상 (보통 자기 자신 또는 자식 루트)
+    [SerializeField] private CanvasGroup canvasGroup;    // 없으면 자동 추가
+    [SerializeField] private Button closeButton;         // 옵션 (있으면 자동 연결)
+
+    [Header("Animation")]
+    [SerializeField] private float animDuration = 0.2f;
+    [SerializeField] private float slideOffset = 30f;
+    [SerializeField] private Ease ease = Ease.OutCubic;
+
+    [Header("Start State")]
+    [SerializeField] private bool startOpen = false;
+
+    private bool _isOpen;
+    private Vector2 _openPos;
+    private Vector2 _closedPos;
+
+    private void Awake()
+    {
+        if (panel == null) panel = transform as RectTransform;
+
+        if (canvasGroup == null)
+        {
+            canvasGroup = panel.GetComponent<CanvasGroup>();
+            if (canvasGroup == null) canvasGroup = panel.gameObject.AddComponent<CanvasGroup>();
+        }
+
+        _openPos = panel.anchoredPosition;
+        _closedPos = _openPos + new Vector2(0f, -slideOffset);
+
+        if (closeButton != null) closeButton.onClick.AddListener(Close);
+
+        Apply(startOpen, instant: true);
+    }
+
+    public void Open()   => Apply(true,  instant: false);
+    public void Close()  => Apply(false, instant: false);
+    public void Toggle() => Apply(!_isOpen, instant: false);
+
+    private void Apply(bool open, bool instant)
+    {
+        _isOpen = open;
+        panel.DOKill();
+        canvasGroup.DOKill();
+
+        if (open)
+        {
+            panel.gameObject.SetActive(true);
+            canvasGroup.interactable = true;
+            canvasGroup.blocksRaycasts = true;
+
+            if (instant)
+            {
+                panel.anchoredPosition = _openPos;
+                canvasGroup.alpha = 1f;
+            }
+            else
+            {
+                panel.anchoredPosition = _closedPos;
+                canvasGroup.alpha = 0f;
+                panel.DOAnchorPos(_openPos, animDuration).SetEase(ease);
+                canvasGroup.DOFade(1f, animDuration);
+            }
+        }
+        else
+        {
+            canvasGroup.interactable = false;
+            canvasGroup.blocksRaycasts = false;
+
+            if (instant)
+            {
+                panel.anchoredPosition = _closedPos;
+                canvasGroup.alpha = 0f;
+                panel.gameObject.SetActive(false);
+            }
+            else
+            {
+                panel.DOAnchorPos(_closedPos, animDuration).SetEase(ease);
+                canvasGroup.DOFade(0f, animDuration)
+                    .OnComplete(() => panel.gameObject.SetActive(false));
+            }
+        }
+    }
+}

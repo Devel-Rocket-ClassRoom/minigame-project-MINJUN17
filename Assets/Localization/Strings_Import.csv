@@ -1,0 +1,110 @@
+Key,Id,Korean (South Korea)(ko-KR),English(en)
+furniture.seat,,좌석,Seat
+furniture.counter,,카운터,Counter
+furniture.passWindow,,패스창구,Pass Window
+furniture.grill,,그릴,Grill
+furniture.phone,,전화기,Phone
+furniture.dtOrderWindow,,DT 주문창구,DT Order Window
+furniture.dtPickupWindow,,DT 픽업창구,DT Pickup Window
+menu.burger,,햄버거,Burger
+menu.sushi,,초밥,Sushi
+ui.common.confirm,,확인,Confirm
+ui.common.cancel,,취소,Cancel
+ui.common.close,,닫기,Close
+ui.common.save,,저장,Save
+ui.common.yes,,예,Yes
+ui.common.no,,아니오,No
+ui.common.ok,,확인,OK
+ui.common.back,,뒤로,Back
+ui.common.next,,다음,Next
+ui.common.buy,,구매,Buy
+ui.common.sell,,판매,Sell
+ui.common.unlock,,해금,Unlock
+ui.common.locked,,잠김,Locked
+ui.common.price,,가격,Price
+ui.common.cost,,비용,Cost
+ui.dropdown.install,,설치,Install
+ui.dropdown.move,,이동,Move
+ui.dropdown.remove,,삭제,Remove
+ui.dropdown.customer,,손님,Customer
+ui.dropdown.marketing,,마케팅,Marketing
+ui.dropdown.info,,정보,Info
+ui.dropdown.settings,,설정,Settings
+ui.dropdown.menu,,메뉴,Menu
+ui.shop.tab.hall,,홀,Hall
+ui.shop.tab.kitchen,,주방,Kitchen
+ui.shop.tab.riderRoom,,라이더룸,Rider Room
+ui.shop.tab.dt,,드라이브 쓰루,Drive Thru
+ui.shop.tab.menu,,메뉴,Menu
+ui.shop.empty,,해금된 항목이 없습니다,No unlocked items
+ui.hud.money,,돈,Money
+ui.hud.satisfaction,,만족도,Satisfaction
+ui.hud.reputation,,평판,Reputation
+ui.hud.year,,년,Year
+ui.hud.month,,월,Month
+ui.hud.day,,일,Day
+ui.hud.time,,시간,Time
+ui.placement.confirm,,배치,Place
+ui.placement.cancel,,취소,Cancel
+ui.placement.rotate,,회전,Rotate
+ui.placement.cannotPlace,,여기에 배치할 수 없습니다,Cannot place here
+ui.staff.cook,,요리사,Cook
+ui.staff.server,,서버,Server
+ui.staff.rider,,라이더,Rider
+ui.staff.hire,,고용,Hire
+ui.staff.fire,,해고,Fire
+ui.staff.grade,,등급,Grade
+ui.staff.salary,,월급,Salary
+ui.staff.tenure,,근속,Tenure
+ui.staff.upgrade,,승급,Promote
+ui.marketing.title,,마케팅,Marketing
+ui.marketing.apply,,적용,Apply
+ui.marketing.satisfactionCost,,만족도 비용,Satisfaction Cost
+ui.marketing.duration,,기간,Duration
+ui.expansion.title,,확장,Expansion
+ui.expansion.expand,,확장하기,Expand
+ui.expansion.cost,,확장 비용,Expansion Cost
+ui.expansion.maxed,,더 이상 확장할 수 없습니다,Fully expanded
+ui.ranking.title,,연말 결산,Year End Result
+ui.ranking.revenue,,매출,Revenue
+ui.ranking.score,,점수,Score
+ui.ranking.rank,,순위,Rank
+ui.ranking.notQualified,,순위권 외,Out of ranking
+ui.settings.title,,설정,Settings
+ui.settings.language,,언어,Language
+ui.settings.sound,,사운드,Sound
+ui.settings.bgm,,배경음악,BGM
+ui.settings.sfx,,효과음,SFX
+ui.settings.reset,,초기화,Reset
+ui.info.title,,정보,Info
+ui.info.version,,버전,Version
+ui.info.credits,,크레딧,Credits
+msg.gameStart,,영업 시작,Day Started
+msg.gameEnd,,영업 종료,Day Ended
+msg.notEnoughMoney,,돈이 부족합니다,Not enough money
+msg.notEnoughSatisfaction,,만족도가 부족합니다,Not enough satisfaction
+msg.unlocked,,해금되었습니다,Unlocked!
+msg.purchased,,구매했습니다,Purchased
+msg.saved,,저장되었습니다,Saved
+msg.error,,오류가 발생했습니다,An error occurred
+marketing.test,,테스트 마케팅,Test Marketing
+marketing.test.desc,,테스트용 마케팅 캠페인입니다,Marketing campaign for testing
+marketing.flyer,,전단지,Flyer
+marketing.flyer.desc,,일정 기간 손님 유입을 늘립니다,Increases customer flow for a period
+marketing.snsAd,,SNS 광고,SNS Ad
+marketing.snsAd.desc,,SNS 광고로 큰 유입 증가,Large flow boost via SNS ad
+marketing.tvAd,,TV 광고,TV Ad
+marketing.tvAd.desc,,TV 광고로 광범위한 유입 증가,Wide flow boost via TV ad
+expansion.hall1,,홀 확장 1,Hall Expansion 1
+expansion.hall2,,홀 확장 2,Hall Expansion 2
+expansion.kitchen1,,주방 확장 1,Kitchen Expansion 1
+expansion.riderRoom,,라이더룸 확장,Rider Room Expansion
+customer.regular,,일반 손님,Regular Customer
+customer.test1,,테스트 손님 1,Test Customer 1
+customer.dt.default,,드라이브 쓰루 손님,Drive Thru Customer
+staff.role.cook,,요리사,Cook
+staff.role.server,,서버,Server
+staff.role.rider,,라이더,Rider
+staff.grade.junior,,주니어,Junior
+staff.grade.senior,,시니어,Senior
+staff.grade.manager,,매니저,Manager

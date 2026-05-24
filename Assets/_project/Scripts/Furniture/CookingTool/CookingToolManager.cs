@@ -1,29 +1,25 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
+/// <summary>
+/// 해금 상태는 CatalogManager로 이관. 여기서는 씬에 배치된 인스턴스 추적만.
+/// </summary>
 public class CookingToolManager : MonoBehaviour
 {
     public static CookingToolManager Instance;
 
-    [SerializeField] private List<CookingToolData> startingTools;     // 처음부터 해금
-    private readonly List<CookingToolData> _unlockedTools = new();    // 해금된 도구 데이터
     private readonly List<CookingToolInstance> _instances = new();    // 씬에 배치된 인스턴스
 
-    public IReadOnlyList<CookingToolData> UnlockedTools => _unlockedTools;
+    public IEnumerable<CookingToolData> UnlockedTools =>
+        CatalogManager.Instance != null
+            ? CatalogManager.Instance.UnlockedFurniture.OfType<CookingToolData>()
+            : Enumerable.Empty<CookingToolData>();
 
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
-        _unlockedTools.AddRange(startingTools);
-    }
-
-    // === 해금 ===
-    public bool UnlockTool(CookingToolData tool)
-    {
-        if (_unlockedTools.Contains(tool)) return false;
-        _unlockedTools.Add(tool);
-        return true;
     }
 
     // === 인스턴스 추적 ===

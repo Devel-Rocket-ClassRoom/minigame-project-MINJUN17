@@ -224,6 +224,18 @@ public class PlacementSystem : MonoBehaviour
     {
         if (!gridManager.CanPlace(_currentOrigin, PreviewWidth, PreviewHeight, gridManager.GetZone(_currentOrigin))) return false;
 
+        // 설치 비용 차감 (0이면 무료, 무료가 아니고 잔액 부족이면 배치 실패)
+        long cost = _previewData.purchaseCost;
+        if (cost > 0)
+        {
+            if (MoneySystem.Instance == null || !MoneySystem.Instance.CanAfford(cost))
+            {
+                Debug.Log($"[PlacementSystem] 설치 실패 — 돈 부족 (필요 {cost:N0}원)");
+                return false;
+            }
+            MoneySystem.Instance.Spend(cost);
+        }
+
         GameObject instance = Instantiate(
             _previewData.prefab,
             gridManager.CellToWorld(_currentOrigin, PreviewWidth, PreviewHeight),

@@ -7,9 +7,9 @@ public class PhoneManager : MonoBehaviour
 {
     public static PhoneManager Instance;
 
-    [Header("해금/설치")]
-    [SerializeField] private int unlockSatisfactionCost = 500;
-    [SerializeField] private bool unlocked = false;
+    [Header("카탈로그 식별")]
+    [Tooltip("전화기 가구 데이터 — CatalogManager에서 이게 해금되면 IsUnlocked=true")]
+    [SerializeField] private FurnitureData phoneCatalogData;
 
     [Header("ring 룰")]
     [SerializeField] private float ringTimeout = 10f;   // 서버가 받지 못하면 폐기
@@ -26,11 +26,13 @@ public class PhoneManager : MonoBehaviour
     private float _nextCallTimer;
     private int _activeDeliveryCount;   // ring + cooking + delivering 합
 
-    public event Action OnUnlocked;
+    public event Action OnUnlocked;            // CatalogManager 프록시 (외부 호환)
     public event Action OnInstalled;
     public event Action OnUninstalled;
 
-    public bool IsUnlocked => unlocked;
+    public FurnitureData PhoneCatalogData => phoneCatalogData;
+    public bool IsUnlocked => CatalogManager.Instance != null
+                              && CatalogManager.Instance.IsUnlocked(phoneCatalogData);
     public bool HasInstalledPhone => phones.Count > 0;
     public bool IsRiderHiringUnlocked => HasInstalledPhone;
     public int ActiveDeliveryCount => _activeDeliveryCount;
@@ -39,6 +41,23 @@ public class PhoneManager : MonoBehaviour
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
+    }
+
+    private void Start()
+    {
+        if (CatalogManager.Instance != null)
+            CatalogManager.Instance.OnFurnitureUnlocked += HandleFurnitureUnlocked;
+    }
+
+    private void OnDestroy()
+    {
+        if (CatalogManager.Instance != null)
+            CatalogManager.Instance.OnFurnitureUnlocked -= HandleFurnitureUnlocked;
+    }
+
+    private void HandleFurnitureUnlocked(FurnitureData f)
+    {
+        if (f == phoneCatalogData) OnUnlocked?.Invoke();
     }
 
     public void Register(Phone p)
@@ -54,17 +73,6 @@ public class PhoneManager : MonoBehaviour
         if (!phones.Remove(p)) return;
         if (p.IsRinging) p.StopRinging();
         if (phones.Count == 0) OnUninstalled?.Invoke();
-    }
-
-    // 만족도로 전화기 카탈로그 해금
-    public bool Unlock()
-    {
-        if (unlocked) return false;
-        if (SatisfactionSystem.Instance == null) return false;
-        if (!SatisfactionSystem.Instance.Spend(unlockSatisfactionCost)) return false;
-        unlocked = true;
-        OnUnlocked?.Invoke();
-        return true;
     }
 
     private float RollCallInterval(Phone p)
@@ -143,7 +151,7 @@ public class PhoneManager : MonoBehaviour
             totalPrice += menu.price;
             SalesTracker.Instance.RecordSale(menu);
         }
-        MoneySystem.Instance.Earn(totalPrice);   // ← MoneySystem API 이름 확인 필요
+        MoneySystem.Instance.Earn(totalPrice);
 
         var order = new Order
         {

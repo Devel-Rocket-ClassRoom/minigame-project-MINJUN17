@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,6 +12,8 @@ public class ExpansionManager : MonoBehaviour
 
     public bool CanExpand => _currentStage < stages.Count;
     public ExpansionStageData NextStage => CanExpand ? stages[_currentStage] : null;
+
+    public event Action<ExpansionStageData> OnExpanded;
 
     private void Awake()
     {
@@ -28,6 +31,7 @@ public class ExpansionManager : MonoBehaviour
         MoneySystem.Instance.Spend(stage.unlockCost);
         gridManager.ActivateCells(stage);  // GridManager 싱글톤이 아니면 SerializeField로 참조
         _currentStage++;
+        OnExpanded?.Invoke(stage);
         return true;
     }
 }

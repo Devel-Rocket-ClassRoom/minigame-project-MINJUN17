@@ -1,0 +1,459 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: StringTable_en
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.StringTable
+  m_LocaleId:
+    m_Code: en
+  m_SharedData: {fileID: 11400000, guid: e8a326a4f684cfd4f828350fbb7606b2, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 1715356631040
+    m_Localized: Seat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715402768384
+    m_Localized: Counter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715402768385
+    m_Localized: Pass Window
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715402768386
+    m_Localized: Grill
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962688
+    m_Localized: Phone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962689
+    m_Localized: DT Order Window
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962690
+    m_Localized: DT Pickup Window
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962691
+    m_Localized: Burger
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962692
+    m_Localized: Sushi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962693
+    m_Localized: Confirm
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962694
+    m_Localized: Cancel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962695
+    m_Localized: Close
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962696
+    m_Localized: Save
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962697
+    m_Localized: Yes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962698
+    m_Localized: No
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962699
+    m_Localized: OK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962700
+    m_Localized: Back
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962701
+    m_Localized: Next
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962702
+    m_Localized: Buy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962703
+    m_Localized: Sell
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962704
+    m_Localized: Unlock
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962705
+    m_Localized: Locked
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962706
+    m_Localized: Price
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962707
+    m_Localized: Cost
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962708
+    m_Localized: Install
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962709
+    m_Localized: Move
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962710
+    m_Localized: Remove
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962711
+    m_Localized: Customer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962712
+    m_Localized: Marketing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962713
+    m_Localized: Info
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962714
+    m_Localized: Settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962715
+    m_Localized: Menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962716
+    m_Localized: Hall
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962717
+    m_Localized: Kitchen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962718
+    m_Localized: Rider Room
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962719
+    m_Localized: Drive Thru
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962720
+    m_Localized: Menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962721
+    m_Localized: No unlocked items
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962722
+    m_Localized: Money
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962723
+    m_Localized: Satisfaction
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962724
+    m_Localized: Reputation
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962725
+    m_Localized: Year
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962726
+    m_Localized: Month
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962727
+    m_Localized: Day
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962728
+    m_Localized: Time
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962729
+    m_Localized: Place
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962730
+    m_Localized: Cancel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962731
+    m_Localized: Rotate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962732
+    m_Localized: Cannot place here
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962733
+    m_Localized: Cook
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962734
+    m_Localized: Server
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962735
+    m_Localized: Rider
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962736
+    m_Localized: Hire
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962737
+    m_Localized: Fire
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962738
+    m_Localized: Grade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962739
+    m_Localized: Salary
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962740
+    m_Localized: Tenure
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962741
+    m_Localized: Promote
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962742
+    m_Localized: Marketing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962743
+    m_Localized: Apply
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962744
+    m_Localized: Satisfaction Cost
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962745
+    m_Localized: Duration
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962746
+    m_Localized: Expansion
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962747
+    m_Localized: Expand
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962748
+    m_Localized: Expansion Cost
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962749
+    m_Localized: Fully expanded
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962750
+    m_Localized: Year End Result
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962751
+    m_Localized: Revenue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962752
+    m_Localized: Score
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962753
+    m_Localized: Rank
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962754
+    m_Localized: Out of ranking
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962755
+    m_Localized: Settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962756
+    m_Localized: Language
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962757
+    m_Localized: Sound
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962758
+    m_Localized: BGM
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962759
+    m_Localized: SFX
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962760
+    m_Localized: Reset
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962761
+    m_Localized: Info
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962762
+    m_Localized: Version
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962763
+    m_Localized: Credits
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962764
+    m_Localized: Day Started
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962765
+    m_Localized: Day Ended
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962766
+    m_Localized: Not enough money
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962767
+    m_Localized: Not enough satisfaction
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962768
+    m_Localized: Unlocked!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962769
+    m_Localized: Purchased
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962770
+    m_Localized: Saved
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1715406962771
+    m_Localized: An error occurred
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880874020864
+    m_Localized: Test Marketing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880878215168
+    m_Localized: Marketing campaign for testing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880878215169
+    m_Localized: Flyer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409472
+    m_Localized: Increases customer flow for a period
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409473
+    m_Localized: SNS Ad
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409474
+    m_Localized: Large flow boost via SNS ad
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409475
+    m_Localized: TV Ad
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409476
+    m_Localized: Wide flow boost via TV ad
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409477
+    m_Localized: Hall Expansion 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409478
+    m_Localized: Hall Expansion 2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409479
+    m_Localized: Kitchen Expansion 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409480
+    m_Localized: Rider Room Expansion
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409481
+    m_Localized: Regular Customer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409482
+    m_Localized: Test Customer 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409483
+    m_Localized: Drive Thru Customer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409484
+    m_Localized: Cook
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409485
+    m_Localized: Server
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409486
+    m_Localized: Rider
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409487
+    m_Localized: Junior
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409488
+    m_Localized: Senior
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2880882409489
+    m_Localized: Manager
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

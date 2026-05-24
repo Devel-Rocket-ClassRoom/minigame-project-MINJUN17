@@ -1,10 +1,11 @@
 using UnityEngine;
+using UnityEngine.Localization;
 
 [CreateAssetMenu(fileName = "DTCustomerData", menuName = "Customer/DTCustomerData")]
 public class DTCustomerData : ScriptableObject
 {
     [Header("기본")]
-    public string customerName;
+    public LocalizedString customerName;    // 다국어 표시명
     public Sprite carSprite;
     public float moveSpeed = 2f;        // 차 이동 속도 (waypoint 간 MoveTowards)
     public float patience = 30f;        // 응대/음식 대기 한계 (초)
