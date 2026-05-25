@@ -24,9 +24,9 @@ public class RiderStaff : Staff
         }
     }
 
-    public void Init(StaffData data, int id, float hireVariance = 0f)
+    public void Init(StaffData data, int id, string nameKey, float hireVariance = 0f)
     {
-        InitBase(data, id, hireVariance);
+        InitBase(data, id, nameKey, hireVariance);
         ChangeState(RiderState.IDLE_AT_RIDERPOS);
     }
 

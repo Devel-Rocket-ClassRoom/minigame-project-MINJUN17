@@ -15,6 +15,12 @@ public class PlacedShopPanel : MonoBehaviour
     [SerializeField] private RectTransform content;          // 슬롯들이 들어갈 부모 (보통 ScrollView Content)
     [SerializeField] private PlacementSystem placementSystem;
 
+    [Header("창 루트 (비우면 이 GameObject)")]
+    [SerializeField] private GameObject windowRoot;
+
+    [Header("설치 모드 진입 시 토글할 하단 UI")]
+    [SerializeField] private PlacementModeUI placementModeUI;
+
     private readonly List<PlacedSlot> _spawned = new();
     private PlacedSlot _selectedSlot;
 
@@ -69,6 +75,24 @@ public class PlacedShopPanel : MonoBehaviour
             slot.Setup(data, placementSystem, this);
             _spawned.Add(slot);
         }
+    }
+
+    /// <summary>설치 모드 진입 직전 등에서 창을 통째로 닫고 싶을 때 호출.</summary>
+    public void CloseWindow()
+    {
+        var root = windowRoot != null ? windowRoot : gameObject;
+        root.SetActive(false);
+    }
+
+    /// <summary>슬롯 확정 버튼이 호출 — 배치 시작 + 패널 닫기 + 하단 UI 전환을 한 군데서.</summary>
+    public void ConfirmSlot(PlacedSlot slot)
+    {
+        if (slot == null || slot.Data == null || placementSystem == null) return;
+
+        SelectSlot(null);
+        CloseWindow();
+        placementSystem.StartPlace(slot.Data);
+        if (placementModeUI != null) placementModeUI.ShowPlace();
     }
 
     /// <summary>슬롯이 자기 선택/해제를 알릴 때 호출. 단일 선택을 보장한다 (null이면 전체 해제).</summary>

@@ -102,9 +102,7 @@ public class PlacedSlot : MonoBehaviour
 
     private void OnConfirmClicked()
     {
-        if (_placement == null || _data == null) return;
-        _placement.StartPlace(_data);
-        if (_panel != null) _panel.SelectSlot(null);
+        if (_panel != null) _panel.ConfirmSlot(this);
     }
 
     /// <summary>패널에서 호출 — 단일 선택 보장용.</summary>

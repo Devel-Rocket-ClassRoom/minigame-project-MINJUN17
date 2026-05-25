@@ -17,9 +17,9 @@ public class CookStaff : Staff
 
     public float EffectiveSpeedMultiplier => _data.speedMultiplier * (1f + _hireVariance) * _growthMultiplier;
 
-    public void Init(StaffData data, int id, float hireVariance = 0f)
+    public void Init(StaffData data, int id, string nameKey, float hireVariance = 0f)
     {
-        InitBase(data, id, hireVariance);
+        InitBase(data, id, nameKey, hireVariance);
         ChangeState(CookState.IDLE_AT_KITCHEN);
     }
 
