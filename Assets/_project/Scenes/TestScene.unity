@@ -11935,6 +11935,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1062168224}
   - component: {fileID: 1062168225}
+  - component: {fileID: 1062168226}
   m_Layer: 5
   m_Name: UnlockMenu
   m_TagString: Untagged
@@ -11973,6 +11974,24 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1062168223}
   m_CullTransparentMesh: 1
+--- !u!114 &1062168226
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1062168223}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0fc8502c8036edc499f466617899f802, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnlockShopPanel
+  currentCategory: 0
+  slotPrefab: {fileID: 0}
+  content: {fileID: 0}
+  emptyMessage: {fileID: 0}
+  satisfactionIcon: {fileID: 0}
+  moneyIcon: {fileID: 0}
 --- !u!1 &1062524982
 GameObject:
   m_ObjectHideFlags: 0
@@ -13192,6 +13211,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MarketingManager
   customerManager: {fileID: 1118384915}
   timeSystem: {fileID: 1118384919}
+  allMarketing:
+  - {fileID: 11400000, guid: 53b972f305739c34db8e4289917a5159, type: 2}
+  - {fileID: 11400000, guid: 635ab891f01b3b54b9790a625fc34f76, type: 2}
+  - {fileID: 11400000, guid: cdaf2c17fa0b6f843b462c16e052aa4a, type: 2}
 --- !u!114 &1118384928
 MonoBehaviour:
   m_ObjectHideFlags: 0
