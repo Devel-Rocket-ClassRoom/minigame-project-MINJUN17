@@ -12,10 +12,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88ad3a3536494ba42ac37b1a58e4863e, type: 3}
   m_Name: Burger
   m_EditorClassIdentifier: Assembly-CSharp::MenuData
-  menuName: "\uD584\uBC84\uAC70"
+  menuName:
+    m_TableReference:
+      m_TableCollectionName: GUID:e8a326a4f684cfd4f828350fbb7606b2
+    m_TableEntryReference:
+      m_KeyId: 1715406962691
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
   foodSprite: {fileID: 109503038894596790, guid: d7fe7e5fa5c9dc240ac2312866a613d1, type: 3}
   price: 5000
   cost: 2000
   tool: {fileID: 11400000, guid: d19e3da870805a242a72292d0739cb8f, type: 2}
   satisfactionUnlock: 0
   spawnWeight: 0
+  references:
+    version: 2
+    RefIds: []

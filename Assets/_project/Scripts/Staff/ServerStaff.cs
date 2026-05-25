@@ -21,9 +21,9 @@ public class ServerStaff : Staff
 
     public bool IsIdle => _state == ServerState.IDLE_AT_COUNTER;
 
-    public void Init(StaffData data, int id, float hireVariance = 0f)
+    public void Init(StaffData data, int id, string nameKey, float hireVariance = 0f)
     {
-        InitBase(data, id, hireVariance);
+        InitBase(data, id, nameKey, hireVariance);
         ChangeState(ServerState.IDLE_AT_COUNTER);
     }
 

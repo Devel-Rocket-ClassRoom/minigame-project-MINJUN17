@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3f0cc6336acd53945a1d4307bb60037e, type: 3}
-  m_Name: Chair
+  m_Name: Seat
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureData
   prefab: {fileID: 5182720186777033002, guid: 414cd04a4db30d34e8ee519973d13726, type: 3}
   zone: 1
@@ -19,3 +19,19 @@ MonoBehaviour:
   anchorX: 0
   anchorY: 0
   deliveryBonus: 0
+  displayName:
+    m_TableReference:
+      m_TableCollectionName: GUID:e8a326a4f684cfd4f828350fbb7606b2
+    m_TableEntryReference:
+      m_KeyId: 1715356631040
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  icon: {fileID: -8012548003156586367, guid: 052c49ea498b689499d1e5ea6819d263, type: 3}
+  satisfactionUnlock: 0
+  purchaseCost: 15000
+  unlockOnExpansion: {fileID: 0}
+  references:
+    version: 2
+    RefIds: []

@@ -5,6 +5,7 @@ public abstract class Staff : MonoBehaviour
 {
     protected StaffData _data;
     [SerializeField] protected int id;
+    protected string _nameKey;
     protected float _stateTimer;
 
     protected int _tenureMonths;
@@ -19,6 +20,17 @@ public abstract class Staff : MonoBehaviour
 
     public StaffData Data => _data;
     public int Id => id;
+    public string NameKey => _nameKey;
+    public string Name
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(_nameKey)) return "";
+            return StaffManager.Instance != null
+                ? StaffManager.Instance.ResolveName(_nameKey)
+                : _nameKey;
+        }
+    }
     public int TenureMonths => _tenureMonths;
     public int GrowthBumps => _growthBumps;
     public float GrowthMultiplier => _growthMultiplier;
@@ -65,10 +77,11 @@ public abstract class Staff : MonoBehaviour
         }
     }
 
-    protected void InitBase(StaffData data, int id, float hireVariance = 0f)
+    protected void InitBase(StaffData data, int id, string nameKey, float hireVariance = 0f)
     {
         _data = data;
         this.id = id;
+        _nameKey = nameKey;
         _hireVariance = hireVariance;
         GetComponent<SpriteRenderer>().sprite = data.sprite;
         _tenureMonths = 0;

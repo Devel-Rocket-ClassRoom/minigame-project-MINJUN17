@@ -19,3 +19,19 @@ MonoBehaviour:
   anchorX: 0
   anchorY: 0
   deliveryBonus: 0
+  displayName:
+    m_TableReference:
+      m_TableCollectionName: GUID:e8a326a4f684cfd4f828350fbb7606b2
+    m_TableEntryReference:
+      m_KeyId: 1715406962688
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  icon: {fileID: 0}
+  satisfactionUnlock: 1500
+  purchaseCost: 70000
+  unlockOnExpansion: {fileID: 0}
+  references:
+    version: 2
+    RefIds: []

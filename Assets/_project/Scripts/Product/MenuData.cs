@@ -1,9 +1,10 @@
 using UnityEngine;
+using UnityEngine.Localization;
 
 [CreateAssetMenu(fileName = "MenuData", menuName = "Menu/MenuData")]
 public class MenuData : ScriptableObject
 {
-    public string menuName;
+    public LocalizedString menuName;      // 다국어 표시명
     public Sprite foodSprite;
     public int price;
     public int cost;

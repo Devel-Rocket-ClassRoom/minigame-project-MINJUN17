@@ -391,13 +391,11 @@ public class TestDebugPanel : MonoBehaviour
     public void ForceUnlockPhone()
     {
         if (PhoneManager.Instance == null) { Debug.LogWarning("[TestDebugPanel] PhoneManager 없음"); return; }
-        var bf = BindingFlags.NonPublic | BindingFlags.Instance;
-        var f = typeof(PhoneManager).GetField("unlocked", bf);
-        if (f == null) { Debug.LogWarning("[TestDebugPanel] unlocked 필드 못 찾음"); return; }
-        if ((bool)f.GetValue(PhoneManager.Instance)) { Debug.Log("[TestDebugPanel] Phone 이미 해금됨"); return; }
-        f.SetValue(PhoneManager.Instance, true);
-        var ev = typeof(PhoneManager).GetField("OnUnlocked", bf);
-        (ev?.GetValue(PhoneManager.Instance) as Action)?.Invoke();
+        if (CatalogManager.Instance == null) { Debug.LogWarning("[TestDebugPanel] CatalogManager 없음"); return; }
+        var data = PhoneManager.Instance.PhoneCatalogData;
+        if (data == null) { Debug.LogWarning("[TestDebugPanel] PhoneManager.phoneCatalogData 미할당"); return; }
+        if (CatalogManager.Instance.IsUnlocked(data)) { Debug.Log("[TestDebugPanel] Phone 이미 해금됨"); return; }
+        CatalogManager.Instance.ForceUnlock(data);
         Debug.Log("[TestDebugPanel] Phone 강제 해금");
     }
 
@@ -586,13 +584,11 @@ public class TestDebugPanel : MonoBehaviour
     public void ForceUnlockDT()
     {
         if (DTSystem.Instance == null) { Debug.LogWarning("[TestDebugPanel] DTSystem 없음"); return; }
-        var bf = BindingFlags.NonPublic | BindingFlags.Instance;
-        var f = typeof(DTSystem).GetField("unlocked", bf);
-        if (f == null) { Debug.LogWarning("[TestDebugPanel] DTSystem.unlocked 필드 못 찾음"); return; }
-        if ((bool)f.GetValue(DTSystem.Instance)) { Debug.Log("[TestDebugPanel] DT 이미 해금됨"); return; }
-        f.SetValue(DTSystem.Instance, true);
-        var ev = typeof(DTSystem).GetField("OnUnlocked", bf);
-        (ev?.GetValue(DTSystem.Instance) as Action)?.Invoke();
+        if (CatalogManager.Instance == null) { Debug.LogWarning("[TestDebugPanel] CatalogManager 없음"); return; }
+        var data = DTSystem.Instance.DTCatalogData;
+        if (data == null) { Debug.LogWarning("[TestDebugPanel] DTSystem.dtCatalogData 미할당"); return; }
+        if (CatalogManager.Instance.IsUnlocked(data)) { Debug.Log("[TestDebugPanel] DT 이미 해금됨"); return; }
+        CatalogManager.Instance.ForceUnlock(data);
         Debug.Log("[TestDebugPanel] DT 강제 해금");
     }
 
@@ -600,7 +596,9 @@ public class TestDebugPanel : MonoBehaviour
     public void TryUnlockDT()
     {
         if (DTSystem.Instance == null) { Debug.LogWarning("[TestDebugPanel] DTSystem 없음"); return; }
-        bool ok = DTSystem.Instance.Unlock();
+        if (CatalogManager.Instance == null) { Debug.LogWarning("[TestDebugPanel] CatalogManager 없음"); return; }
+        var data = DTSystem.Instance.DTCatalogData;
+        bool ok = CatalogManager.Instance.TryUnlock(data);
         Debug.Log($"[TestDebugPanel] DT Unlock 결과: {ok} (현재 만족도: {SatisfactionSystem.Instance?.Satisfaction})");
     }
 

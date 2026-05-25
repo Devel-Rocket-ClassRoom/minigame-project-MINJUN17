@@ -5,7 +5,7 @@ using Random = UnityEngine.Random;
 
 /// <summary>
 /// 드라이브 쓰루 매니저 + 스포너.
-/// - 만족도 구매로 해금 (PhoneManager.Unlock 패턴).
+/// - 해금 상태는 CatalogManager가 보관 (dtCatalogData가 해금됐는지 조회)
 /// - 해금 + 영업 중일 때 차 스폰. 영업 종료 시 스폰만 멈추고 차는 정상 흐름 유지.
 /// - 차로 점유 한도(DTLane.IsFull) 체크.
 /// </summary>
@@ -13,9 +13,9 @@ public class DTSystem : MonoBehaviour
 {
     public static DTSystem Instance;
 
-    [Header("해금")]
-    [SerializeField] private int unlockSatisfactionCost = 800;
-    [SerializeField] private bool unlocked = false;
+    [Header("카탈로그 식별")]
+    [Tooltip("DT 시스템을 나타내는 카탈로그 항목 (보통 DTOrderWindow나 DT 마커 FurnitureData)")]
+    [SerializeField] private FurnitureData dtCatalogData;
 
     [Header("스폰")]
     [SerializeField] private GameObject dtCustomerPrefab;
@@ -29,9 +29,11 @@ public class DTSystem : MonoBehaviour
     private float _spawnInterval;
     private bool _spawning;
 
-    public event Action OnUnlocked;
+    public event Action OnUnlocked;            // CatalogManager 프록시 (외부 호환)
 
-    public bool IsUnlocked => unlocked;
+    public FurnitureData DTCatalogData => dtCatalogData;
+    public bool IsUnlocked => CatalogManager.Instance != null
+                              && CatalogManager.Instance.IsUnlocked(dtCatalogData);
     public bool IsSpawning => _spawning;
     public int ActiveCarCount => DTLane.Instance != null ? DTLane.Instance.ActiveCarCount : 0;
 
@@ -44,17 +46,19 @@ public class DTSystem : MonoBehaviour
     private void Start()
     {
         _spawnInterval = RollSpawnInterval();
+        if (CatalogManager.Instance != null)
+            CatalogManager.Instance.OnFurnitureUnlocked += HandleFurnitureUnlocked;
     }
 
-    /// <summary>만족도 차감으로 DT 시스템 해금. PhoneManager.Unlock 패턴.</summary>
-    public bool Unlock()
+    private void OnDestroy()
     {
-        if (unlocked) return false;
-        if (SatisfactionSystem.Instance == null) return false;
-        if (!SatisfactionSystem.Instance.Spend(unlockSatisfactionCost)) return false;
-        unlocked = true;
-        OnUnlocked?.Invoke();
-        return true;
+        if (CatalogManager.Instance != null)
+            CatalogManager.Instance.OnFurnitureUnlocked -= HandleFurnitureUnlocked;
+    }
+
+    private void HandleFurnitureUnlocked(FurnitureData f)
+    {
+        if (f == dtCatalogData) OnUnlocked?.Invoke();
     }
 
     public void StartSpawning()
@@ -74,7 +78,7 @@ public class DTSystem : MonoBehaviour
     private void Update()
     {
         if (!_spawning) return;
-        if (!unlocked) return;
+        if (!IsUnlocked) return;
         if (!CanSpawn()) return;
 
         _spawnTimer += Time.deltaTime;

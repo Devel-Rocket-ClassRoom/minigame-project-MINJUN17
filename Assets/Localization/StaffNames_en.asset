@@ -1,0 +1,223 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: StaffNames_en
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.StringTable
+  m_LocaleId:
+    m_Code: en
+  m_SharedData: {fileID: 11400000, guid: 20d03a596659f0444a3eecd023c5ccbe, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 39270809600
+    m_Localized: Sarah Kim
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364032
+    m_Localized: Andrew Lee
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364033
+    m_Localized: Justin Park
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364034
+    m_Localized: Sophie Choi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364035
+    m_Localized: David Jung
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364036
+    m_Localized: Emma Kang
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364037
+    m_Localized: Julie Cho
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364038
+    m_Localized: Hannah Yoon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364039
+    m_Localized: Tyler Jang
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364040
+    m_Localized: Lily Lim
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364041
+    m_Localized: Jasmine Han
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364042
+    m_Localized: Jason Oh
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364043
+    m_Localized: Erin Seo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364044
+    m_Localized: Daniel Shin
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364045
+    m_Localized: Nora Kwon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364046
+    m_Localized: Eugene Hwang
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364047
+    m_Localized: Sua Ahn
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364048
+    m_Localized: Jiwon Song
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364049
+    m_Localized: Ryan Ryu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364050
+    m_Localized: Garam Hong
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364051
+    m_Localized: Kelly Kim
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364052
+    m_Localized: Joohwan Lee
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364053
+    m_Localized: Brian Park
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364054
+    m_Localized: Yena Choi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364055
+    m_Localized: Minjae Jung
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364056
+    m_Localized: Yuri Kang
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364057
+    m_Localized: Steve Cho
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364058
+    m_Localized: Yeseul Yoon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364059
+    m_Localized: Hazel Jang
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364060
+    m_Localized: Doyoon Lim
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364061
+    m_Localized: Henry Han
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364062
+    m_Localized: Jian Oh
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364063
+    m_Localized: Jiho Seo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364064
+    m_Localized: Yuna Shin
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39304364065
+    m_Localized: Sam Kwon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39308558336
+    m_Localized: Bora Hwang
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39308558337
+    m_Localized: Jay Ahn
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39308558338
+    m_Localized: Harin Song
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39308558339
+    m_Localized: Sebin Ryu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39308558340
+    m_Localized: Minji Hong
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39308558341
+    m_Localized: Daniella Kim
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39308558342
+    m_Localized: Subin Lee
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39308558343
+    m_Localized: Chris Park
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39308558344
+    m_Localized: Ara Choi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39308558345
+    m_Localized: Wonseok Jung
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39308558346
+    m_Localized: Haeun Kang
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39308558347
+    m_Localized: Yoonseo Cho
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39308558348
+    m_Localized: Siu Yoon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39308558349
+    m_Localized: Roa Jang
+    m_Metadata:
+      m_Items: []
+  - m_Id: 39308558350
+    m_Localized: Chaerin Lim
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

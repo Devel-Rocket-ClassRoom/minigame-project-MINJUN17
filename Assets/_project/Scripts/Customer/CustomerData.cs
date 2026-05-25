@@ -1,10 +1,11 @@
 using UnityEngine;
+using UnityEngine.Localization;
 
 [CreateAssetMenu(fileName = "CustomerData", menuName = "Customer/CustomerData")]
 public class CustomerData : ScriptableObject
 {
     public GameObject customerPrefab;
-    public string customerName;
+    public LocalizedString customerName;   // 다국어 표시명
     public Sprite icon;
 
     public int minOrderCount = 1;      // 최소 주문 개수

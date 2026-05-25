@@ -20,6 +20,12 @@ public class StaffManager : MonoBehaviour
     [Header("라이더 상한")]
     [SerializeField] private int maxRiderCount = 3;
 
+    [Header("이름 풀")]
+    [SerializeField] private StaffNamePool namePool;
+
+    /// <summary>채용/해고/승급 시 발화 — UI 갱신 신호.</summary>
+    public event System.Action OnRosterChanged;
+
     private int nextId = 1;
     private readonly List<CookStaff> cookStaffs = new();
     private readonly List<ServerStaff> serverStaffs = new();
@@ -29,6 +35,21 @@ public class StaffManager : MonoBehaviour
     public IReadOnlyList<ServerStaff> ServerStaffs => serverStaffs;
     public IReadOnlyList<RiderStaff> RiderStaffs => riderStaffs;
     public int RiderCount => riderStaffs.Count;
+    public int TotalStaffCount => cookStaffs.Count + serverStaffs.Count + riderStaffs.Count;
+
+    /// <summary>Cook → Server → Rider 순으로 전체 직원 순회.</summary>
+    public IEnumerable<Staff> GetAllStaffs()
+    {
+        foreach (var s in cookStaffs)   yield return s;
+        foreach (var s in serverStaffs) yield return s;
+        foreach (var s in riderStaffs)  yield return s;
+    }
+
+    private string PickNameKey() => namePool != null ? namePool.PickRandomKey() : null;
+
+    /// <summary>UI / Staff.Name 에서 호출 — 키를 현재 로케일 문자열로.</summary>
+    public string ResolveName(string nameKey) =>
+        namePool != null ? namePool.Resolve(nameKey) : nameKey;
 
     public int MaxServerCount => CounterManager.Instance.CounterCount;
     public int MaxCookCount => CounterManager.Instance.CounterCount;
@@ -58,6 +79,7 @@ public class StaffManager : MonoBehaviour
         foreach (var c in cookStaffs)   c.TickMonth();
         foreach (var s in serverStaffs) s.TickMonth();
         foreach (var r in riderStaffs)  r.TickMonth();
+        OnRosterChanged?.Invoke();
     }
 
     public void Init()
@@ -78,9 +100,10 @@ public class StaffManager : MonoBehaviour
         MoneySystem.Instance.Spend(data.hireCost);
         var staff = Instantiate(cookStaffPrefab);
         staff.gameObject.name = $"Cook_{nextId}";
-        staff.Init(data, nextId, hireVariance);
+        staff.Init(data, nextId, PickNameKey(), hireVariance);
         nextId++;
         cookStaffs.Add(staff);
+        OnRosterChanged?.Invoke();
         return staff;
     }
 
@@ -93,9 +116,10 @@ public class StaffManager : MonoBehaviour
         MoneySystem.Instance.Spend(data.hireCost);
         var staff = Instantiate(serverStaffPrefab);
         staff.gameObject.name = $"Server_{nextId}";
-        staff.Init(data, nextId, hireVariance);
+        staff.Init(data, nextId, PickNameKey(), hireVariance);
         nextId++;
         serverStaffs.Add(staff);
+        OnRosterChanged?.Invoke();
         return staff;
     }
 
@@ -119,9 +143,10 @@ public class StaffManager : MonoBehaviour
             staff.transform.position, candidates, occupiers, 0.5f);
         if (spawnPos != Vector3.zero) staff.transform.position = spawnPos;
 
-        staff.Init(data, nextId, hireVariance);
+        staff.Init(data, nextId, PickNameKey(), hireVariance);
         nextId++;
         riderStaffs.Add(staff);
+        OnRosterChanged?.Invoke();
         return staff;
     }
 
@@ -134,6 +159,7 @@ public class StaffManager : MonoBehaviour
         MoneySystem.Instance.Spend(severance);
         cookStaffs.Remove(staff);
         Destroy(staff.gameObject);
+        OnRosterChanged?.Invoke();
         return true;
     }
 
@@ -146,6 +172,7 @@ public class StaffManager : MonoBehaviour
         MoneySystem.Instance.Spend(severance);
         serverStaffs.Remove(staff);
         Destroy(staff.gameObject);
+        OnRosterChanged?.Invoke();
         return true;
     }
 
@@ -158,8 +185,27 @@ public class StaffManager : MonoBehaviour
         MoneySystem.Instance.Spend(severance);
         riderStaffs.Remove(staff);
         Destroy(staff.gameObject);
+        OnRosterChanged?.Invoke();
         return true;
     }
+
+    /// <summary>UI용 통합 해고 — Staff 타입을 모르고 호출 가능.</summary>
+    public bool Fire(Staff staff) => staff switch
+    {
+        CookStaff c   => FireCookStaff(c),
+        ServerStaff s => FireServerStaff(s),
+        RiderStaff r  => FireRiderStaff(r),
+        _ => false
+    };
+
+    /// <summary>UI용 통합 승급.</summary>
+    public bool Upgrade(Staff staff) => staff switch
+    {
+        CookStaff c   => UpgradeCook(c),
+        ServerStaff s => UpgradeServer(s),
+        RiderStaff r  => UpgradeRider(r),
+        _ => false
+    };
 
     public long CalculateTotalSalaryCost()
     {
@@ -204,6 +250,7 @@ public class StaffManager : MonoBehaviour
 
         MoneySystem.Instance.Spend(cost);
         staff.SetData(next);
+        OnRosterChanged?.Invoke();
         return true;
     }
 
@@ -218,6 +265,7 @@ public class StaffManager : MonoBehaviour
 
         MoneySystem.Instance.Spend(cost);
         staff.SetData(next);
+        OnRosterChanged?.Invoke();
         return true;
     }
 
@@ -232,6 +280,7 @@ public class StaffManager : MonoBehaviour
 
         MoneySystem.Instance.Spend(cost);
         staff.SetData(next);
+        OnRosterChanged?.Invoke();
         return true;
     }
 
