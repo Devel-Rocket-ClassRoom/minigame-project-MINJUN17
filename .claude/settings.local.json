@@ -21,7 +21,8 @@
       "Bash(Format-Table FullName)",
       "mcp__Windows-MCP__FileSystem",
       "Bash(gh label *)",
-      "Bash(gh pr *)"
+      "Bash(gh pr *)",
+      "Bash(xxd)"
     ]
   }
 }

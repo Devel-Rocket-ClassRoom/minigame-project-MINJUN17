@@ -5,6 +5,7 @@ using UnityEngine.Localization;
 public class MenuData : ScriptableObject
 {
     public LocalizedString menuName;      // 다국어 표시명
+    public LocalizedString description;   // 다국어 설명 (해금 슬롯 표시용)
     public Sprite foodSprite;
     public int price;
     public int cost;

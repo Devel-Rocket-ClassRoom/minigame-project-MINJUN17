@@ -9,6 +9,10 @@ public class MarketingManager : MonoBehaviour
     [SerializeField] private CustomerManager customerManager;
     [SerializeField] private TimeSystem timeSystem;
 
+    [Header("전체 마케팅 카탈로그 (UnlockShopPanel 에서 순회)")]
+    [SerializeField] private List<MarketingData> allMarketing;
+    public IReadOnlyList<MarketingData> AllMarketing => allMarketing;
+
     public event Action<MarketingData> OnMarketingPurchased;
     public event Action OnActiveChanged;
 

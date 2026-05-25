@@ -14,6 +14,7 @@ public class FurnitureData : ScriptableObject
 
     [Header("카탈로그 / 해금")]
     public LocalizedString displayName;           // 상점 슬롯 표시명 (다국어)
+    public LocalizedString description;           // 다국어 설명 (해금 슬롯 표시용)
     public Sprite icon;                           // 상점 슬롯 아이콘
     public int satisfactionUnlock;                // 0이면 시작 해금 가능 (좌석 등 기본 가구) — 카탈로그 1회 해금 비용
     public long purchaseCost;                     // 설치 1회당 돈 비용 (0이면 무료)
