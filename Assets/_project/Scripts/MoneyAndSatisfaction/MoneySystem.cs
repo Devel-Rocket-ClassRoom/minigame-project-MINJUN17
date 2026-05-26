@@ -67,4 +67,13 @@ public class MoneySystem : MonoBehaviour
         };
     }
 
+    // ─── Save / Load ───
+    public MoneyData ToData() => new MoneyData { money = _money };
+
+    public void FromData(MoneyData data)
+    {
+        if (data == null) return;
+        _money = data.money;
+        OnMoneyChanged?.Invoke(_money);
+    }
 }

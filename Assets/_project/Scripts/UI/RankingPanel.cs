@@ -201,6 +201,7 @@ public class RankingPanel : MonoBehaviour
     {
         _seq?.Kill();
         SetPanelVisible(false);
+        SaveLoadManager.Instance?.Save();   // 연말 정산 직후 자동 저장 (LastResult 포함)
     }
 
     private void SetPanelVisible(bool visible)

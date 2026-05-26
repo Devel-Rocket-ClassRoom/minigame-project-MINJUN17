@@ -111,4 +111,44 @@ public class CatalogManager : MonoBehaviour
         foreach (var f in allFurniture)
             if (f != null && f.unlockOnExpansion == stage) ForceUnlock(f);
     }
+
+    // ─── Save / Load ───
+    public CatalogData ToData()
+    {
+        var furn = new List<string>();
+        foreach (var f in _unlockedFurniture)
+            if (f != null && !string.IsNullOrEmpty(f.SaveId)) furn.Add(f.SaveId);
+
+        var menus = new List<string>();
+        foreach (var m in _unlockedMenus)
+            if (m != null && !string.IsNullOrEmpty(m.SaveId)) menus.Add(m.SaveId);
+
+        return new CatalogData { unlockedFurnitureIds = furn, unlockedMenuIds = menus };
+    }
+
+    public void FromData(CatalogData data)
+    {
+        // 시작 해금은 Awake에서 이미 채워졌음. 추가로 세이브된 해금만 더한다.
+        if (data == null) return;
+
+        if (data.unlockedFurnitureIds != null)
+        {
+            foreach (var id in data.unlockedFurnitureIds)
+            {
+                var f = SaveIdRegistry.GetById<FurnitureData>(id);
+                if (f != null) _unlockedFurniture.Add(f);
+            }
+        }
+        if (data.unlockedMenuIds != null)
+        {
+            foreach (var id in data.unlockedMenuIds)
+            {
+                var m = SaveIdRegistry.GetById<MenuData>(id);
+                if (m == null) continue;
+                _unlockedMenus.Add(m);
+                if (m.tool != null) _unlockedFurniture.Add(m.tool);   // 메뉴 → 매칭 도구 자동
+            }
+        }
+        // 이벤트 발화 X — 로드 시점에는 UI가 직접 조회로 갱신
+    }
 }

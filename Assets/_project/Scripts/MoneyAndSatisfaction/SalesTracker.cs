@@ -36,4 +36,36 @@ public class SalesTracker : MonoBehaviour
     }
 
     public void ResetMonthly() => _monthlySales.Clear();
+
+    // ─── Save / Load ───
+    public SalesData ToData()
+    {
+        var monthly = new List<MonthlySaleEntry>();
+        foreach (var kv in _monthlySales)
+        {
+            if (kv.Key == null) continue;
+            if (kv.Key is not ISaveIdentifiable ident || string.IsNullOrEmpty(ident.SaveId)) continue;
+            monthly.Add(new MonthlySaleEntry { menuId = ident.SaveId, count = kv.Value });
+        }
+        return new SalesData
+        {
+            annualRevenue = _annualRevenue,
+            monthlySales  = monthly,
+        };
+    }
+
+    public void FromData(SalesData data)
+    {
+        if (data == null) return;
+        _annualRevenue = data.annualRevenue;
+        _monthlySales.Clear();
+        if (data.monthlySales != null)
+        {
+            foreach (var entry in data.monthlySales)
+            {
+                var menu = SaveIdRegistry.GetById<MenuData>(entry.menuId);
+                if (menu != null) _monthlySales[menu] = entry.count;
+            }
+        }
+    }
 }

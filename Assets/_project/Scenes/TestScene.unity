@@ -2774,7 +2774,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &298098912
 RectTransform:
   m_ObjectHideFlags: 0
@@ -15696,6 +15696,7 @@ GameObject:
   - component: {fileID: 1118384932}
   - component: {fileID: 1118384930}
   - component: {fileID: 1118384935}
+  - component: {fileID: 1118384936}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -16137,7 +16138,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ffa3362d16e41f9b6dd649736f76af1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaffCandidatePool
-  timeSystem: {fileID: 0}
+  timeSystem: {fileID: 1118384919}
   tierConfigs:
   - tier: 0
     displayName:
@@ -16159,7 +16160,7 @@ MonoBehaviour:
       m_WaitForCompletion: 0
       m_LocalVariables: []
     icon: {fileID: 0}
-    satisfactionCost: 0
+    satisfactionCost: 500
     juniorWeight: 90
     seniorWeight: 8
     managerWeight: 2
@@ -16216,10 +16217,24 @@ MonoBehaviour:
   ticketDelayMonths: 2
   statVariance: 0.1
   isDeliveryUnlocked: 0
-  candidateNames: []
   references:
     version: 2
     RefIds: []
+--- !u!114 &1118384936
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1118384907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 033529763ef71b449bf0926a3cca0db1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SaveLoadManager
+  _time: {fileID: 1118384919}
+  _expansion: {fileID: 1118384925}
+  _placement: {fileID: 1118384909}
 --- !u!1 &1121342472
 GameObject:
   m_ObjectHideFlags: 0

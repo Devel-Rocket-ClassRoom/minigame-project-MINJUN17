@@ -78,4 +78,68 @@ public class MarketingManager : MonoBehaviour
         float multiplier = 1f + Mathf.Log(1f + Mathf.Max(0f, sumBoost));
         customerManager.SetMarketingMultiplier(multiplier);
     }
+
+    // ─── Save / Load ───
+    public MarketingSaveData ToData()
+    {
+        var active = new List<ActiveCampaignEntry>();
+        foreach (var a in _active)
+        {
+            if (a == null || a.Data == null) continue;
+            active.Add(new ActiveCampaignEntry
+            {
+                marketingSaveId = a.Data.SaveId,
+                remainingMonths = a.RemainingMonths,
+            });
+        }
+
+        var pending = new List<string>();
+        foreach (var p in _pending)
+        {
+            if (p == null) continue;
+            pending.Add(p.SaveId);
+        }
+
+        return new MarketingSaveData { active = active, pending = pending };
+    }
+
+    public void FromData(MarketingSaveData data)
+    {
+        _active.Clear();
+        _pending.Clear();
+
+        if (data != null)
+        {
+            if (data.active != null)
+            {
+                foreach (var e in data.active)
+                {
+                    if (e == null) continue;
+                    var md = SaveIdRegistry.GetById<MarketingData>(e.marketingSaveId);
+                    if (md == null)
+                    {
+                        Debug.LogWarning($"[MarketingManager] MarketingData 못 찾음: {e.marketingSaveId}");
+                        continue;
+                    }
+                    _active.Add(new ActiveCampaign { Data = md, RemainingMonths = e.remainingMonths });
+                }
+            }
+            if (data.pending != null)
+            {
+                foreach (var id in data.pending)
+                {
+                    var md = SaveIdRegistry.GetById<MarketingData>(id);
+                    if (md == null)
+                    {
+                        Debug.LogWarning($"[MarketingManager] MarketingData 못 찾음: {id}");
+                        continue;
+                    }
+                    _pending.Add(md);
+                }
+            }
+        }
+
+        RecomputeMultiplier();
+        OnActiveChanged?.Invoke();
+    }
 }

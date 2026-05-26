@@ -2,8 +2,23 @@ using UnityEngine;
 using UnityEngine.Localization;
 
 [CreateAssetMenu(fileName = "FurnitureData", menuName = "Furniture/Furniture Data")]
-public class FurnitureData : ScriptableObject
+public class FurnitureData : ScriptableObject, ISaveIdentifiable
 {
+    [Header("Save ID (자동 채움 — 수정 X)")]
+    [SerializeField] private string saveId;
+    public string SaveId => saveId;
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        if (string.IsNullOrEmpty(saveId))
+        {
+            saveId = System.Guid.NewGuid().ToString("N").Substring(0, 12);
+            UnityEditor.EditorUtility.SetDirty(this);
+        }
+    }
+#endif
+
     public GameObject prefab;
     public PlacementZone zone;
     public int width = 1;

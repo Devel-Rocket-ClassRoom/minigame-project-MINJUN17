@@ -14,7 +14,6 @@ public class StaffCandidatePool : MonoBehaviour
     [SerializeField] private int ticketDelayMonths = 2;
     [SerializeField, Range(0f, 0.5f)] private float statVariance = 0.1f;
     [SerializeField] private bool isDeliveryUnlocked = false;
-    [SerializeField] private string[] candidateNames;
 
     private readonly List<StaffCandidate> _applicants = new();
     private readonly List<RecruitmentTicket> _pendingTickets = new();
@@ -142,9 +141,12 @@ public class StaffCandidatePool : MonoBehaviour
 
     private string PickName()
     {
-        if (candidateNames == null || candidateNames.Length == 0)
-            return $"후보_{Random.Range(1000, 9999)}";
-        return candidateNames[Random.Range(0, candidateNames.Length)];
+        // StaffManager의 StaffNamePool 공용 사용 (50개 등록된 이름)
+        string key = StaffManager.Instance?.PickNameKey();
+        if (!string.IsNullOrEmpty(key)) return key;
+
+        // 폴백: 이름 풀 없거나 비어있으면 자동 생성
+        return $"후보_{Random.Range(1000, 9999)}";
     }
 
     public bool Hire(StaffCandidate candidate)
@@ -153,9 +155,9 @@ public class StaffCandidatePool : MonoBehaviour
 
         bool ok = candidate.baseData.role switch
         {
-            StaffRole.Cook   => StaffManager.Instance.HireCookStaff(candidate.baseData, candidate.hireVariance) != null,
-            StaffRole.Server => StaffManager.Instance.HireServerStaff(candidate.baseData, candidate.hireVariance) != null,
-            StaffRole.Rider  => StaffManager.Instance.HireRiderStaff(candidate.baseData, candidate.hireVariance) != null,
+            StaffRole.Cook   => StaffManager.Instance.HireCookStaff(candidate.baseData, candidate.hireVariance, candidate.candidateName) != null,
+            StaffRole.Server => StaffManager.Instance.HireServerStaff(candidate.baseData, candidate.hireVariance, candidate.candidateName) != null,
+            StaffRole.Rider  => StaffManager.Instance.HireRiderStaff(candidate.baseData, candidate.hireVariance, candidate.candidateName) != null,
             _ => false,
         };
 
@@ -172,5 +174,82 @@ public class StaffCandidatePool : MonoBehaviour
         if (tierConfigs == null) return null;
         foreach (var c in tierConfigs) if (c != null && c.tier == tier) return c;
         return null;
+    }
+
+    // ─── Save / Load ───
+    public CandidatePoolData ToData()
+    {
+        var apps = new List<CandidateEntry>();
+        foreach (var c in _applicants)
+        {
+            if (c == null || c.baseData == null) continue;
+            apps.Add(new CandidateEntry
+            {
+                candidateName   = c.candidateName,
+                staffDataSaveId = (c.baseData as ISaveIdentifiable)?.SaveId,
+                hireVariance    = c.hireVariance,
+            });
+        }
+
+        var tickets = new List<TicketEntry>();
+        foreach (var t in _pendingTickets)
+        {
+            if (t == null) continue;
+            tickets.Add(new TicketEntry { tier = (int)t.tier, monthsRemaining = t.monthsRemaining });
+        }
+
+        return new CandidatePoolData
+        {
+            applicants         = apps,
+            pendingTickets     = tickets,
+            purchasedThisMonth = _purchasedThisMonth,
+        };
+    }
+
+    public void FromData(CandidatePoolData data)
+    {
+        _applicants.Clear();
+        _pendingTickets.Clear();
+        _purchasedThisMonth = false;
+
+        if (data != null)
+        {
+            if (data.applicants != null)
+            {
+                foreach (var e in data.applicants)
+                {
+                    if (e == null) continue;
+                    var sd = SaveIdRegistry.GetById<StaffData>(e.staffDataSaveId);
+                    if (sd == null)
+                    {
+                        Debug.LogWarning($"[StaffCandidatePool] StaffData 못 찾음: {e.staffDataSaveId}");
+                        continue;
+                    }
+                    _applicants.Add(new StaffCandidate
+                    {
+                        candidateName = e.candidateName,
+                        baseData      = sd,
+                        hireVariance  = e.hireVariance,
+                    });
+                }
+            }
+            if (data.pendingTickets != null)
+            {
+                foreach (var t in data.pendingTickets)
+                {
+                    if (t == null) continue;
+                    _pendingTickets.Add(new RecruitmentTicket
+                    {
+                        tier            = (RecruitmentTier)t.tier,
+                        monthsRemaining = t.monthsRemaining,
+                    });
+                }
+            }
+            _purchasedThisMonth = data.purchasedThisMonth;
+        }
+
+        OnApplicantsChanged?.Invoke();
+        OnPendingTicketsChanged?.Invoke();
+        OnPurchaseStateChanged?.Invoke();
     }
 }

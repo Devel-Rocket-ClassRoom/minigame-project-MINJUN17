@@ -367,4 +367,68 @@ public class PlacementSystem : MonoBehaviour
         _removeTargetRenderer = null;
         Mode = Mode.None;
     }
+
+    // ─── Save / Load ───
+
+    /// <summary>가구가 복원된 직후 발화. PlacedObjectInit 등이 PassWindow 셀 재설정에 사용.</summary>
+    public event System.Action OnPlacementsRestored;
+
+    public PlacementData[] ToData()
+    {
+        var unique = CollectPlacedObjects();
+        var list = new List<PlacementData>();
+        foreach (var po in unique)
+        {
+            if (po.Data is not ISaveIdentifiable ident || string.IsNullOrEmpty(ident.SaveId)) continue;
+            list.Add(new PlacementData
+            {
+                furnitureSaveId = ident.SaveId,
+                originX         = po.Origin.x,
+                originY         = po.Origin.y,
+                rotationStep    = po.RotationStep,
+            });
+        }
+        return list.ToArray();
+    }
+
+    public void FromData(PlacementData[] data)
+    {
+        ClearAll();
+        if (data != null)
+        {
+            foreach (var pd in data)
+            {
+                var fdata = SaveIdRegistry.GetById<FurnitureData>(pd.furnitureSaveId);
+                if (fdata == null)
+                {
+                    Debug.LogWarning($"[PlacementSystem] FurnitureData 못 찾음: {pd.furnitureSaveId}");
+                    continue;
+                }
+                PlaceInitial(fdata, new Vector2Int(pd.originX, pd.originY), pd.rotationStep);
+            }
+        }
+        OnPlacementsRestored?.Invoke();
+    }
+
+    private void ClearAll()
+    {
+        var unique = CollectPlacedObjects();
+        foreach (var po in unique)
+        {
+            gridManager.RemoveObject(po);
+            if (po.Instance != null) Destroy(po.Instance);
+        }
+    }
+
+    private HashSet<PlacedObject> CollectPlacedObjects()
+    {
+        var set = new HashSet<PlacedObject>();
+        for (int x = 0; x < gridManager.GridWidth; x++)
+            for (int y = 0; y < gridManager.GridHeight; y++)
+            {
+                var c = gridManager.GetCell(new Vector2Int(x, y));
+                if (c?.placedObject != null) set.Add(c.placedObject);
+            }
+        return set;
+    }
 }

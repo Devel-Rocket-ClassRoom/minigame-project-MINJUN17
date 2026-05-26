@@ -34,6 +34,12 @@ public class StaffManager : MonoBehaviour
     public IReadOnlyList<CookStaff> CookStaffs => cookStaffs;
     public IReadOnlyList<ServerStaff> ServerStaffs => serverStaffs;
     public IReadOnlyList<RiderStaff> RiderStaffs => riderStaffs;
+
+    // SaveIdRegistry용 — 등급 SO 리스트 노출
+    public IReadOnlyList<StaffData> CookGrades   => cookGrades;
+    public IReadOnlyList<StaffData> ServerGrades => serverGrades;
+    public IReadOnlyList<StaffData> RiderGrades  => riderGrades;
+
     public int RiderCount => riderStaffs.Count;
     public int TotalStaffCount => cookStaffs.Count + serverStaffs.Count + riderStaffs.Count;
 
@@ -45,7 +51,7 @@ public class StaffManager : MonoBehaviour
         foreach (var s in riderStaffs)  yield return s;
     }
 
-    private string PickNameKey() => namePool != null ? namePool.PickRandomKey() : null;
+    public string PickNameKey() => namePool != null ? namePool.PickRandomKey() : null;
 
     /// <summary>UI / Staff.Name 에서 호출 — 키를 현재 로케일 문자열로.</summary>
     public string ResolveName(string nameKey) =>
@@ -91,7 +97,7 @@ public class StaffManager : MonoBehaviour
             if (HireServerStaff(starterServerData) == null) break;
     }
 
-    public CookStaff HireCookStaff(StaffData data, float hireVariance = 0f)
+    public CookStaff HireCookStaff(StaffData data, float hireVariance = 0f, string nameKey = null)
     {
         if (data == null || cookStaffPrefab == null) return null;
         if (cookStaffs.Count >= MaxCookCount) return null;
@@ -100,14 +106,14 @@ public class StaffManager : MonoBehaviour
         MoneySystem.Instance.Spend(data.hireCost);
         var staff = Instantiate(cookStaffPrefab);
         staff.gameObject.name = $"Cook_{nextId}";
-        staff.Init(data, nextId, PickNameKey(), hireVariance);
+        staff.Init(data, nextId, nameKey ?? PickNameKey(), hireVariance);
         nextId++;
         cookStaffs.Add(staff);
         OnRosterChanged?.Invoke();
         return staff;
     }
 
-    public ServerStaff HireServerStaff(StaffData data, float hireVariance = 0f)
+    public ServerStaff HireServerStaff(StaffData data, float hireVariance = 0f, string nameKey = null)
     {
         if (data == null || serverStaffPrefab == null) return null;
         if (serverStaffs.Count >= MaxServerCount) return null;
@@ -116,14 +122,14 @@ public class StaffManager : MonoBehaviour
         MoneySystem.Instance.Spend(data.hireCost);
         var staff = Instantiate(serverStaffPrefab);
         staff.gameObject.name = $"Server_{nextId}";
-        staff.Init(data, nextId, PickNameKey(), hireVariance);
+        staff.Init(data, nextId, nameKey ?? PickNameKey(), hireVariance);
         nextId++;
         serverStaffs.Add(staff);
         OnRosterChanged?.Invoke();
         return staff;
     }
 
-    public RiderStaff HireRiderStaff(StaffData data, float hireVariance = 0f)
+    public RiderStaff HireRiderStaff(StaffData data, float hireVariance = 0f, string nameKey = null)
     {
         if (data == null || riderStaffPrefab == null) return null;
         if (!IsRiderHiringUnlocked) return null;
@@ -143,7 +149,7 @@ public class StaffManager : MonoBehaviour
             staff.transform.position, candidates, occupiers, 0.5f);
         if (spawnPos != Vector3.zero) staff.transform.position = spawnPos;
 
-        staff.Init(data, nextId, PickNameKey(), hireVariance);
+        staff.Init(data, nextId, nameKey ?? PickNameKey(), hireVariance);
         nextId++;
         riderStaffs.Add(staff);
         OnRosterChanged?.Invoke();
@@ -286,4 +292,62 @@ public class StaffManager : MonoBehaviour
 
     private bool CanAfford(long amount) =>
         MoneySystem.Instance != null && MoneySystem.Instance.CanAfford(amount);
+
+    // ─── Save / Load ───
+
+    public StaffSaveData[] CollectSaveData()
+    {
+        var list = new List<StaffSaveData>();
+        foreach (var c in cookStaffs)   if (c != null) list.Add(c.ToData("Cook"));
+        foreach (var s in serverStaffs) if (s != null) list.Add(s.ToData("Server"));
+        foreach (var r in riderStaffs)  if (r != null) list.Add(r.ToData("Rider"));
+        return list.ToArray();
+    }
+
+    public void RestoreFromData(StaffSaveData[] data)
+    {
+        ClearAllStaff();
+        if (data == null) return;
+
+        int maxId = 0;
+        foreach (var sd in data)
+        {
+            Staff staff = sd.role switch
+            {
+                "Cook"   => cookStaffPrefab   != null ? Instantiate(cookStaffPrefab)   as Staff : null,
+                "Server" => serverStaffPrefab != null ? Instantiate(serverStaffPrefab) as Staff : null,
+                "Rider"  => riderStaffPrefab  != null ? Instantiate(riderStaffPrefab)  as Staff : null,
+                _ => null,
+            };
+            if (staff == null)
+            {
+                Debug.LogWarning($"[StaffManager] 복원 실패 (prefab 없음 또는 role 인식 안됨): {sd.role}");
+                continue;
+            }
+
+            staff.gameObject.name = $"{sd.role}_{sd.id}";
+            staff.FromData(sd);
+
+            switch (staff)
+            {
+                case CookStaff c:   cookStaffs.Add(c);   break;
+                case ServerStaff s: serverStaffs.Add(s); break;
+                case RiderStaff r:  riderStaffs.Add(r);  break;
+            }
+
+            if (sd.id > maxId) maxId = sd.id;
+        }
+        nextId = maxId + 1;
+        OnRosterChanged?.Invoke();
+    }
+
+    private void ClearAllStaff()
+    {
+        foreach (var c in cookStaffs)   if (c != null) Destroy(c.gameObject);
+        foreach (var s in serverStaffs) if (s != null) Destroy(s.gameObject);
+        foreach (var r in riderStaffs)  if (r != null) Destroy(r.gameObject);
+        cookStaffs.Clear();
+        serverStaffs.Clear();
+        riderStaffs.Clear();
+    }
 }
