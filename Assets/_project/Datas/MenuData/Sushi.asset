@@ -21,12 +21,21 @@ MonoBehaviour:
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
+  description:
+    m_TableReference:
+      m_TableCollectionName: 
+    m_TableEntryReference:
+      m_KeyId: 0
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
   foodSprite: {fileID: 609855222940722255, guid: f179e6dbb1269d747b1e69da011cc606, type: 3}
   price: 10000
   cost: 4000
   tool: {fileID: 0}
-  satisfactionUnlock: 0
-  spawnWeight: 0
+  satisfactionUnlock: 1200
+  spawnWeight: 0.5
   references:
     version: 2
     RefIds: []

@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Localization;
 
-public enum UnlockCategory { Marketing, Food, MapExpansion, Furniture }
+public enum UnlockCategory { Marketing, Food, MapExpansion, Furniture, Recruitment }
 public enum CurrencyType   { Satisfaction, Money }
 
 /// <summary>

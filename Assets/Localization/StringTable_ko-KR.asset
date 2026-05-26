@@ -454,6 +454,31 @@ MonoBehaviour:
     m_Localized: "\uB9E4\uB2C8\uC800"
     m_Metadata:
       m_Items: []
+  - m_Id: 662806836539392
+    m_Localized: "\uC77C\uBC18 \uBAA8\uC9D1\uAD8C"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 662806857510912
+    m_Localized: "\uC2E0\uC785 \uC704\uC8FC\uC758 \uD6C4\uBCF4\uAC00 \uB3C4\uCC29\uD569\uB2C8\uB2E4"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 662806857510913
+    m_Localized: "\uACE0\uAE09 \uBAA8\uC9D1\uAD8C"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 662806857510914
+    m_Localized: "\uACBD\uB825\uC790 \uBE44\uC911\uC774 \uB192\uC740 \uD6C4\uBCF4\uAC00
+      \uB3C4\uCC29\uD569\uB2C8\uB2E4"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 662806857510915
+    m_Localized: "\uD76C\uADC0 \uBAA8\uC9D1\uAD8C"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 662806857510916
+    m_Localized: "\uB9E4\uB2C8\uC800\uAE09\uC774 \uB4F1\uC7A5\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

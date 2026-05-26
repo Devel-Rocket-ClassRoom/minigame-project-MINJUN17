@@ -454,6 +454,30 @@ MonoBehaviour:
     m_Localized: Manager
     m_Metadata:
       m_Items: []
+  - m_Id: 662806836539392
+    m_Localized: Normal Recruitment
+    m_Metadata:
+      m_Items: []
+  - m_Id: 662806857510912
+    m_Localized: Mostly junior applicants
+    m_Metadata:
+      m_Items: []
+  - m_Id: 662806857510913
+    m_Localized: High Recruitment
+    m_Metadata:
+      m_Items: []
+  - m_Id: 662806857510914
+    m_Localized: Mostly senior applicants
+    m_Metadata:
+      m_Items: []
+  - m_Id: 662806857510915
+    m_Localized: Rare Recruitment
+    m_Metadata:
+      m_Items: []
+  - m_Id: 662806857510916
+    m_Localized: Manager-grade candidates possible
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -68,6 +68,10 @@ public class UnlockShopPanel : MonoBehaviour
         {
             MoneySystem.Instance.OnMoneyChanged += OnMoneyChanged;
         }
+        if (StaffCandidatePool.Instance != null)
+        {
+            StaffCandidatePool.Instance.OnPurchaseStateChanged += OnRecruitmentPurchaseStateChanged;
+        }
     }
 
     private void UnsubscribeAll()
@@ -93,6 +97,10 @@ public class UnlockShopPanel : MonoBehaviour
         {
             MoneySystem.Instance.OnMoneyChanged -= OnMoneyChanged;
         }
+        if (StaffCandidatePool.Instance != null)
+        {
+            StaffCandidatePool.Instance.OnPurchaseStateChanged -= OnRecruitmentPurchaseStateChanged;
+        }
     }
 
     private void OnFurnitureUnlocked(FurnitureData _) => Refresh();
@@ -101,6 +109,8 @@ public class UnlockShopPanel : MonoBehaviour
     private void OnExpanded(ExpansionStageData _)      => Refresh();
     private void OnSatisfactionChanged(int _)          => RefreshCanAffordOnly();
     private void OnMoneyChanged(long _)                => RefreshCanAffordOnly();
+    /// <summary>월 1회 제한 토글 — 설명 텍스트가 바뀌므로 슬롯 재생성 필요.</summary>
+    private void OnRecruitmentPurchaseStateChanged()   => Refresh();
 
     public void Refresh()
     {
@@ -169,6 +179,13 @@ public class UnlockShopPanel : MonoBehaviour
             case UnlockCategory.MapExpansion:
                 if (ExpansionManager.Instance == null || ExpansionManager.Instance.NextStage == null) yield break;
                 yield return new MapExpansionUnlockEntry(ExpansionManager.Instance.NextStage);
+                yield break;
+
+            case UnlockCategory.Recruitment:
+                if (StaffCandidatePool.Instance == null || StaffCandidatePool.Instance.TierConfigs == null)
+                    yield break;
+                foreach (var cfg in StaffCandidatePool.Instance.TierConfigs)
+                    if (cfg != null) yield return new RecruitmentUnlockEntry(cfg);
                 yield break;
         }
     }

@@ -17,6 +17,9 @@ public class UnlockSlot : MonoBehaviour
 
     [Header("구매 버튼")]
     [SerializeField] private Button buyButton;
+    [SerializeField] private TextMeshProUGUI buyButtonText;
+    [SerializeField] private string buyLabel = "구매";
+    [SerializeField] private string purchasedThisMonthLabel = "구매완료";
 
     [Header("잔액 부족 색")]
     [SerializeField] private Color affordColor   = Color.white;
@@ -72,11 +75,15 @@ public class UnlockSlot : MonoBehaviour
         RefreshAffordability();
 
         // 구매 버튼
+        bool blockedByMonthly = entry is RecruitmentUnlockEntry r && !r.IsPurchasableThisMonth;
         if (buyButton != null)
         {
             buyButton.onClick.RemoveAllListeners();
             buyButton.onClick.AddListener(OnBuyClicked);
+            buyButton.interactable = !blockedByMonthly;
         }
+        if (buyButtonText != null)
+            buyButtonText.text = blockedByMonthly ? purchasedThisMonthLabel : buyLabel;
     }
 
     /// <summary>잔액이 바뀌었을 때 비용 색만 갱신.</summary>

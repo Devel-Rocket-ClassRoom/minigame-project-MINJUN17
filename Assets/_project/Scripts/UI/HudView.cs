@@ -30,7 +30,7 @@ public class HudView : MonoBehaviour
     }
     private void UpdateSatisfaction(int satisfaction)
     {
-        if (satisfactionText != null) satisfactionText.text = $"Satis : {satisfaction}";
+        if (satisfactionText != null) satisfactionText.text = $"{satisfaction}";
     }
     private void UpdateReputation(long reputation)
     {
