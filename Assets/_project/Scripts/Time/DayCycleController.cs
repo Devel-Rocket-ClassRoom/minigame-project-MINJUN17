@@ -26,18 +26,12 @@ public class DayCycleController : MonoBehaviour
     private void Start()
     {
         time.BeginDay();
-        OnSettlementReady += AutoConfirm;
     }
 
     private void HandleDayStarted()
     {
         customerManager.StartSpawning();
         DTSystem.Instance?.StartSpawning();
-    }
-    private void AutoConfirm() // 임시
-    {
-        Debug.Log($"[정산] Day 정산 — 보유금: {MoneySystem.Instance.Money}");
-        ConfirmSettlement();
     }
 
     private void HandleClose()
