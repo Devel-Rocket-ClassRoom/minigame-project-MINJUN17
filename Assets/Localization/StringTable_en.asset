@@ -478,6 +478,90 @@ MonoBehaviour:
     m_Localized: Manager-grade candidates possible
     m_Metadata:
       m_Items: []
+  - m_Id: 721454673686528
+    m_Localized: Staff
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269440
+    m_Localized: Hire Staff
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269441
+    m_Localized: Recruit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269442
+    m_Localized: Please recruit staff!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269443
+    m_Localized: Staff hiring available in {0} months
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269444
+    m_Localized: Candidates {0}/{1}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269445
+    m_Localized: Settlement
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269446
+    m_Localized: Material Cost
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269447
+    m_Localized: Staff Salary
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269448
+    m_Localized: Rent
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269449
+    m_Localized: Total
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269450
+    m_Localized: Year {0} Results
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269451
+    m_Localized: Annual Revenue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269452
+    m_Localized: Customer Reputation
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269453
+    m_Localized: Food
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269454
+    m_Localized: Furniture
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269455
+    m_Localized: Map Expansion
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269456
+    m_Localized: No available unlocks
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269457
+    m_Localized: Confirm
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269458
+    m_Localized: Apply Marketing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269459
+    m_Localized: Delivery Zone
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -475,6 +475,90 @@ MonoBehaviour:
     m_Key: recruitment.rare.desc
     m_Metadata:
       m_Items: []
+  - m_Id: 721454673686528
+    m_Key: ui.staff.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269440
+    m_Key: ui.staff.hireMenu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269441
+    m_Key: ui.recruit.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269442
+    m_Key: ui.recruit.empty
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269443
+    m_Key: ui.recruit.pendingFormat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269444
+    m_Key: ui.recruit.candidateCount
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269445
+    m_Key: ui.settlement.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269446
+    m_Key: ui.settlement.material
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269447
+    m_Key: ui.settlement.staffSalary
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269448
+    m_Key: ui.settlement.rent
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269449
+    m_Key: ui.settlement.total
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269450
+    m_Key: ui.ranking.titleFormat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269451
+    m_Key: ui.ranking.annualRevenue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269452
+    m_Key: ui.ranking.customerReputation
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269453
+    m_Key: ui.shop.tab.food
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269454
+    m_Key: ui.shop.tab.furniture
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269455
+    m_Key: ui.shop.tab.expansion
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269456
+    m_Key: ui.shop.empty.unlock
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269457
+    m_Key: ui.placement.confirmAction
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269458
+    m_Key: ui.marketing.applyAction
+    m_Metadata:
+      m_Items: []
+  - m_Id: 721454686269459
+    m_Key: ui.zone.delivery
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

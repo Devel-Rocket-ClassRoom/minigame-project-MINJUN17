@@ -114,3 +114,24 @@ recruitment.high,,고급 모집권,High Recruitment
 recruitment.high.desc,,경력자 비중이 높은 후보가 도착합니다,Mostly senior applicants
 recruitment.rare,,희귀 모집권,Rare Recruitment
 recruitment.rare.desc,,매니저급이 등장할 수 있습니다,Manager-grade candidates possible
+ui.staff.title,,직원,Staff
+ui.staff.hireMenu,,직원모집하기,Hire Staff
+ui.recruit.title,,모집,Recruit
+ui.recruit.empty,,직원 모집을 해주세요!,Please recruit staff!
+ui.recruit.pendingFormat,,{0}달 후에 직원 고용이 가능합니다!,Staff hiring available in {0} months
+ui.recruit.candidateCount,,직원 선택 {0}/{1},Candidates {0}/{1}
+ui.settlement.title,,정산,Settlement
+ui.settlement.material,,재료비,Material Cost
+ui.settlement.staffSalary,,직원월급,Staff Salary
+ui.settlement.rent,,임대료,Rent
+ui.settlement.total,,총합,Total
+ui.ranking.titleFormat,,{0}년차 결산,Year {0} Results
+ui.ranking.annualRevenue,,연매출,Annual Revenue
+ui.ranking.customerReputation,,손님평판,Customer Reputation
+ui.shop.tab.food,,음식,Food
+ui.shop.tab.furniture,,가구,Furniture
+ui.shop.tab.expansion,,맵 확장,Map Expansion
+ui.shop.empty.unlock,,가능한 해금이 없습니다,No available unlocks
+ui.placement.confirmAction,,확정,Confirm
+ui.marketing.applyAction,,마케팅 적용,Apply Marketing
+ui.zone.delivery,,배달존,Delivery Zone
