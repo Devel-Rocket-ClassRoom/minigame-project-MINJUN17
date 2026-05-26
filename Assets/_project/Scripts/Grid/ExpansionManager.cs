@@ -12,6 +12,8 @@ public class ExpansionManager : MonoBehaviour
 
     public bool CanExpand => _currentStage < stages.Count;
     public ExpansionStageData NextStage => CanExpand ? stages[_currentStage] : null;
+    public int CurrentStage => _currentStage;
+    public IReadOnlyList<ExpansionStageData> Stages => stages;   // SaveIdRegistry용
 
     public event Action<ExpansionStageData> OnExpanded;
 
@@ -33,5 +35,22 @@ public class ExpansionManager : MonoBehaviour
         _currentStage++;
         OnExpanded?.Invoke(stage);
         return true;
+    }
+
+    // ─── Save / Load ───
+    public ExpansionData ToData() => new ExpansionData { currentStage = _currentStage };
+
+    public void FromData(ExpansionData data)
+    {
+        if (data == null) return;
+
+        // 0 ~ (currentStage-1) 단계까지 다시 활성화 (그리드 셀 + 카메라)
+        int target = Mathf.Min(data.currentStage, stages != null ? stages.Count : 0);
+        for (int i = 0; i < target; i++)
+        {
+            if (stages[i] != null) gridManager.ActivateCells(stages[i]);
+        }
+        _currentStage = data.currentStage;
+        // 이벤트 발화 X — 이미 적용된 상태 복원
     }
 }

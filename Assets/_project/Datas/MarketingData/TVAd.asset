@@ -12,12 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9a22bc607f44d3db66c13701c62fe73, type: 3}
   m_Name: TVAd
   m_EditorClassIdentifier: Assembly-CSharp::MarketingData
+  saveId: bd3fdfe73d19
   marketingName:
     m_TableReference:
       m_TableCollectionName: GUID:e8a326a4f684cfd4f828350fbb7606b2
     m_TableEntryReference:
       m_KeyId: 2880882409475
-      m_Key:
+      m_Key: 
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
@@ -26,7 +27,7 @@ MonoBehaviour:
       m_TableCollectionName: GUID:e8a326a4f684cfd4f828350fbb7606b2
     m_TableEntryReference:
       m_KeyId: 2880882409476
-      m_Key:
+      m_Key: 
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []

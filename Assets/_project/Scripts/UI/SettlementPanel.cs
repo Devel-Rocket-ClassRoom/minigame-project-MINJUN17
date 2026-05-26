@@ -149,6 +149,7 @@ public class SettlementPanel : MonoBehaviour
         _seq?.Kill();
         SetPanelVisible(false);
         dayCycle?.ConfirmSettlement();
+        SaveLoadManager.Instance?.Save();   // 월 정산 직후 자동 저장
     }
 
     private void SetPanelVisible(bool visible)

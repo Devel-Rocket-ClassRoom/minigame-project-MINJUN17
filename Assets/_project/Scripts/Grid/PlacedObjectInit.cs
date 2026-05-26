@@ -13,8 +13,14 @@ public class PlacedObjectInit : MonoBehaviour
 
     private void Start()
     {
-        foreach (var e in layoutData.entries)
-            placementSystem.PlaceInitial(e.furniture, e.position, e.rotationStep);
+        // 세이브 있으면 SaveLoadManager가 이미 placements 복원함 → 초기 배치 스킵
+        bool hasSave = SaveLoadManager.Instance != null && SaveLoadManager.Instance.HasActiveSave;
+
+        if (!hasSave)
+        {
+            foreach (var e in layoutData.entries)
+                placementSystem.PlaceInitial(e.furniture, e.position, e.rotationStep);
+        }
 
         // PassWindow 위치 자동 감지 → 풋프린트 셀들 reserved + 주방측은 벽 opening 처리
         var passWindowCells = new List<Vector2Int>();
@@ -30,7 +36,9 @@ public class PlacedObjectInit : MonoBehaviour
         }
         GridManager.Instance.SetupPassWindow(passWindowCells);
 
-        StaffManager.Instance.Init();
+        // 세이브 있으면 SaveLoadManager가 RestoreFromData 호출함 → Init 스킵
+        if (!hasSave)
+            StaffManager.Instance.Init();
         //placementSystem.PlaceInitial(counterData, new Vector2Int(1, 3));
         //placementSystem.PlaceInitial(counterData, new Vector2Int(2, 3));
         //placementSystem.PlaceInitial(passWindowData, new Vector2Int(1, 5));

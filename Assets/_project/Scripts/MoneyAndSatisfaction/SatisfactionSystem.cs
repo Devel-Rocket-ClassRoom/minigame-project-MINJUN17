@@ -31,4 +31,14 @@ public class SatisfactionSystem : MonoBehaviour
         _satisfaction += amount;
         OnSatisfactionChanged?.Invoke(_satisfaction);
     }
+
+    // ─── Save / Load ───
+    public SatisfactionData ToData() => new SatisfactionData { satisfaction = _satisfaction };
+
+    public void FromData(SatisfactionData data)
+    {
+        if (data == null) return;
+        _satisfaction = data.satisfaction;
+        OnSatisfactionChanged?.Invoke(_satisfaction);
+    }
 }

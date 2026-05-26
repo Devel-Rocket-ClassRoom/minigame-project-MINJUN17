@@ -27,4 +27,14 @@ public class ReputationSystem : MonoBehaviour
         _annualReputation = 0;
         OnReputationChanged?.Invoke(_annualReputation);
     }
+
+    // ─── Save / Load ───
+    public ReputationData ToData() => new ReputationData { annualReputation = _annualReputation };
+
+    public void FromData(ReputationData data)
+    {
+        if (data == null) return;
+        _annualReputation = data.annualReputation;
+        OnReputationChanged?.Invoke(_annualReputation);
+    }
 }

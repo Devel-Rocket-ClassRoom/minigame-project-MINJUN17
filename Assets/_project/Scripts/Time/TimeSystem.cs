@@ -16,6 +16,7 @@ public class TimeSystem : MonoBehaviour
     private int _month = 1;
     private int _year = 0;
     private bool _ticking = true;
+    private Coroutine _rollRoutine;
 
     public int Hour => _hour;
     public int Month => _month;
@@ -46,7 +47,8 @@ public class TimeSystem : MonoBehaviour
 
     public void BeginDay()
     {
-        StartCoroutine(RollToOpenHour());
+        if (_rollRoutine != null) StopCoroutine(_rollRoutine);
+        _rollRoutine = StartCoroutine(RollToOpenHour());
     }
     private IEnumerator RollToOpenHour()
     {
@@ -64,6 +66,37 @@ public class TimeSystem : MonoBehaviour
         }
         _timer = 0f;
         _ticking = true;
+        _rollRoutine = null;
         OnDayStarted?.Invoke();
+    }
+
+    // ─── Save / Load ───
+    public TimeData ToData() => new TimeData
+    {
+        hour    = _hour,
+        month   = _month,
+        year    = _year,
+        ticking = _ticking,
+        timer   = _timer,
+    };
+
+    public void FromData(TimeData data)
+    {
+        if (data == null) return;
+
+        // 진행 중일 수 있는 RollToOpenHour 코루틴 정리
+        StopAllCoroutines();
+        _rollRoutine = null;
+
+        _hour    = data.hour;
+        _month   = data.month;
+        _year    = data.year;
+        _ticking = data.ticking;
+        _timer   = data.timer;
+
+        OnHourChanged?.Invoke();   // HUD 즉시 갱신
+
+        // 영업 중이 아니면 다음 영업일 코루틴 재시작
+        if (!_ticking) BeginDay();
     }
 }

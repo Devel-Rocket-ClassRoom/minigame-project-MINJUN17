@@ -111,4 +111,37 @@ public abstract class Staff : MonoBehaviour
         food.transform.SetParent(parent, false);
         food.transform.localPosition = Vector3.zero;
     }
+
+    // ─── Save / Load ───
+    public StaffSaveData ToData(string roleName)
+    {
+        var pos = transform.position;
+        return new StaffSaveData
+        {
+            role            = roleName,
+            staffDataSaveId = _data is ISaveIdentifiable ident ? ident.SaveId : null,
+            nameKey         = _nameKey,
+            id              = id,
+            tenureMonths    = _tenureMonths,
+            growthBumps     = _growthBumps,
+            hireVariance    = _hireVariance,
+            posX = pos.x, posY = pos.y, posZ = pos.z,
+        };
+    }
+
+    public void FromData(StaffSaveData data)
+    {
+        var staffData = SaveIdRegistry.GetById<StaffData>(data.staffDataSaveId);
+        if (staffData == null)
+        {
+            Debug.LogWarning($"[Staff] StaffData 못 찾음: {data.staffDataSaveId}");
+            return;
+        }
+
+        InitBase(staffData, data.id, data.nameKey, data.hireVariance);
+        _tenureMonths     = data.tenureMonths;
+        _growthBumps      = data.growthBumps;
+        _growthMultiplier = 1f + 0.03f * _growthBumps;
+        transform.position = new Vector3(data.posX, data.posY, data.posZ);
+    }
 }

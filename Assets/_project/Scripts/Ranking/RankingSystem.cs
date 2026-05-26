@@ -100,4 +100,42 @@ public class RankingSystem : MonoBehaviour
             if (score >= dummyTop100[i]) return i + 1;
         return dummyTop100.Count + 1;
     }
+
+    // ─── Save / Load ───
+    // 직전 연말 정산 결과(LastResult)만 저장. dummyTop100은 SO처럼 고정 데이터라 미저장.
+    public RankingData ToData()
+    {
+        // 정산 한 번도 안 했으면 default 구조체 — Score/Revenue/Reputation 모두 0
+        if (LastResult.Score == 0 && LastResult.Revenue == 0 && LastResult.Reputation == 0 && LastResult.Rank == 0)
+            return new RankingData { hasLastResult = false };
+
+        return new RankingData
+        {
+            hasLastResult = true,
+            score         = LastResult.Score,
+            qualified     = LastResult.Qualified,
+            rank          = LastResult.Rank,
+            revenue       = LastResult.Revenue,
+            reputation    = LastResult.Reputation,
+        };
+    }
+
+    public void FromData(RankingData data)
+    {
+        if (data == null || !data.hasLastResult)
+        {
+            LastResult = default;
+            return;
+        }
+
+        LastResult = new YearResult
+        {
+            Score      = data.score,
+            Qualified  = data.qualified,
+            Rank       = data.rank,
+            Revenue    = data.revenue,
+            Reputation = data.reputation,
+        };
+        // 이벤트 발화 X — UI는 패널 열 때 LastResult 조회로 재구성하면 됨
+    }
 }
