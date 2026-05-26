@@ -49,15 +49,22 @@ public class MoneySystem : MonoBehaviour
 
     public void SettleMonthly()
     {
-        long materialCost = SalesTracker.Instance.CalculateMaterialCost();
-        long totalSalaryCost = StaffManager.Instance.CalculateTotalSalaryCost();
-        long operationCost = gridManager.ActiveCellCount * PricePerSquareMeter;
-        long total = materialCost + operationCost + totalSalaryCost;
-        ForceSpend(total);
-        Debug.Log($"[정산] 재료비={materialCost} 급여={totalSalaryCost} 유지비={operationCost} 총={total} → 잔액={_money}");
+        var r = CalculateSettlement();
+        ForceSpend(r.TotalExpense);
         SalesTracker.Instance.ResetMonthly();
     }
 
-    
+    public SettlementResult CalculateSettlement()
+    {
+        return new SettlementResult
+        {
+            MaterialCost = SalesTracker.Instance != null
+                            ? SalesTracker.Instance.CalculateMaterialCost() : 0,
+            SalaryCost = StaffManager.Instance != null
+                            ? StaffManager.Instance.CalculateTotalSalaryCost() : 0,
+            OperationCost = gridManager != null
+                            ? gridManager.ActiveCellCount * PricePerSquareMeter : 0,
+        };
+    }
 
 }
