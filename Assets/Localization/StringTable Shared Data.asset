@@ -451,6 +451,30 @@ MonoBehaviour:
     m_Key: staff.grade.manager
     m_Metadata:
       m_Items: []
+  - m_Id: 662806836539392
+    m_Key: recruitment.normal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 662806857510912
+    m_Key: recruitment.normal.desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 662806857510913
+    m_Key: recruitment.high
+    m_Metadata:
+      m_Items: []
+  - m_Id: 662806857510914
+    m_Key: recruitment.high.desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 662806857510915
+    m_Key: recruitment.rare
+    m_Metadata:
+      m_Items: []
+  - m_Id: 662806857510916
+    m_Key: recruitment.rare.desc
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

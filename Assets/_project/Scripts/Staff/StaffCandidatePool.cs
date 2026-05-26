@@ -22,10 +22,13 @@ public class StaffCandidatePool : MonoBehaviour
 
     public IReadOnlyList<StaffCandidate> Applicants => _applicants;
     public IReadOnlyList<RecruitmentTicket> PendingTickets => _pendingTickets;
+    public IReadOnlyList<RecruitmentTierConfig> TierConfigs => tierConfigs;
     public bool CanPurchaseThisMonth => !_purchasedThisMonth;
 
     public event Action OnApplicantsChanged;
     public event Action OnPendingTicketsChanged;
+    /// <summary>이번 달 구매 가능 상태가 바뀔 때 (구매 직후 / 새 달 시작) — UI 갱신용.</summary>
+    public event Action OnPurchaseStateChanged;
 
     private void Awake()
     {
@@ -53,12 +56,15 @@ public class StaffCandidatePool : MonoBehaviour
         _pendingTickets.Add(new RecruitmentTicket { tier = tier, monthsRemaining = ticketDelayMonths });
         _purchasedThisMonth = true;
         OnPendingTicketsChanged?.Invoke();
+        OnPurchaseStateChanged?.Invoke();
         return true;
     }
 
     private void HandleDayStarted()
     {
+        bool wasBlocked = _purchasedThisMonth;
         _purchasedThisMonth = false;
+        if (wasBlocked) OnPurchaseStateChanged?.Invoke();
 
         bool applicantsChanged = false;
         bool ticketsChanged = false;

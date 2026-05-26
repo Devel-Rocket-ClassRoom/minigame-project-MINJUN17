@@ -108,3 +108,9 @@ staff.role.rider,,라이더,Rider
 staff.grade.junior,,주니어,Junior
 staff.grade.senior,,시니어,Senior
 staff.grade.manager,,매니저,Manager
+recruitment.normal,,일반 모집권,Normal Recruitment
+recruitment.normal.desc,,신입 위주의 후보가 도착합니다,Mostly junior applicants
+recruitment.high,,고급 모집권,High Recruitment
+recruitment.high.desc,,경력자 비중이 높은 후보가 도착합니다,Mostly senior applicants
+recruitment.rare,,희귀 모집권,Rare Recruitment
+recruitment.rare.desc,,매니저급이 등장할 수 있습니다,Manager-grade candidates possible
