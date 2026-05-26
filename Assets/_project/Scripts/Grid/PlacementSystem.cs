@@ -104,14 +104,32 @@ public class PlacementSystem : MonoBehaviour
         Mode = Mode.Place;
     }
 
-    // Preview용: 매니저 자동등록되는 로직 컴포넌트 즉시 제거
-    // (Awake에서 이미 등록은 됐지만, OnDestroy/Unregister가 호출되도록 Destroy 처리)
+    // Preview용: 매니저 자동등록되는 로직 컴포넌트 즉시 제거.
+    // Awake에서 등록된 매니저에서 동기적으로 unregister해야 함 — Destroy()는 end-of-frame에야
+    // OnDestroy/Unregister가 돌기 때문에, 그 사이 같은 프레임의 Customer.Update가 preview를
+    // 진짜 가구로 잡아챌 수 있음 (의자 설치 중 MissingReferenceException 원인).
     private void StripLogicComponents(GameObject preview)
     {
-        foreach (var c in preview.GetComponentsInChildren<Counter>(true))            Destroy(c);
-        foreach (var p in preview.GetComponentsInChildren<PassWindow>(true))         Destroy(p);
-        foreach (var s in preview.GetComponentsInChildren<Seat>(true))               Destroy(s);
-        foreach (var t in preview.GetComponentsInChildren<CookingToolInstance>(true)) Destroy(t);
+        foreach (var c in preview.GetComponentsInChildren<Counter>(true))
+        {
+            CounterManager.Instance?.UnregisterCounter(c);
+            Destroy(c);
+        }
+        foreach (var p in preview.GetComponentsInChildren<PassWindow>(true))
+        {
+            PassWindowManager.Instance?.Unregister(p);
+            Destroy(p);
+        }
+        foreach (var s in preview.GetComponentsInChildren<Seat>(true))
+        {
+            SeatManager.Instance?.UnregisterSeat(s);
+            Destroy(s);
+        }
+        foreach (var t in preview.GetComponentsInChildren<CookingToolInstance>(true))
+        {
+            CookingToolManager.Instance?.Unregister(t);
+            Destroy(t);
+        }
     }
 
     public void StartMove()

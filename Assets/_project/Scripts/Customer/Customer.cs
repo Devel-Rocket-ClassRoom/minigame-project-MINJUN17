@@ -185,6 +185,14 @@ public class Customer : MonoBehaviour
     }
     private void WalkToSeatState()
     {
+        // 좌석이 사라졌으면(가구 철거/preview race) 크래시 대신 퇴장
+        if (_targetSeat == null)
+        {
+            _targetSeat = null;
+            ChangeState(CustomerState.LEAVE);
+            return;
+        }
+
         // Seat의 transform.position이 의자 sprite 정렬용으로 셀 중앙에서 어긋날 수 있어서
         // 손님은 그 위치가 속한 셀의 중앙으로 이동
         Vector2Int seatCell = GridManager.Instance.WorldToCell(_targetSeat.transform.position);
