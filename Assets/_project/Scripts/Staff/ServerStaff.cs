@@ -29,9 +29,19 @@ public class ServerStaff : Staff
 
     protected override PathRole GetPathRole() => PathRole.Server;
 
+    protected override Vector3 GetWorkPosition()
+    {
+        Vector3 spot = PickRestSpot();
+        return spot != Vector3.zero ? spot : transform.position;
+    }
+
+    protected override void OnArrivedAtWork() => ChangeState(ServerState.IDLE_AT_COUNTER);
+
 
     private void Update()
     {
+        if (TickCommute()) { _stateTimer += Time.deltaTime; return; }
+
         switch (_state)
         {
             case ServerState.IDLE_AT_COUNTER:        IdleAtCounterState(); break;

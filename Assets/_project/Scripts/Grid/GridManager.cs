@@ -43,6 +43,10 @@ public class GridManager : MonoBehaviour
         // 픽업대 셀은 시작 배치 좌표에 맞춰 추가 (예: new Vector2Int(1, 8))
     };
 
+    [Header("직원 통근용 주방 문 (벽으로 안 막는 1칸)")]
+    [SerializeField] private Vector2Int kitchenDoorCell = new Vector2Int(1, 8);
+    public Vector2Int KitchenDoorCell => kitchenDoorCell;
+
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
@@ -150,6 +154,7 @@ public class GridManager : MonoBehaviour
             case PathRole.Cook:     return c.zone == CellZone.Kitchen;
             case PathRole.Server:   return true; // 주방/홀 둘 다 OK
             case PathRole.Rider:    return c.zone == CellZone.Hall || c.zone == CellZone.RiderRoom;
+            case PathRole.Commute:  return true; // 통근: 존 무시 (단 벽/가구/비활성은 위에서 이미 차단)
             default: return true;
         }
     }
@@ -179,6 +184,11 @@ public class GridManager : MonoBehaviour
             if (c != null && c.zone == CellZone.Kitchen)
                 openings.Add(pos);
         }
+
+        // 직원 통근용 주방 전용 문: 벽 제외 + 가구 배치 금지(reserved)
+        openings.Add(kitchenDoorCell);
+        SetReserved(kitchenDoorCell, true);
+
         BuildKitchenLWalls(openings);
     }
 

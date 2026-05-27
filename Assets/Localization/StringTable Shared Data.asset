@@ -39,6 +39,18 @@ MonoBehaviour:
     m_Key: furniture.grill
     m_Metadata:
       m_Items: []
+  - m_Id: 1195184867573760
+    m_Key: furniture.fryer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1195184917905408
+    m_Key: furniture.workTable
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1195184917905409
+    m_Key: furniture.iceCreamMachine
+    m_Metadata:
+      m_Items: []
   - m_Id: 1715406962688
     m_Key: furniture.phone
     m_Metadata:
@@ -57,6 +69,98 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 1715406962692
     m_Key: menu.sushi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984357756928
+    m_Key: menu.bread
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117056
+    m_Key: menu.bacon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117057
+    m_Key: menu.burrito
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117058
+    m_Key: menu.cheesecake
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117059
+    m_Key: menu.cookies
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117060
+    m_Key: menu.chocolateCake
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117061
+    m_Key: menu.curry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117062
+    m_Key: menu.dumplings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117063
+    m_Key: menu.friedEgg
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117064
+    m_Key: menu.eggTart
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117065
+    m_Key: menu.frenchFries
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117066
+    m_Key: menu.fruitCake
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117067
+    m_Key: menu.garlicBread
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117068
+    m_Key: menu.hotDog
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117069
+    m_Key: menu.iceCream
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117070
+    m_Key: menu.meatball
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117071
+    m_Key: menu.omelet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117072
+    m_Key: menu.pudding
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117073
+    m_Key: menu.pizza
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117074
+    m_Key: menu.roastedChicken
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117075
+    m_Key: menu.sandwich
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117076
+    m_Key: menu.taco
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117077
+    m_Key: menu.waffle
     m_Metadata:
       m_Items: []
   - m_Id: 1715406962693

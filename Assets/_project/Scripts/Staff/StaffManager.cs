@@ -88,6 +88,32 @@ public class StaffManager : MonoBehaviour
         OnRosterChanged?.Invoke();
     }
 
+    /// <summary>영업 시작 — 전 직원 입구에서 등장해 근무지로.</summary>
+    public void OnBusinessOpen()
+    {
+        if (CustomerManager.Instance == null) return;
+        Vector3 entry = CustomerManager.Instance.EntryPosition;
+        foreach (var s in GetAllStaffs()) s.BeginArriving(entry);
+    }
+
+    /// <summary>영업 종료 — 전 직원 입구로 퇴장(도착 시 숨김).</summary>
+    public void OnBusinessClose()
+    {
+        if (CustomerManager.Instance == null) return;
+        Vector3 exit = CustomerManager.Instance.ExitPosition;
+        foreach (var s in GetAllStaffs()) s.BeginLeaving(exit);
+    }
+
+    // 채용 직후 등장 처리: 영업 중이면 즉시 입구에서 입장, 아니면 숨겨뒀다 다음 영업에 입장
+    private void OnHired(Staff staff)
+    {
+        bool open = timeSystem != null && timeSystem.IsOpen;
+        if (open && CustomerManager.Instance != null)
+            staff.BeginArriving(CustomerManager.Instance.EntryPosition);
+        else
+            staff.gameObject.SetActive(false);
+    }
+
     public void Init()
     {
         HireCookStaff(starterCookData);
@@ -109,6 +135,7 @@ public class StaffManager : MonoBehaviour
         staff.Init(data, nextId, nameKey ?? PickNameKey(), hireVariance);
         nextId++;
         cookStaffs.Add(staff);
+        OnHired(staff);
         OnRosterChanged?.Invoke();
         return staff;
     }
@@ -125,6 +152,7 @@ public class StaffManager : MonoBehaviour
         staff.Init(data, nextId, nameKey ?? PickNameKey(), hireVariance);
         nextId++;
         serverStaffs.Add(staff);
+        OnHired(staff);
         OnRosterChanged?.Invoke();
         return staff;
     }
@@ -152,6 +180,7 @@ public class StaffManager : MonoBehaviour
         staff.Init(data, nextId, nameKey ?? PickNameKey(), hireVariance);
         nextId++;
         riderStaffs.Add(staff);
+        OnHired(staff);
         OnRosterChanged?.Invoke();
         return staff;
     }
@@ -338,6 +367,11 @@ public class StaffManager : MonoBehaviour
             if (sd.id > maxId) maxId = sd.id;
         }
         nextId = maxId + 1;
+
+        // 영업 시간이 아니면 직원 숨김(다음 영업에 입장). 영업 중이면 저장 위치에서 근무.
+        if (timeSystem == null || !timeSystem.IsOpen)
+            foreach (var s in GetAllStaffs()) s.gameObject.SetActive(false);
+
         OnRosterChanged?.Invoke();
     }
 

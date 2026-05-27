@@ -5,11 +5,37 @@ furniture.chair2p,,2인용 의자,2-Seat Chair
 furniture.counter,,카운터,Counter
 furniture.passWindow,,패스창구,Pass Window
 furniture.grill,,그릴,Grill
+furniture.fryer,,튀김기,Fryer
+furniture.workTable,,조리대,Work Table
+furniture.iceCreamMachine,,아이스크림 기계,Ice Cream Machine
 furniture.phone,,전화기,Phone
 furniture.dtOrderWindow,,DT 주문창구,DT Order Window
 furniture.dtPickupWindow,,DT 픽업창구,DT Pickup Window
 menu.burger,,햄버거,Burger
 menu.sushi,,초밥,Sushi
+menu.bread,,빵,Bread
+menu.bacon,,베이컨,Bacon
+menu.burrito,,부리토,Burrito
+menu.cheesecake,,치즈케이크,Cheesecake
+menu.cookies,,쿠키,Cookies
+menu.chocolateCake,,초콜릿케이크,Chocolate Cake
+menu.curry,,카레,Curry
+menu.dumplings,,만두,Dumplings
+menu.friedEgg,,계란프라이,Fried Egg
+menu.eggTart,,에그타르트,Egg Tart
+menu.frenchFries,,감자튀김,French Fries
+menu.fruitCake,,과일케이크,Fruit Cake
+menu.garlicBread,,마늘빵,Garlic Bread
+menu.hotDog,,핫도그,Hot Dog
+menu.iceCream,,아이스크림,Ice Cream
+menu.meatball,,미트볼,Meatball
+menu.omelet,,오믈렛,Omelet
+menu.pudding,,푸딩,Pudding
+menu.pizza,,피자,Pizza
+menu.roastedChicken,,로스트치킨,Roasted Chicken
+menu.sandwich,,샌드위치,Sandwich
+menu.taco,,타코,Taco
+menu.waffle,,와플,Waffle
 ui.common.confirm,,확인,Confirm
 ui.common.cancel,,취소,Cancel
 ui.common.close,,닫기,Close

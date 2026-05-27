@@ -38,6 +38,13 @@ public class CookingToolManager : MonoBehaviour
         return null;
     }
 
+    public CookingToolInstance GetToolInstance(ToolType type)
+    {
+        foreach (var inst in _instances)
+            if (inst.data != null && inst.data.toolType == type) return inst;
+        return null;
+    }
+
     // 요리사가 도구 옆에 설 수 있는 인접 walkable 셀 위치 반환 (풋프린트 전체 고려)
     public Vector3 GetToolApproachPosition(ToolType type, Vector3 from)
     {

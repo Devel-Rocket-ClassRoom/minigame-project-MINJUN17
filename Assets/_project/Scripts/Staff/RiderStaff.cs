@@ -34,6 +34,8 @@ public class RiderStaff : Staff
 
     private void Update()
     {
+        if (TickCommute()) { _stateTimer += Time.deltaTime; return; }
+
         switch (_state)
         {
             case RiderState.IDLE_AT_RIDERPOS:   IdleAtRiderPosState(); break;
@@ -43,6 +45,20 @@ public class RiderStaff : Staff
             case RiderState.RETURN_TO_ENTRY:    ReturnToEntryState(); break;
         }
         _stateTimer += Time.deltaTime;
+    }
+
+    protected override Vector3 GetWorkPosition()
+    {
+        Vector3 spot = PickRestSpot();
+        if (spot != Vector3.zero) return spot;
+        var cells = GridManager.Instance.GetWalkableCellsInZone(CellZone.RiderRoom);
+        return cells.Count > 0 ? cells[0] : transform.position;
+    }
+
+    protected override void OnArrivedAtWork()
+    {
+        SetVisible(true);   // 배달 중 숨겨졌던 경우 대비
+        ChangeState(RiderState.IDLE_AT_RIDERPOS);
     }
 
     private void ChangeState(RiderState next)

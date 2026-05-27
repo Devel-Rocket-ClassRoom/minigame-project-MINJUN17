@@ -80,6 +80,62 @@ public abstract class Staff : MonoBehaviour
     // 자식 클래스가 자기 역할 지정 (Cook/Server)
     protected abstract PathRole GetPathRole();
 
+    // ─── 통근(출퇴근) ───
+    protected enum CommuteState { NONE, ARRIVING, LEAVING }
+    private CommuteState _commute = CommuteState.NONE;
+    private Vector3 _commuteTarget;
+
+    public bool IsCommuting => _commute != CommuteState.NONE;
+
+    // 서브클래스가 자기 근무지 좌표 / 도착 시 IDLE 진입을 구현
+    protected abstract Vector3 GetWorkPosition();
+    protected abstract void OnArrivedAtWork();
+
+    /// <summary>영업 시작: 입구에서 등장 → 근무지로 이동.</summary>
+    public void BeginArriving(Vector3 entryPos)
+    {
+        gameObject.SetActive(true);
+        transform.position = entryPos;
+        _commuteTarget = GetWorkPosition();
+        _mover.Role = PathRole.Commute;
+        _mover.Clear();
+        _commute = CommuteState.ARRIVING;
+    }
+
+    /// <summary>영업 종료: 입구로 이동 → 도착하면 숨김(다음날 재입장).</summary>
+    public void BeginLeaving(Vector3 exitPos)
+    {
+        if (!gameObject.activeSelf) return;
+        _commuteTarget = exitPos;
+        _mover.Role = PathRole.Commute;
+        _mover.Clear();
+        _commute = CommuteState.LEAVING;
+    }
+
+    /// <summary>각 서브클래스 Update 맨 위에서 호출. true면 통근 중이라 기존 FSM 정지.</summary>
+    protected bool TickCommute()
+    {
+        if (_commute == CommuteState.NONE) return false;
+
+        MoveTo(_commuteTarget);
+        if (HasArrived())
+        {
+            if (_commute == CommuteState.ARRIVING)
+            {
+                _commute = CommuteState.NONE;
+                _mover.Role = GetPathRole();   // 근무 역할 복원
+                _mover.Clear();
+                OnArrivedAtWork();             // 서브클래스 IDLE 진입
+            }
+            else // LEAVING
+            {
+                _commute = CommuteState.NONE;
+                gameObject.SetActive(false);   // 퇴장 → 숨김
+            }
+        }
+        return true;
+    }
+
     public bool CanUpgrade
     {
         get
