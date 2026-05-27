@@ -1,5 +1,7 @@
 Key,Id,Korean (South Korea)(ko-KR),English(en)
 furniture.seat,,좌석,Seat
+furniture.seat2p,,2인용 좌석,2-Seat Bench
+furniture.chair2p,,2인용 의자,2-Seat Chair
 furniture.counter,,카운터,Counter
 furniture.passWindow,,패스창구,Pass Window
 furniture.grill,,그릴,Grill
@@ -102,6 +104,13 @@ expansion.riderRoom,,라이더룸 확장,Rider Room Expansion
 customer.regular,,일반 손님,Regular Customer
 customer.test1,,테스트 손님 1,Test Customer 1
 customer.dt.default,,드라이브 쓰루 손님,Drive Thru Customer
+customer.blonde,,금발 여성,Blonde Woman
+customer.boy,,남자아이,Boy
+customer.littleGirl,,여자아이,Girl
+customer.officeWorker,,회사원,Office Worker
+customer.college,,대학생,College Student
+customer.police,,경찰,Police Officer
+customer.rapper,,래퍼,Rapper
 staff.role.cook,,요리사,Cook
 staff.role.server,,서버,Server
 staff.role.rider,,라이더,Rider

@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f0cc6336acd53945a1d4307bb60037e, type: 3}
   m_Name: PassWindow
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureData
+  saveId: df36962f54de
   prefab: {fileID: 4311967154920751949, guid: a1d348a5115565f40bc1cd5d9474567f, type: 3}
   zone: 0
   width: 2
@@ -24,6 +25,15 @@ MonoBehaviour:
       m_TableCollectionName: GUID:e8a326a4f684cfd4f828350fbb7606b2
     m_TableEntryReference:
       m_KeyId: 1715402768385
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  description:
+    m_TableReference:
+      m_TableCollectionName: 
+    m_TableEntryReference:
+      m_KeyId: 0
       m_Key: 
     m_FallbackState: 0
     m_WaitForCompletion: 0

@@ -21,16 +21,12 @@ public class Customer : MonoBehaviour
     private Seat _targetSeat;
     public Seat AssignedSeat => _targetSeat;
 
-    [Header("만족도")]
-    [SerializeField] private int baseSatisfaction = 50;
-    [SerializeField] private int eatGainRate = 5;         // 초당 증가
-    [SerializeField] private int waitPenaltyRate = 3;     // patience 초과 1초당 감소
-
     private float _stateTimer;
     private float _waitStartTime;
     private float _spawnTime;
     private int _satisfaction;
     private PathMover _mover;
+    private DirectionalCharacterAnimator _dirAnim;
     private Food _servedFood;
 
     public List<MenuData> OrderedMenus { get; private set; }
@@ -39,6 +35,13 @@ public class Customer : MonoBehaviour
     {
         _mover = GetComponent<PathMover>();
         if (_mover != null) _mover.Role = PathRole.Customer;
+        _dirAnim = GetComponent<DirectionalCharacterAnimator>();
+    }
+
+    /// <summary>특정 월드 지점을 바라보게 한다 (대기/식사 중 방향 고정용). 애니메이터 없으면 무시.</summary>
+    private void FaceToward(Vector3 worldPoint)
+    {
+        if (_dirAnim != null) _dirAnim.FaceTowards(worldPoint - transform.position);
     }
 
     private void MoveTo(Vector3 destination)
@@ -56,7 +59,7 @@ public class Customer : MonoBehaviour
         _seatManager = seatManager;
         _queueManager = queueManager;
         _exitPoint = exitPoint;
-        _satisfaction = baseSatisfaction;
+        _satisfaction = _data.baseSatisfaction;
         _spawnTime = Time.time;
 
         int orderCount = Random.Range(_data.minOrderCount, _data.maxOrderCount + 1);
@@ -75,9 +78,13 @@ public class Customer : MonoBehaviour
             case CustomerState.WAIT_FOR_SEAT:    WaitForSeatState(); break;
             case CustomerState.Enter:            EnterState(); break;
             case CustomerState.WALK_TO_COUNTER:  WalkToCounterState(); break;
-            case CustomerState.WAIT_AT_COUNTER:  break;
+            case CustomerState.WAIT_AT_COUNTER:
+                if (_targetCounter != null) FaceToward(_targetCounter.transform.position);
+                break;
             case CustomerState.WALK_TO_SEAT:     WalkToSeatState(); break;
-            case CustomerState.WAIT_AT_SEAT:     break;
+            case CustomerState.WAIT_AT_SEAT:
+                if (_targetSeat != null) FaceToward(_targetSeat.FoodDropOff.position);
+                break;
             case CustomerState.EAT:              EatState(); break;
             case CustomerState.LEAVE:            LeaveState(); break;
         }
@@ -133,7 +140,7 @@ public class Customer : MonoBehaviour
             case CustomerState.EAT:
                 float waitDuration = _waitStartTime > 0 ? Time.time - _waitStartTime : 0f;
                 if (waitDuration > _data.patience)
-                    _satisfaction -= Mathf.FloorToInt((waitDuration - _data.patience) * waitPenaltyRate);
+                    _satisfaction -= Mathf.FloorToInt((waitDuration - _data.patience) * _data.waitPenaltyRate);
                 _satisfaction = Mathf.Max(0, _satisfaction);
                 break;
             case CustomerState.LEAVE:
@@ -193,10 +200,19 @@ public class Customer : MonoBehaviour
             return;
         }
 
-        // Seat의 transform.position이 의자 sprite 정렬용으로 셀 중앙에서 어긋날 수 있어서
-        // 손님은 그 위치가 속한 셀의 중앙으로 이동
-        Vector2Int seatCell = GridManager.Instance.WorldToCell(_targetSeat.transform.position);
-        Vector3 target = GridManager.Instance.CellToWorld(seatCell);
+        // 앉을 위치 결정:
+        //  - Seat에 sitPoint가 지정돼 있으면 그 위치로 정확히 이동 (2인용 등 자리별 지정용)
+        //  - 없으면 좌석이 속한 셀 중앙으로 이동 (기존 동작 — 의자 sprite 정렬 오프셋 보정)
+        Vector3 target;
+        if (_targetSeat.SitPoint != null)
+        {
+            target = _targetSeat.SitPoint.position;
+        }
+        else
+        {
+            Vector2Int seatCell = GridManager.Instance.WorldToCell(_targetSeat.transform.position);
+            target = GridManager.Instance.CellToWorld(seatCell);
+        }
         MoveTo(target);
         if (HasArrived())
             ChangeState(CustomerState.WAIT_AT_SEAT);
@@ -226,7 +242,8 @@ public class Customer : MonoBehaviour
 
     private void EatState()
     {
-        _satisfaction += Mathf.FloorToInt(Time.deltaTime * eatGainRate);
+        if (_targetSeat != null) FaceToward(_targetSeat.FoodDropOff.position);   // 먹는 동안 테이블 바라보기
+        _satisfaction += Mathf.FloorToInt(Time.deltaTime * _data.eatGainRate);
 
         if (_stateTimer >= _data.eatSpeed)
         {

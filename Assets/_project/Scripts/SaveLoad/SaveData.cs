@@ -34,6 +34,15 @@ public class SaveData
 
     // Phase 6
     public RankingData       ranking;
+
+    // 손님 해금 (누적 만족도 임계점으로 랜덤 해금된 손님 목록)
+    public CustomerUnlockData customers;
+}
+
+[Serializable]
+public class CustomerUnlockData
+{
+    public List<string> unlockedIds;   // CustomerData saveId 목록
 }
 
 [Serializable]
@@ -45,7 +54,8 @@ public class MoneyData
 [Serializable]
 public class SatisfactionData
 {
-    public int satisfaction;
+    public int  satisfaction;
+    public long lifetimeSatisfaction;   // 평생 누적(초기화/차감 없음) — 손님 해금 임계점용
 }
 
 [Serializable]

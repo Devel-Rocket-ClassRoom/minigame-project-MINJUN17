@@ -10,6 +10,8 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
 
     [SerializeField] private CounterManager counterManager;
     [SerializeField] private CustomerData[] pool;
+    [Tooltip("이 누적 만족도마다 잠긴 손님 1종을 랜덤 해금")]
+    [SerializeField] private int customerUnlockThreshold = 1000;
     [SerializeField] private QueueManager queueManager;
     [SerializeField] private SeatManager seatManager;
     [SerializeField] private Transform entryPoint;
@@ -20,6 +22,12 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
 
     private readonly HashSet<Customer> _active = new();
     private readonly List<Customer> _waitingForSeat = new();
+
+    /// <summary>현재 방문 가능한(해금된) 손님들. 잠긴 손님은 누적 만족도 임계점에서 랜덤 해금된다.</summary>
+    private readonly HashSet<CustomerData> _unlocked = new();
+
+    /// <summary>SaveIdRegistry용 — 전체 손님 풀 노출.</summary>
+    public IReadOnlyList<CustomerData> Pool => pool;
     public int ActiveCount => _active.Count; // 남은 손님 없어야 영업종료
     public void Register(Customer c) => _active.Add(c);
     public void Unregister(Customer c) { _active.Remove(c); _waitingForSeat.Remove(c); }
@@ -65,6 +73,61 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
     private void Start()
     {
         _spawnInterval = RollSpawnInterval();
+
+        EnsureStartingUnlocked();
+        if (SatisfactionSystem.Instance != null)
+        {
+            SatisfactionSystem.Instance.OnLifetimeSatisfactionChanged += CheckUnlocks;
+            CheckUnlocks(SatisfactionSystem.Instance.LifetimeSatisfaction);  // 로드 직후 누락분 캐치업
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (SatisfactionSystem.Instance != null)
+            SatisfactionSystem.Instance.OnLifetimeSatisfactionChanged -= CheckUnlocks;
+    }
+
+    // ─── 손님 해금 ───
+
+    /// <summary>unlockedFromStart 손님을 항상 해금 상태로 보장 (중복 추가 안전).</summary>
+    private void EnsureStartingUnlocked()
+    {
+        if (pool == null) return;
+        foreach (var d in pool)
+            if (d != null && d.unlockedFromStart) _unlocked.Add(d);
+    }
+
+    private int CountStartingUnlocked()
+    {
+        int n = 0;
+        if (pool != null)
+            foreach (var d in pool)
+                if (d != null && d.unlockedFromStart) n++;
+        return n;
+    }
+
+    /// <summary>누적 만족도가 임계점(threshold)을 넘은 만큼 잠긴 손님을 랜덤 해금.</summary>
+    private void CheckUnlocks(long lifetimeSatisfaction)
+    {
+        if (customerUnlockThreshold <= 0) return;
+        int target  = (int)(lifetimeSatisfaction / customerUnlockThreshold);  // 허용되는 임계점 해금 수
+        int granted = _unlocked.Count - CountStartingUnlocked();              // 이미 임계점으로 해금한 수
+        while (granted < target)
+        {
+            if (!UnlockRandomLocked()) break;   // 더 잠긴 손님 없음
+            granted++;
+        }
+    }
+
+    private bool UnlockRandomLocked()
+    {
+        var locked = pool.Where(d => d != null && !_unlocked.Contains(d)).ToList();
+        if (locked.Count == 0) return false;
+        var pick = locked[Random.Range(0, locked.Count)];
+        _unlocked.Add(pick);
+        Debug.Log($"[CustomerManager] 신규 손님 해금: {pick.name}");
+        return true;
     }
 
     public void StartSpawning()
@@ -101,6 +164,7 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
     private void Spawn()
     {
         var data = PickByWeight();
+        if (data == null || data.customerPrefab == null) return;
         var go = Instantiate(data.customerPrefab, entryPoint.position, Quaternion.identity);
         var c = go.GetComponent<Customer>();
         c.OnDespawned += HandleDespawn;
@@ -116,14 +180,58 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
 
     public CustomerData PickByWeight()
     {
-        float total = pool.Sum(d => d.spawnWeight);
-        float r = Random.Range(0, total);
+        // 해금된 손님만 후보로
+        float total = 0f;
+        foreach (var d in pool)
+            if (d != null && _unlocked.Contains(d)) total += Mathf.Max(0f, d.spawnWeight);
+
+        if (total <= 0f)
+        {
+            // 폴백: 가중치 합이 0이면 해금된 첫 손님이라도 반환
+            foreach (var d in pool)
+                if (d != null && _unlocked.Contains(d)) return d;
+            return null;
+        }
+
+        float r = Random.Range(0f, total);
         float acc = 0f;
         foreach (var d in pool)
         {
-            acc += d.spawnWeight;
+            if (d == null || !_unlocked.Contains(d)) continue;
+            acc += Mathf.Max(0f, d.spawnWeight);
             if (r <= acc) return d;
         }
-        return pool[pool.Length - 1];
+
+        // 부동소수 오차 대비 — 해금된 마지막 손님
+        for (int i = pool.Length - 1; i >= 0; i--)
+            if (pool[i] != null && _unlocked.Contains(pool[i])) return pool[i];
+        return null;
+    }
+
+    // ─── Save / Load ───
+
+    public CustomerUnlockData ToData()
+    {
+        var ids = new List<string>();
+        foreach (var d in pool)
+        {
+            if (d == null || !_unlocked.Contains(d)) continue;
+            if (d is ISaveIdentifiable s && !string.IsNullOrEmpty(s.SaveId)) ids.Add(s.SaveId);
+        }
+        return new CustomerUnlockData { unlockedIds = ids };
+    }
+
+    public void FromData(CustomerUnlockData data)
+    {
+        _unlocked.Clear();
+        EnsureStartingUnlocked();                       // 시작 손님은 항상 포함
+        if (data?.unlockedIds != null)
+        {
+            foreach (var id in data.unlockedIds)
+            {
+                var cd = SaveIdRegistry.GetById<CustomerData>(id);
+                if (cd != null) _unlocked.Add(cd);
+            }
+        }
     }
 }

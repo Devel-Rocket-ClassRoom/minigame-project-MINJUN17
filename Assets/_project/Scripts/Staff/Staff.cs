@@ -14,6 +14,9 @@ public abstract class Staff : MonoBehaviour
     protected float _hireVariance;
 
     protected PathMover _mover;
+    protected Animator _animator;
+    protected SpriteRenderer _spriteRenderer;
+    protected DirectionalCharacterAnimator _dirAnim;
 
     [Header("운반 위치 (자식 Transform — 인스펙터에서 위치 조정)")]
     [SerializeField] protected Transform carryPoint;
@@ -43,6 +46,35 @@ public abstract class Staff : MonoBehaviour
     {
         _mover = GetComponent<PathMover>();
         if (_mover != null) _mover.Role = GetPathRole();
+        _animator = GetComponent<Animator>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+        _dirAnim = GetComponent<DirectionalCharacterAnimator>();
+    }
+
+    /// <summary>특정 월드 지점을 바라보게 한다 (대기/작업 중 방향 고정용). 애니메이터 없으면 무시.</summary>
+    protected void FaceToward(Vector3 worldPoint)
+    {
+        if (_dirAnim != null) _dirAnim.FaceTowards(worldPoint - transform.position);
+    }
+
+    /// <summary>
+    /// 등급(StaffData)별 외형 적용.
+    /// - animController가 있으면 Animator의 클립 세트를 그걸로 교체 (걷기/대기 4방향).
+    /// - 없으면 단일 sprite로 폴백 (애니메이터 미설정 캐릭터 대비).
+    /// 채용/로드(InitBase) · 승급(SetData) 양쪽에서 호출된다.
+    /// </summary>
+    protected void ApplyVisuals(StaffData data)
+    {
+        if (data == null) return;
+
+        if (_animator == null) _animator = GetComponent<Animator>();
+        if (_animator != null && data.animController != null)
+            _animator.runtimeAnimatorController = data.animController;
+
+        // 폴백: 애니메이터 override가 없으면 정적 스프라이트라도 세팅
+        if (_spriteRenderer == null) _spriteRenderer = GetComponent<SpriteRenderer>();
+        if (_spriteRenderer != null && data.sprite != null)
+            _spriteRenderer.sprite = data.sprite;
     }
 
     // 자식 클래스가 자기 역할 지정 (Cook/Server)
@@ -64,7 +96,7 @@ public abstract class Staff : MonoBehaviour
     public virtual void SetData(StaffData data)
     {
         _data = data;
-        GetComponent<SpriteRenderer>().sprite = data.sprite;
+        ApplyVisuals(data);
     }
 
     public virtual void TickMonth()
@@ -83,7 +115,7 @@ public abstract class Staff : MonoBehaviour
         this.id = id;
         _nameKey = nameKey;
         _hireVariance = hireVariance;
-        GetComponent<SpriteRenderer>().sprite = data.sprite;
+        ApplyVisuals(data);
         _tenureMonths = 0;
         _growthBumps = 0;
         _growthMultiplier = 1f;

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8184818629054271993}
   - component: {fileID: 8349077152581522029}
   - component: {fileID: 1922965880548666802}
+  - component: {fileID: 59386229166859048}
   m_Layer: 0
   m_Name: Counter
   m_TagString: Untagged
@@ -27,8 +28,8 @@ Transform:
   m_GameObject: {fileID: 3213614043865315584}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
+  m_LocalPosition: {x: 0, y: 0.07, z: 0}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1121858713517599219}
@@ -108,6 +109,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Counter
   servicePos: {fileID: 1121858713517599219}
   staffPos: {fileID: 4171505909023474250}
+--- !u!114 &59386229166859048
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3213614043865315584}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65f0c05f3a54337498adac7c391f2432, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::YSorter
+  precision: 100
+  orderBias: 0
+  staticObject: 0
 --- !u!1 &3244549334458657626
 GameObject:
   m_ObjectHideFlags: 0
@@ -133,7 +149,7 @@ Transform:
   m_GameObject: {fileID: 3244549334458657626}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.5, z: 0}
+  m_LocalPosition: {x: 0, y: -1.49, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -164,7 +180,7 @@ Transform:
   m_GameObject: {fileID: 7799375710093714321}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.5, z: 0}
+  m_LocalPosition: {x: 0, y: 1.75, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

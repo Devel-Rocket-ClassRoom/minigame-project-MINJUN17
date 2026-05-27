@@ -102,6 +102,11 @@ public class CookStaff : Staff
     private void UsingToolState()
     {
         MenuData currentMenu = _remainingMenus.Peek();
+
+        // 조리 중엔 도구를 바라보게
+        var toolT = CookingToolManager.Instance.GetToolTransform(currentMenu.tool.toolType);
+        if (toolT != null) FaceToward(toolT.position);
+
         float effectiveDuration = currentMenu.tool.usingDuration / Mathf.Max(0.01f, EffectiveSpeedMultiplier);
         if (_stateTimer < effectiveDuration) return;
 

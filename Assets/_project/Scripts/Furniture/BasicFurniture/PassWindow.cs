@@ -10,6 +10,22 @@ public class PassWindow : MonoBehaviour
     [SerializeField] private Vector3 firstSlotOffset = new Vector3(-0.3f, 0.2f, 0f);
     [SerializeField] private float slotSpacing = 0.3f;
 
+    [Header("사용 위치 (비우면 자동 인접셀 계산)")]
+    [Tooltip("요리사가 음식을 놓는 위치 (주방측)")]
+    [SerializeField] private Transform cookUsePoint;
+    [Tooltip("서버/라이더가 음식을 가져가는 위치 (홀측)")]
+    [SerializeField] private Transform serverUsePoint;
+
+    [Header("음식 가림 방지 (놓인 음식 강제 표시)")]
+    [Tooltip("창구 타일맵의 Sorting Layer와 같게 입력")]
+    [SerializeField] private string pinnedSortingLayer = "Default";
+    [Tooltip("창구 타일맵의 Order in Layer보다 크게 (예: 창구가 0이면 100)")]
+    [SerializeField] private int pinnedSortingOrder = 100;
+
+    /// <summary>역할별 명시 사용 위치. null이면 호출측이 자동 계산으로 폴백.</summary>
+    public Transform GetUsePoint(PathRole role) =>
+        role == PathRole.Cook ? cookUsePoint : serverUsePoint;
+
     private void Awake()
     {
         PassWindowManager.Instance.Register(this);
@@ -59,6 +75,7 @@ public class PassWindow : MonoBehaviour
         {
             ReflowSlots();
             food.claimedBy = null;   // 정리
+            food.RestoreSorting();   // 강제 표시 해제 (들어올릴 때 원래 정렬로)
             return food;
         }
         return null;
@@ -72,6 +89,7 @@ public class PassWindow : MonoBehaviour
         readyFoods.Add(food);
         food.transform.SetParent(transform, false);
         food.transform.localPosition = SlotPos(readyFoods.Count - 1);
+        food.PinInFront(pinnedSortingLayer, pinnedSortingOrder);   // 놓인 동안 창구 위로 강제 표시
     }
 
     // FIFO를 유지하면서 isDelivery 매칭되는 가장 앞 음식 픽업
@@ -84,6 +102,7 @@ public class PassWindow : MonoBehaviour
                 Food f = readyFoods[i];
                 readyFoods.RemoveAt(i);
                 ReflowSlots();
+                f.RestoreSorting();
                 return f;
             }
         }
@@ -99,6 +118,7 @@ public class PassWindow : MonoBehaviour
                 Food f = readyFoods[i];
                 readyFoods.RemoveAt(i);
                 ReflowSlots();
+                f.RestoreSorting();
                 return f;
             }
         }

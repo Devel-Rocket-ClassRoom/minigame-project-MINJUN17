@@ -12,11 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71b6d6edfdc5c4d48bd6304ba69e48cf, type: 3}
   m_Name: Rider_Manager
   m_EditorClassIdentifier: Assembly-CSharp::StaffData
+  saveId: 56be1ba83421
   role: 2
   grade: 2
-  sprite: {fileID: 0}
-  moveSpeed: 5
+  sprite: {fileID: 6019279233290180414, guid: e754830489ba91141a59c36c64dfeb07, type: 3}
+  animController: {fileID: 22100000, guid: 5bf77390045f1af4992ac02da0e446cc, type: 2}
+  moveSpeed: 3
   kindness: 3
+  deliveryTime: 0
   speedMultiplier: 1.6
   hireCost: 15000
   salary: 4000

@@ -11,6 +11,12 @@ public class Seat : MonoBehaviour
     [SerializeField] private Transform foodDropOff;
     public Transform FoodDropOff => foodDropOff != null ? foodDropOff : transform;
 
+    [Tooltip("손님이 실제로 앉을 위치. 비워두면 좌석이 속한 셀 중앙으로 이동(기존 동작). " +
+             "2인용 등 한 가구에 좌석이 여러 개일 때 각 자리를 정확히 지정하려면 여기에 위치를 연결")]
+    [SerializeField] private Transform sitPoint;
+    /// <summary>지정된 착석 위치. null이면 호출측에서 셀 중앙 폴백.</summary>
+    public Transform SitPoint => sitPoint;
+
     private void Awake()
     {
         // 1순위: 인스펙터에서 명시적으로 드래그한 dropOff 사용

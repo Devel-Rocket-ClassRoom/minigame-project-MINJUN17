@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f0cc6336acd53945a1d4307bb60037e, type: 3}
+  m_Name: Seat_1p
+  m_EditorClassIdentifier: Assembly-CSharp::FurnitureData
+  saveId: 40fe13cce901
+  prefab: {fileID: 5182720186777033002, guid: 414cd04a4db30d34e8ee519973d13726, type: 3}
+  zone: 1
+  width: 1
+  height: 2
+  anchorX: 0
+  anchorY: 0
+  deliveryBonus: 0
+  displayName:
+    m_TableReference:
+      m_TableCollectionName: GUID:e8a326a4f684cfd4f828350fbb7606b2
+    m_TableEntryReference:
+      m_KeyId: 1715356631040
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  description:
+    m_TableReference:
+      m_TableCollectionName: 
+    m_TableEntryReference:
+      m_KeyId: 0
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  icon: {fileID: -8012548003156586367, guid: 052c49ea498b689499d1e5ea6819d263, type: 3}
+  satisfactionUnlock: 0
+  purchaseCost: 15000
+  unlockOnExpansion: {fileID: 0}
+  references:
+    version: 2
+    RefIds: []

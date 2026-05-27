@@ -19,6 +19,14 @@ MonoBehaviour:
     m_Key: furniture.seat
     m_Metadata:
       m_Items: []
+  - m_Id: 1089519869489152
+    m_Key: furniture.seat2p
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1089519894654976
+    m_Key: furniture.chair2p
+    m_Metadata:
+      m_Items: []
   - m_Id: 1715402768384
     m_Key: furniture.counter
     m_Metadata:
@@ -425,6 +433,34 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 2880882409483
     m_Key: customer.dt.default
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1089519903043584
+    m_Key: customer.blonde
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1089519903043585
+    m_Key: customer.boy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1089519903043586
+    m_Key: customer.littleGirl
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1089519903043587
+    m_Key: customer.officeWorker
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1089519903043588
+    m_Key: customer.college
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1089519903043589
+    m_Key: customer.police
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1089519903043590
+    m_Key: customer.rapper
     m_Metadata:
       m_Items: []
   - m_Id: 2880882409484

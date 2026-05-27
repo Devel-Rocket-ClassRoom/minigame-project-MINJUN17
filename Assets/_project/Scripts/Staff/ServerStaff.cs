@@ -186,6 +186,7 @@ public class ServerStaff : Staff
         }
         MoveTo(_targetCounter.StaffPos.position);
         if (!HasArrived()) return;
+        FaceToward(_targetCounter.transform.position);   // 카운터 바라보기
         if (_stateTimer < takingOrderDuration) return;
 
         Customer customer = _targetCounter.WaitingCustomer;
@@ -323,6 +324,7 @@ public class ServerStaff : Staff
             ChangeState(ServerState.IDLE_AT_COUNTER);
             return;
         }
+        FaceToward(_targetDTOrderWindow.transform.position);   // DT 창구 바라보기
         if (_stateTimer < takingOrderDuration) return;
 
         DTCustomer car = _targetDTOrderWindow.WaitingCar;

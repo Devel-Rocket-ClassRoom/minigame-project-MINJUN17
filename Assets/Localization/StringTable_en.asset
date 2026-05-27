@@ -562,6 +562,42 @@ MonoBehaviour:
     m_Localized: Delivery Zone
     m_Metadata:
       m_Items: []
+  - m_Id: 1089519869489152
+    m_Localized: 2-Seat Bench
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1089519894654976
+    m_Localized: 2-Seat Chair
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1089519903043584
+    m_Localized: Blonde Woman
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1089519903043585
+    m_Localized: Boy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1089519903043586
+    m_Localized: Girl
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1089519903043587
+    m_Localized: Office Worker
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1089519903043588
+    m_Localized: College Student
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1089519903043589
+    m_Localized: Police Officer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1089519903043590
+    m_Localized: Rapper
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
