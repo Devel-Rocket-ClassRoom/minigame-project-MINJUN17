@@ -32,6 +32,7 @@ public class DayCycleController : MonoBehaviour
     {
         customerManager.StartSpawning();
         DTSystem.Instance?.StartSpawning();
+        StaffManager.Instance?.OnBusinessOpen();
     }
 
     private void HandleClose()
@@ -55,6 +56,7 @@ public class DayCycleController : MonoBehaviour
     private void TriggerSettlement()
     {
         _waitingToClear = false;
+        StaffManager.Instance?.OnBusinessClose(); // 손님 다 나간 뒤에야 직원 퇴근
         OnSettlementReady?.Invoke();
     }
 

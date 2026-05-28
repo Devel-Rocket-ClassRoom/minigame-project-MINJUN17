@@ -12,7 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb00b628147a761409e93f391ec02e7d, type: 3}
   m_Name: DTCustomerData
   m_EditorClassIdentifier: Assembly-CSharp::DTCustomerData
-  customerName: blue
+  customerName:
+    m_TableReference:
+      m_TableCollectionName: GUID:e8a326a4f684cfd4f828350fbb7606b2
+    m_TableEntryReference:
+      m_KeyId: 2880882409483
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
   carSprite: {fileID: 3058493775741808118, guid: 767b0ca033bfc2845abd536447e1d77e, type: 3}
   moveSpeed: 2
   patience: 30
@@ -21,3 +29,6 @@ MonoBehaviour:
   maxOrderCount: 2
   baseSatisfaction: 50
   waitPenaltyRate: 3
+  references:
+    version: 2
+    RefIds: []

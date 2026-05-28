@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0ea88a793e072c4a93ff59edf571335, type: 3}
   m_Name: Grill
   m_EditorClassIdentifier: Assembly-CSharp::CookingToolData
+  saveId: d22988e91a11
   prefab: {fileID: 3385571978879531138, guid: c05f9d3be9148604abb07b1d6f593e8c, type: 3}
   zone: 0
   width: 1
@@ -28,7 +29,16 @@ MonoBehaviour:
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
-  icon: {fileID: 0}
+  description:
+    m_TableReference:
+      m_TableCollectionName: 
+    m_TableEntryReference:
+      m_KeyId: 0
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  icon: {fileID: 1989365053788644909, guid: 42b3767372e8b434fbdc37c5196fc2dc, type: 3}
   satisfactionUnlock: 0
   purchaseCost: 30000
   unlockOnExpansion: {fileID: 0}

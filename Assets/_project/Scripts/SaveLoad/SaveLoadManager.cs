@@ -30,8 +30,9 @@ public class SaveLoadManager : MonoBehaviour
     /// 세이브 데이터 버전. 필드 추가/변경 시 +1.
     /// v1: Phase 1~4
     /// v2: Phase 5 (catalog/marketing/candidatePool) + Phase 6 (ranking)
+    /// v3: 누적 만족도(lifetimeSatisfaction) + 손님 해금(customers)
     /// </summary>
-    private const int    CurrentVersion = 2;
+    private const int    CurrentVersion = 3;
     private const string FileFormat     = "save_{0}.json";
     private const string ActiveSlotPref = "save.activeSlot";
 
@@ -242,6 +243,7 @@ public class SaveLoadManager : MonoBehaviour
             marketing      = MarketingManager.Instance?.ToData(),
             candidatePool  = StaffCandidatePool.Instance?.ToData(),
             ranking        = RankingSystem.Instance?.ToData(),
+            customers      = CustomerManager.Instance?.ToData(),
         };
     }
 
@@ -258,7 +260,8 @@ public class SaveLoadManager : MonoBehaviour
         StaffManager.Instance?.RestoreFromData(data.staff);          // 직원 복원 (카운터 등 가구 복원 후)
         MarketingManager.Instance?.FromData(data.marketing);         // 마케팅 캠페인 (CustomerManager multiplier 반영)
         StaffCandidatePool.Instance?.FromData(data.candidatePool);   // 채용 후보/티켓 (StaffData 등록 후)
-        RankingSystem.Instance?.FromData(data.ranking);              // 연말 결과 — 마지막
+        RankingSystem.Instance?.FromData(data.ranking);              // 연말 결과
+        CustomerManager.Instance?.FromData(data.customers);          // 손님 해금 목록 (SaveIdRegistry 등록 후)
     }
 }
 

@@ -33,6 +33,10 @@ public static class SaveIdRegistry
         {
             AddRange(MarketingManager.Instance.AllMarketing);
         }
+        if (CustomerManager.Instance != null)
+        {
+            AddRange(CustomerManager.Instance.Pool);
+        }
     }
 
     private static void AddRange<T>(IEnumerable<T> items) where T : ScriptableObject

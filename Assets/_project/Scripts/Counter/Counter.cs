@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Counter : MonoBehaviour
@@ -5,8 +6,12 @@ public class Counter : MonoBehaviour
     [SerializeField] private Transform servicePos;
     [SerializeField] private Transform staffPos;
 
+    [Tooltip("서버가 일감 없을 때 대기/휴식하는 자리들 (보통 3개). 비우면 staffPos로 폴백.")]
+    [SerializeField] private Transform[] restPositions;
+
     public Transform ServicePos => servicePos;
     public Transform StaffPos => staffPos;
+    public IReadOnlyList<Transform> RestPositions => restPositions;
 
     private bool _isOccupied;
     public bool IsOccupied => _isOccupied;

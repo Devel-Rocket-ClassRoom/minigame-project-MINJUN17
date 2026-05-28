@@ -14,6 +14,9 @@ public abstract class Staff : MonoBehaviour
     protected float _hireVariance;
 
     protected PathMover _mover;
+    protected Animator _animator;
+    protected SpriteRenderer _spriteRenderer;
+    protected DirectionalCharacterAnimator _dirAnim;
 
     [Header("운반 위치 (자식 Transform — 인스펙터에서 위치 조정)")]
     [SerializeField] protected Transform carryPoint;
@@ -43,10 +46,115 @@ public abstract class Staff : MonoBehaviour
     {
         _mover = GetComponent<PathMover>();
         if (_mover != null) _mover.Role = GetPathRole();
+        _animator = GetComponent<Animator>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+        _dirAnim = GetComponent<DirectionalCharacterAnimator>();
+    }
+
+    /// <summary>특정 월드 지점을 바라보게 한다 (대기/작업 중 방향 고정용). 애니메이터 없으면 무시.</summary>
+    protected void FaceToward(Vector3 worldPoint)
+    {
+        if (_dirAnim != null) _dirAnim.FaceTowards(worldPoint - transform.position);
+    }
+
+    /// <summary>
+    /// 등급(StaffData)별 외형 적용.
+    /// - animController가 있으면 Animator의 클립 세트를 그걸로 교체 (걷기/대기 4방향).
+    /// - 없으면 단일 sprite로 폴백 (애니메이터 미설정 캐릭터 대비).
+    /// 채용/로드(InitBase) · 승급(SetData) 양쪽에서 호출된다.
+    /// </summary>
+    protected void ApplyVisuals(StaffData data)
+    {
+        if (data == null) return;
+
+        if (_animator == null) _animator = GetComponent<Animator>();
+        if (_animator != null && data.animController != null)
+            _animator.runtimeAnimatorController = data.animController;
+
+        // 폴백: 애니메이터 override가 없으면 정적 스프라이트라도 세팅
+        if (_spriteRenderer == null) _spriteRenderer = GetComponent<SpriteRenderer>();
+        if (_spriteRenderer != null && data.sprite != null)
+            _spriteRenderer.sprite = data.sprite;
     }
 
     // 자식 클래스가 자기 역할 지정 (Cook/Server)
     protected abstract PathRole GetPathRole();
+
+    // ─── 통근(출퇴근) ───
+    protected enum CommuteState { NONE, ARRIVING, LEAVING }
+    private CommuteState _commute = CommuteState.NONE;
+    private Vector3 _commuteTarget;
+
+    // 사이드워크 ↔ 가게 안 횡단 시 도어 (0,1) 경유 — 직선이동이 외벽 가로지르는 것 방지
+    private bool _commutePassedDoor;
+    private static readonly Vector3 DoorWorld = new Vector3(0.5f, 1.5f, 0f);
+
+    public bool IsCommuting => _commute != CommuteState.NONE;
+
+    // 서브클래스가 자기 근무지 좌표 / 도착 시 IDLE 진입을 구현
+    protected abstract Vector3 GetWorkPosition();
+    protected abstract void OnArrivedAtWork();
+
+    // 출발/도착이 도어를 가로지르는지 (안↔밖 횡단인지) 판단. 같은 쪽이면 도어 경유 불필요.
+    private static bool DoorCrossingNeeded(Vector3 from, Vector3 to)
+    {
+        bool fromInside = from.x >= 0f;
+        bool toInside   = to.x   >= 0f;
+        return fromInside != toInside;
+    }
+
+    /// <summary>영업 시작: 입구에서 등장 → 근무지로 이동.</summary>
+    public void BeginArriving(Vector3 entryPos)
+    {
+        gameObject.SetActive(true);
+        transform.position = entryPos;
+        _commuteTarget = GetWorkPosition();
+        _mover.Role = PathRole.Commute;
+        _mover.Clear();
+        // 입구(밖) → 근무지가 가게 안이면 도어 경유, 라이더처럼 밖→밖이면 바로 직진
+        _commutePassedDoor = !DoorCrossingNeeded(entryPos, _commuteTarget);
+        _commute = CommuteState.ARRIVING;
+    }
+
+    /// <summary>영업 종료: 입구로 이동 → 도착하면 숨김(다음날 재입장).</summary>
+    public void BeginLeaving(Vector3 exitPos)
+    {
+        if (!gameObject.activeSelf) return;
+        _commuteTarget = exitPos;
+        _mover.Role = PathRole.Commute;
+        _mover.Clear();
+        // 현재 위치(근무지)가 안이고 출구가 밖이면 도어 경유, 같은 쪽이면 바로
+        _commutePassedDoor = !DoorCrossingNeeded(transform.position, _commuteTarget);
+        _commute = CommuteState.LEAVING;
+    }
+
+    /// <summary>각 서브클래스 Update 맨 위에서 호출. true면 통근 중이라 기존 FSM 정지.</summary>
+    protected bool TickCommute()
+    {
+        if (_commute == CommuteState.NONE) return false;
+
+        // 1단계: 도어 경유 필요하면 도어로. 2단계: 진짜 목적지로.
+        Vector3 dest = _commutePassedDoor ? _commuteTarget : DoorWorld;
+        MoveTo(dest);
+        if (HasArrived())
+        {
+            if (!_commutePassedDoor) { _commutePassedDoor = true; return true; }
+
+            if (_commute == CommuteState.ARRIVING)
+            {
+                _commute = CommuteState.NONE;
+                _mover.Role = GetPathRole();   // 근무 역할 복원
+                _mover.Clear();
+                OnArrivedAtWork();             // 서브클래스 IDLE 진입
+            }
+            else // LEAVING
+            {
+                _commute = CommuteState.NONE;
+                gameObject.SetActive(false);   // 퇴장 → 숨김
+            }
+        }
+        return true;
+    }
 
     public bool CanUpgrade
     {
@@ -64,7 +172,7 @@ public abstract class Staff : MonoBehaviour
     public virtual void SetData(StaffData data)
     {
         _data = data;
-        GetComponent<SpriteRenderer>().sprite = data.sprite;
+        ApplyVisuals(data);
     }
 
     public virtual void TickMonth()
@@ -83,7 +191,7 @@ public abstract class Staff : MonoBehaviour
         this.id = id;
         _nameKey = nameKey;
         _hireVariance = hireVariance;
-        GetComponent<SpriteRenderer>().sprite = data.sprite;
+        ApplyVisuals(data);
         _tenureMonths = 0;
         _growthBumps = 0;
         _growthMultiplier = 1f;

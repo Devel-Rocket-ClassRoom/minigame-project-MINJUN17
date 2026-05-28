@@ -17,8 +17,14 @@ public class StaffManager : MonoBehaviour
     [SerializeField] private List<StaffData> serverGrades;
     [SerializeField] private List<StaffData> riderGrades;
 
-    [Header("라이더 상한")]
+    [Header("직원 상한 (카운터 수와 무관 — 각 3명 고정)")]
+    [SerializeField] private int maxCookCount = 3;
+    [SerializeField] private int maxServerCount = 3;
     [SerializeField] private int maxRiderCount = 3;
+
+    [Header("시작 직원 수")]
+    [SerializeField] private int starterCookCount = 1;
+    [SerializeField] private int starterServerCount = 1;
 
     [Header("이름 풀")]
     [SerializeField] private StaffNamePool namePool;
@@ -57,12 +63,13 @@ public class StaffManager : MonoBehaviour
     public string ResolveName(string nameKey) =>
         namePool != null ? namePool.Resolve(nameKey) : nameKey;
 
-    public int MaxServerCount => CounterManager.Instance.CounterCount;
-    public int MaxCookCount => CounterManager.Instance.CounterCount;
+    public int MaxServerCount => maxServerCount;
+    public int MaxCookCount => maxCookCount;
     public int MaxRiderCount => maxRiderCount;
 
+    // 라이더 고용 가능 = 전화기가 카탈로그에서 해금되었을 때
     public bool IsRiderHiringUnlocked =>
-        PhoneManager.Instance != null && PhoneManager.Instance.IsRiderHiringUnlocked;
+        PhoneManager.Instance != null && PhoneManager.Instance.IsUnlocked;
 
     private void Awake()
     {
@@ -88,12 +95,38 @@ public class StaffManager : MonoBehaviour
         OnRosterChanged?.Invoke();
     }
 
+    /// <summary>영업 시작 — 전 직원 입구에서 등장해 근무지로.</summary>
+    public void OnBusinessOpen()
+    {
+        if (CustomerManager.Instance == null) return;
+        Vector3 entry = CustomerManager.Instance.EntryPosition;
+        foreach (var s in GetAllStaffs()) s.BeginArriving(entry);
+    }
+
+    /// <summary>영업 종료 — 전 직원 입구로 퇴장(도착 시 숨김).</summary>
+    public void OnBusinessClose()
+    {
+        if (CustomerManager.Instance == null) return;
+        Vector3 exit = CustomerManager.Instance.ExitPosition;
+        foreach (var s in GetAllStaffs()) s.BeginLeaving(exit);
+    }
+
+    // 채용 직후 등장 처리: 영업 중이면 즉시 입구에서 입장, 아니면 숨겨뒀다 다음 영업에 입장
+    private void OnHired(Staff staff)
+    {
+        bool open = timeSystem != null && timeSystem.IsOpen;
+        if (open && CustomerManager.Instance != null)
+            staff.BeginArriving(CustomerManager.Instance.EntryPosition);
+        else
+            staff.gameObject.SetActive(false);
+    }
+
     public void Init()
     {
-        HireCookStaff(starterCookData);
+        for (int i = 0; i < starterCookCount; i++)
+            if (HireCookStaff(starterCookData) == null) break;
 
-        int targetServers = CounterManager.Instance.CounterCount;
-        for (int i = 0; i < targetServers; i++)
+        for (int i = 0; i < starterServerCount; i++)
             if (HireServerStaff(starterServerData) == null) break;
     }
 
@@ -109,6 +142,7 @@ public class StaffManager : MonoBehaviour
         staff.Init(data, nextId, nameKey ?? PickNameKey(), hireVariance);
         nextId++;
         cookStaffs.Add(staff);
+        OnHired(staff);
         OnRosterChanged?.Invoke();
         return staff;
     }
@@ -125,6 +159,7 @@ public class StaffManager : MonoBehaviour
         staff.Init(data, nextId, nameKey ?? PickNameKey(), hireVariance);
         nextId++;
         serverStaffs.Add(staff);
+        OnHired(staff);
         OnRosterChanged?.Invoke();
         return staff;
     }
@@ -132,8 +167,7 @@ public class StaffManager : MonoBehaviour
     public RiderStaff HireRiderStaff(StaffData data, float hireVariance = 0f, string nameKey = null)
     {
         if (data == null || riderStaffPrefab == null) return null;
-        if (!IsRiderHiringUnlocked) return null;
-        if (RiderRoomManager.Instance != null && !RiderRoomManager.Instance.HasRiderRoom()) return null;
+        if (!IsRiderHiringUnlocked) return null;   // 라이더룸 가구 설치 필요
         if (riderStaffs.Count >= MaxRiderCount) return null;
         if (!CanAfford(data.hireCost)) return null;
 
@@ -141,17 +175,14 @@ public class StaffManager : MonoBehaviour
         var staff = Instantiate(riderStaffPrefab);
         staff.gameObject.name = $"Rider_{nextId}";
 
-        // 라이더룸 빈 셀에 초기 배치
-        var candidates = GridManager.Instance.GetWalkableCellsInZone(CellZone.RiderRoom);
-        var occupiers = new List<Vector3>();
-        foreach (var r in riderStaffs) occupiers.Add(r.transform.position);
-        Vector3 spawnPos = RestSpotPicker.PickClosestFree(
-            staff.transform.position, candidates, occupiers, 0.5f);
-        if (spawnPos != Vector3.zero) staff.transform.position = spawnPos;
+        // 라이더는 밖(입구)에서 대기
+        if (CustomerManager.Instance != null)
+            staff.transform.position = CustomerManager.Instance.EntryPosition;
 
         staff.Init(data, nextId, nameKey ?? PickNameKey(), hireVariance);
         nextId++;
         riderStaffs.Add(staff);
+        OnHired(staff);
         OnRosterChanged?.Invoke();
         return staff;
     }
@@ -338,6 +369,11 @@ public class StaffManager : MonoBehaviour
             if (sd.id > maxId) maxId = sd.id;
         }
         nextId = maxId + 1;
+
+        // 영업 시간이 아니면 직원 숨김(다음 영업에 입장). 영업 중이면 저장 위치에서 근무.
+        if (timeSystem == null || !timeSystem.IsOpen)
+            foreach (var s in GetAllStaffs()) s.gameObject.SetActive(false);
+
         OnRosterChanged?.Invoke();
     }
 

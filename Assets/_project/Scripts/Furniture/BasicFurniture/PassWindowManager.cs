@@ -137,6 +137,10 @@ public class PassWindowManager : MonoBehaviour
     public Vector3 GetApproachPosition(PathRole role, Vector3 from)
     {
         if (passWindows.Count == 0) return Vector3.zero;
-        return GridManager.Instance.GetFurnitureApproachPosition(passWindows[0].transform.position, role, from);
+        var pw = passWindows[0];
+        // 명시 사용 위치가 있으면 우선 (없으면 자동 인접셀 계산)
+        var up = pw.GetUsePoint(role);
+        if (up != null) return up.position;
+        return GridManager.Instance.GetFurnitureApproachPosition(pw.transform.position, role, from);
     }
 }

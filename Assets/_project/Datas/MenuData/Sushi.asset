@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88ad3a3536494ba42ac37b1a58e4863e, type: 3}
   m_Name: Sushi
   m_EditorClassIdentifier: Assembly-CSharp::MenuData
+  saveId: 1db0e8acd590
   menuName:
     m_TableReference:
       m_TableCollectionName: GUID:e8a326a4f684cfd4f828350fbb7606b2
@@ -31,10 +32,10 @@ MonoBehaviour:
     m_WaitForCompletion: 0
     m_LocalVariables: []
   foodSprite: {fileID: 609855222940722255, guid: f179e6dbb1269d747b1e69da011cc606, type: 3}
-  price: 10000
-  cost: 4000
-  tool: {fileID: 0}
-  satisfactionUnlock: 1200
+  price: 15000
+  cost: 4500
+  tool: {fileID: 11400000, guid: a0adb67b1fa100f439f9f2255c7c2adb, type: 2}
+  satisfactionUnlock: 1500
   spawnWeight: 0.5
   references:
     version: 2

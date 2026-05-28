@@ -24,7 +24,18 @@
       "Bash(gh pr *)",
       "Bash(xxd)",
       "Bash(awk '/^--- !u!1 &1537833818/{found=1} found && /m_IsActive/{print \"Title:\", $2; found=0} /^--- !u!1 &2115099519/{found2=1} found2 && /m_IsActive/{print \"Revenue:\", $2; found2=0} /^--- !u!1 &661249135/{found3=1} found3 && /m_IsActive/{print \"Material:\", $2; found3=0} /^--- !u!1 &1060211246/{found4=1} found4 && /m_IsActive/{print \"Panel:\", $2; found4=0}' Assets/_project/Scenes/TestScene.unity)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(grep -E \"\\\\.cs$\")",
+      "Bash(xargs grep -l \"enum.*PlacementZone\\\\|enum.*CellZone\\\\|class.*Expansion\\\\|class.*Catalog\")",
+      "Bash(xargs grep -l \"street\\\\|road\\\\|길거리\\\\|도로\" -i)",
+      "Bash(xargs grep -l \"OnDt\\\\|OnUnlock\\\\|OnExpanded\\\\|OnDtUnlocked\" -i)",
+      "Bash(xargs grep -l \"tile\\\\|Tile\\\\|길거리\\\\|스폰\\\\|spawn\" -i)",
+      "Bash(xargs grep -l \"DT\\\\|드라이브\")",
+      "Bash(xargs grep -A 10 \"enum CellZone\")",
+      "Bash(xargs grep -l \"Tilemap\\\\|tilemap\")",
+      "Bash(xargs grep \"dtVisuals\\\\|DT.*Road\\\\|Road.*DT\\\\|street.*tile\\\\|tile.*road\" -i)",
+      "Bash(xargs grep -l \"DTOrder\\\\|DTPickup\\\\|DriveThru\")",
+      "Bash(dir Assets\\\\_Recovery)"
     ]
   }
 }

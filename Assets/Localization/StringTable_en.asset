@@ -562,6 +562,146 @@ MonoBehaviour:
     m_Localized: Delivery Zone
     m_Metadata:
       m_Items: []
+  - m_Id: 1089519869489152
+    m_Localized: 2-Seat Bench
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1089519894654976
+    m_Localized: 2-Seat Chair
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1089519903043584
+    m_Localized: Blonde Woman
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1089519903043585
+    m_Localized: Boy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1089519903043586
+    m_Localized: Girl
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1089519903043587
+    m_Localized: Office Worker
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1089519903043588
+    m_Localized: College Student
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1089519903043589
+    m_Localized: Police Officer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1089519903043590
+    m_Localized: Rapper
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1195184867573760
+    m_Localized: Fryer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1195184917905408
+    m_Localized: Work Table
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1195184917905409
+    m_Localized: Ice Cream Machine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984357756928
+    m_Localized: Bread
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117056
+    m_Localized: Bacon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117057
+    m_Localized: Burrito
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117058
+    m_Localized: Cheesecake
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117059
+    m_Localized: Cookies
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117060
+    m_Localized: Chocolate Cake
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117061
+    m_Localized: Curry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117062
+    m_Localized: Dumplings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117063
+    m_Localized: Fried Egg
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117064
+    m_Localized: Egg Tart
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117065
+    m_Localized: French Fries
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117066
+    m_Localized: Fruit Cake
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117067
+    m_Localized: Garlic Bread
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117068
+    m_Localized: Hot Dog
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117069
+    m_Localized: Ice Cream
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117070
+    m_Localized: Meatball
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117071
+    m_Localized: Omelet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117072
+    m_Localized: Pudding
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117073
+    m_Localized: Pizza
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117074
+    m_Localized: Roasted Chicken
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117075
+    m_Localized: Sandwich
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117076
+    m_Localized: Taco
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1210984387117077
+    m_Localized: Waffle
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0ea88a793e072c4a93ff59edf571335, type: 3}
+  m_Name: IceCreamMachine
+  m_EditorClassIdentifier: Assembly-CSharp::CookingToolData
+  saveId: e155ff0c0106
+  prefab: {fileID: 3385571978879531138, guid: 784c915f8a576e44eb88d66aa5599eb3, type: 3}
+  zone: 0
+  width: 1
+  height: 1
+  anchorX: 0
+  anchorY: 0
+  deliveryBonus: 0
+  displayName:
+    m_TableReference:
+      m_TableCollectionName: GUID:e8a326a4f684cfd4f828350fbb7606b2
+    m_TableEntryReference:
+      m_KeyId: 1195184917905409
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  description:
+    m_TableReference:
+      m_TableCollectionName: 
+    m_TableEntryReference:
+      m_KeyId: 0
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  icon: {fileID: -7734748676018661037, guid: b16e2b8473480114da333790d299529c, type: 3}
+  satisfactionUnlock: 0
+  purchaseCost: 30000
+  unlockOnExpansion: {fileID: 0}
+  toolType: 4
+  usingDuration: 2
+  references:
+    version: 2
+    RefIds: []

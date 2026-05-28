@@ -10,6 +10,16 @@ public class PassWindow : MonoBehaviour
     [SerializeField] private Vector3 firstSlotOffset = new Vector3(-0.3f, 0.2f, 0f);
     [SerializeField] private float slotSpacing = 0.3f;
 
+    [Header("사용 위치 (비우면 자동 인접셀 계산)")]
+    [Tooltip("요리사가 음식을 놓는 위치 (주방측)")]
+    [SerializeField] private Transform cookUsePoint;
+    [Tooltip("서버/라이더가 음식을 가져가는 위치 (홀측)")]
+    [SerializeField] private Transform serverUsePoint;
+
+    /// <summary>역할별 명시 사용 위치. null이면 호출측이 자동 계산으로 폴백.</summary>
+    public Transform GetUsePoint(PathRole role) =>
+        role == PathRole.Cook ? cookUsePoint : serverUsePoint;
+
     private void Awake()
     {
         PassWindowManager.Instance.Register(this);

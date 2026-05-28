@@ -10,6 +10,7 @@ public class CookStaff : Staff
     private Queue<MenuData> _remainingMenus;
     private Vector3? _currentToolTargetPos;
     private Vector3? _currentRestTarget;
+    private CookingToolInstance _currentTool;
 
     [Header("음식")]
     [SerializeField] private GameObject foodPrefab;
@@ -25,6 +26,8 @@ public class CookStaff : Staff
 
     private void Update()
     {
+        if (TickCommute()) { _stateTimer += Time.deltaTime; return; }
+
         switch (_state)
         {
             case CookState.IDLE_AT_KITCHEN: IdleAtKitchenState(); break;
@@ -36,6 +39,16 @@ public class CookStaff : Staff
     }
 
     protected override PathRole GetPathRole() => PathRole.Cook;
+
+    protected override Vector3 GetWorkPosition()
+    {
+        Vector3 spot = PickRestSpot();
+        if (spot != Vector3.zero) return spot;
+        var cells = GridManager.Instance.GetWalkableCellsInZone(CellZone.Kitchen);
+        return cells.Count > 0 ? cells[0] : transform.position;
+    }
+
+    protected override void OnArrivedAtWork() => ChangeState(CookState.IDLE_AT_KITCHEN);
 
     private void ChangeState(CookState next)
     {
@@ -67,6 +80,15 @@ public class CookStaff : Staff
     private Vector3 PickRestSpot()
     {
         var candidates = GridManager.Instance.GetWalkableCellsInZone(CellZone.Kitchen);
+
+        // 문 앞에서 쉬지 않도록 문 주변 셀 제외
+        Vector3 doorPos = GridManager.Instance.CellToWorld(GridManager.Instance.KitchenDoorCell);
+        candidates.RemoveAll(c => Vector3.Distance(c, doorPos) <= 1.5f);
+
+        // 제외했더니 후보가 하나도 안 남으면(주방이 아주 좁을 때) 전체로 복구
+        if (candidates.Count == 0)
+            candidates = GridManager.Instance.GetWalkableCellsInZone(CellZone.Kitchen);
+
         var occupiers = new List<Vector3>();
         foreach (var c in StaffManager.Instance.CookStaffs)
             if (c != this) occupiers.Add(c.transform.position);
@@ -96,14 +118,27 @@ public class CookStaff : Staff
         }
         MoveTo(_currentToolTargetPos.Value);
         if (HasArrived())
+        {
+            MenuData currentMenu = _remainingMenus.Peek();
+            _currentTool = CookingToolManager.Instance.GetToolInstance(currentMenu.tool.toolType);
+            _currentTool?.SetCooking(true);
             ChangeState(CookState.USING_TOOL);
+        }
     }
 
     private void UsingToolState()
     {
         MenuData currentMenu = _remainingMenus.Peek();
+
+        // 조리 중엔 도구를 바라보게
+        var toolT = CookingToolManager.Instance.GetToolTransform(currentMenu.tool.toolType);
+        if (toolT != null) FaceToward(toolT.position);
+
         float effectiveDuration = currentMenu.tool.usingDuration / Mathf.Max(0.01f, EffectiveSpeedMultiplier);
         if (_stateTimer < effectiveDuration) return;
+
+        _currentTool?.SetCooking(false);   // 이 메뉴 조리 끝 → 도구 애니 정지
+        _currentTool = null;
 
         _remainingMenus.Dequeue();
 

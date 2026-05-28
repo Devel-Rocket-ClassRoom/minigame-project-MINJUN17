@@ -22,9 +22,8 @@ public enum ServerState
 }
 public enum RiderState
 {
-    IDLE_AT_RIDERPOS,
+    IDLE_OUTSIDE,
     WALK_TO_PASSWINDOW,
     WALK_TO_EXIT,
     DELIVER,
-    RETURN_TO_ENTRY,
 }

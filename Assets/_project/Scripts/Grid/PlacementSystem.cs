@@ -4,6 +4,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.EnhancedTouch;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 using TouchPhase = UnityEngine.InputSystem.TouchPhase;
+using TouchSimulation = UnityEngine.InputSystem.EnhancedTouch.TouchSimulation;
 
 public enum Mode { None, Place, Move, Remove }
 
@@ -53,8 +54,21 @@ public class PlacementSystem : MonoBehaviour
         }
     }
 
-    private void OnEnable() => EnhancedTouchSupport.Enable();
-    private void OnDisable() => EnhancedTouchSupport.Disable();
+    private void OnEnable()
+    {
+        EnhancedTouchSupport.Enable();
+#if UNITY_EDITOR || UNITY_STANDALONE
+        TouchSimulation.Enable();   // 에디터/PC에서 마우스 입력을 터치로 시뮬레이트
+#endif
+    }
+
+    private void OnDisable()
+    {
+        EnhancedTouchSupport.Disable();
+#if UNITY_EDITOR || UNITY_STANDALONE
+        TouchSimulation.Disable();
+#endif
+    }
 
     // ========== Update ==========
     private void Update()
@@ -177,6 +191,7 @@ public class PlacementSystem : MonoBehaviour
     private void TrySelectForRemove()
     {
         if (!TryGetTappedObject(out PlacedObject target)) return;
+        if (target.Data != null && target.Data.fixedSingle) return;   // 고정 가구(카운터 등)는 삭제 불가
 
         if (_removeTarget != null)
             _removeTargetRenderer.color = _removeTargetOriginalColor;
@@ -240,6 +255,7 @@ public class PlacementSystem : MonoBehaviour
     // ========== 내부 적용 로직 (성공 시 true, 실패 시 false) ==========
     private bool ApplyPlace()
     {
+        if (_previewData != null && _previewData.fixedSingle) return false;   // 고정 가구는 신규 설치 불가 (이동만)
         if (!gridManager.CanPlace(_currentOrigin, PreviewWidth, PreviewHeight, gridManager.GetZone(_currentOrigin))) return false;
 
         // 설치 비용 차감 (0이면 무료, 무료가 아니고 잔액 부족이면 배치 실패)

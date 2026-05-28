@@ -39,9 +39,13 @@ public class GridManager : MonoBehaviour
 
     private HashSet<Vector2Int> _reservedCells = new HashSet<Vector2Int>
     {
-        new Vector2Int(0, 3), // 출입구 (홀 좌하단)
+        new Vector2Int(0, 1), // 손님/라이더 출입문 (왼쪽 사이드워크 방향) — 가구 배치 금지, 통과 가능
         // 픽업대 셀은 시작 배치 좌표에 맞춰 추가 (예: new Vector2Int(1, 8))
     };
+
+    [Header("직원 통근용 주방 문 (벽으로 안 막는 1칸)")]
+    [SerializeField] private Vector2Int kitchenDoorCell = new Vector2Int(1, 8);
+    public Vector2Int KitchenDoorCell => kitchenDoorCell;
 
     private void Awake()
     {
@@ -149,7 +153,8 @@ public class GridManager : MonoBehaviour
             case PathRole.Customer: return c.zone == CellZone.Hall;
             case PathRole.Cook:     return c.zone == CellZone.Kitchen;
             case PathRole.Server:   return true; // 주방/홀 둘 다 OK
-            case PathRole.Rider:    return c.zone == CellZone.Hall || c.zone == CellZone.RiderRoom;
+            case PathRole.Rider:    return c.zone == CellZone.Hall;
+            case PathRole.Commute:  return true; // 통근: 존 무시 (단 벽/가구/비활성은 위에서 이미 차단)
             default: return true;
         }
     }
@@ -179,6 +184,11 @@ public class GridManager : MonoBehaviour
             if (c != null && c.zone == CellZone.Kitchen)
                 openings.Add(pos);
         }
+
+        // 직원 통근용 주방 전용 문: 벽 제외 + 가구 배치 금지(reserved)
+        openings.Add(kitchenDoorCell);
+        SetReserved(kitchenDoorCell, true);
+
         BuildKitchenLWalls(openings);
     }
 

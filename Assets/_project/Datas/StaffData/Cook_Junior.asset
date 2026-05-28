@@ -12,11 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71b6d6edfdc5c4d48bd6304ba69e48cf, type: 3}
   m_Name: Cook_Junior
   m_EditorClassIdentifier: Assembly-CSharp::StaffData
+  saveId: 467080c88f03
   role: 0
   grade: 0
-  sprite: {fileID: 5788530040005799061, guid: 9ae459407d9b43642af896b0e867c5bf, type: 3}
-  moveSpeed: 2
+  sprite: {fileID: 3983453485446504721, guid: c85d78da1e95f2b41a79c04a23f3ca3b, type: 3}
+  animController: {fileID: 22100000, guid: 624569400f2ea984288356a69253e79d, type: 2}
+  moveSpeed: 1
   kindness: 2
+  deliveryTime: 0
   speedMultiplier: 1
   hireCost: 3000
   salary: 1000
