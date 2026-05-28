@@ -94,6 +94,7 @@ public class DTSystem : MonoBehaviour
     {
         if (DTLane.Instance == null || DTLane.Instance.WaypointCount == 0) return false;
         if (DTLane.Instance.IsFull) return false;
+        if (DTLane.Instance.HasCarPendingOrder()) return false;
         if (DTWindowManager.Instance == null) return false;
         if (DTWindowManager.Instance.FirstOrderWindow == null) return false;
         if (DTWindowManager.Instance.FirstPickupWindow == null) return false;

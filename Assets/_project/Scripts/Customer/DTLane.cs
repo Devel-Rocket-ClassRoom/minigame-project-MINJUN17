@@ -30,6 +30,9 @@ public class DTLane : MonoBehaviour
     public int OrderStopIndex => orderStopIndex;
     public int PickupStopIndex => pickupStopIndex;
 
+    // 마지막 차가 빠질 때 발화 (영업 종료 후 정산 게이트용)
+    public event System.Action OnEmpty;
+
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
@@ -58,7 +61,34 @@ public class DTLane : MonoBehaviour
         if (!_activeCars.Contains(car)) _activeCars.Add(car);
     }
 
-    public void UnregisterCar(DTCustomer car) => _activeCars.Remove(car);
+    public void UnregisterCar(DTCustomer car)
+    {
+        if (!_activeCars.Remove(car)) return;
+        if (_activeCars.Count == 0) OnEmpty?.Invoke();
+    }
+
+    /// <summary>영업 종료 안전 타이머용 — 차로의 모든 차를 즉시 제거.</summary>
+    public void ClearAllCars()
+    {
+        if (_activeCars.Count == 0) return;
+        var copy = new List<DTCustomer>(_activeCars);
+        _activeCars.Clear();
+        foreach (var car in copy)
+            if (car != null) Destroy(car.gameObject);
+        OnEmpty?.Invoke();
+    }
+
+    /// <summary>OrderStop을 아직 통과 못 한 차가 한 대라도 있으면 true.</summary>
+    public bool HasCarPendingOrder()
+    {
+        if (orderStopIndex < 0) return false;
+        foreach (var c in _activeCars)
+        {
+            if (c == null) continue;
+            if (c.CurrentWaypointIndex <= orderStopIndex) return true;
+        }
+        return false;
+    }
 
     /// <summary>해당 waypoint 인덱스를 점유한 다른 차가 있는지.</summary>
     public bool IsWaypointOccupiedByOther(int index, DTCustomer asker)

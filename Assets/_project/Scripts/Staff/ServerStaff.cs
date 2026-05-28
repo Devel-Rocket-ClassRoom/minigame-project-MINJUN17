@@ -17,6 +17,10 @@ public class ServerStaff : Staff
     private DTOrderWindow _targetDTOrderWindow;
     private Vector3? _currentRestTarget;
 
+    // Stair 경유 보조 필드
+    private Stair _pendingStair;
+    private ServerState _stairAfterState;
+
     public float EffectiveKindness => _data.kindness * (1f + _hireVariance) * _growthMultiplier;
 
     public bool IsIdle => _state == ServerState.IDLE_AT_COUNTER;
@@ -48,6 +52,7 @@ public class ServerStaff : Staff
             case ServerState.TAKING_ORDER:           TakingOrderState(); break;
             case ServerState.WALK_TO_PASS_WINDOW:    WalkToPassWindowState(); break;
             case ServerState.WALK_TO_SEAT:           WalkToSeatState(); break;
+            case ServerState.WALK_TO_STAIR:          WalkToStairState(); break;
             case ServerState.WALK_TO_PHONE:          WalkToPhoneState(); break;
             case ServerState.TAKING_DELIVERY_ORDER:  TakingDeliveryOrderState(); break;
             case ServerState.WALK_TO_DT_ORDER:       WalkToDTOrderState(); break;
@@ -268,9 +273,37 @@ public class ServerStaff : Staff
             return;
         }
 
-        // 음식 놓을 위치 = 의자가 속한 테이블 세트의 FoodDropOff (의자 단독이면 의자 자체)
         Seat seat = customer.AssignedSeat;
-        Transform dropOff = seat != null ? seat.FoodDropOff : null;
+        if (seat == null)
+        {
+            if (_carryingFood != null) Destroy(_carryingFood.gameObject);
+            _carryingFood = null;
+            ChangeState(ServerState.IDLE_AT_COUNTER);
+            return;
+        }
+
+        // 좌석 floor가 다르면 먼저 stair 경유
+        FloorIndex myFloor = GridManager.Instance.GetFloorAt(transform.position);
+        FloorIndex seatFloor = GridManager.Instance.GetFloorAt(seat.transform.position);
+        if (myFloor != seatFloor)
+        {
+            Stair stair = StairManager.Instance?.FindNearestStairOnFloor(myFloor, transform.position);
+            if (stair == null || !stair.HasPair)
+            {
+                Debug.LogWarning($"[ServerStaff] No stair on {myFloor} to reach {seatFloor} seat — discarding food");
+                if (_carryingFood != null) Destroy(_carryingFood.gameObject);
+                _carryingFood = null;
+                ChangeState(ServerState.IDLE_AT_COUNTER);
+                return;
+            }
+            _pendingStair = stair;
+            _stairAfterState = ServerState.WALK_TO_SEAT;
+            ChangeState(ServerState.WALK_TO_STAIR);
+            return;
+        }
+
+        // 음식 놓을 위치 = 의자가 속한 테이블 세트의 FoodDropOff (의자 단독이면 의자 자체)
+        Transform dropOff = seat.FoodDropOff;
         Vector3 target = dropOff != null
             ? GridManager.Instance.GetFurnitureApproachPosition(dropOff.position, PathRole.Server, transform.position)
             : customer.transform.position;   // 좌석 정보 없으면 fallback
@@ -286,8 +319,44 @@ public class ServerStaff : Staff
             }
             customer.OnFoodDelivered(this, _carryingFood);
             _carryingFood = null;
+
+            // 배달 끝나고 F2에 있으면 stair로 F1 복귀
+            FloorIndex afterFloor = GridManager.Instance.GetFloorAt(transform.position);
+            if (afterFloor == FloorIndex.Floor2)
+            {
+                Stair backStair = StairManager.Instance?.FindNearestStairOnFloor(afterFloor, transform.position);
+                if (backStair != null && backStair.HasPair)
+                {
+                    _pendingStair = backStair;
+                    _stairAfterState = ServerState.IDLE_AT_COUNTER;
+                    ChangeState(ServerState.WALK_TO_STAIR);
+                    return;
+                }
+            }
             ChangeState(ServerState.IDLE_AT_COUNTER);
         }
+    }
+
+    private void WalkToStairState()
+    {
+        if (_pendingStair == null || !_pendingStair.HasPair)
+        {
+            _pendingStair = null;
+            ChangeState(_stairAfterState);
+            return;
+        }
+
+        Vector3 approachPos = _pendingStair.GetApproachPos(PathRole.Server, transform.position);
+        MoveTo(approachPos);
+        if (!HasArrived()) return;
+
+        // 텔레포트
+        Vector3 landingPos = _pendingStair.GetTeleportLandingPos(PathRole.Server, transform.position);
+        transform.position = landingPos;
+        _mover.Clear();
+
+        _pendingStair = null;
+        ChangeState(_stairAfterState);
     }
 
     private void WalkToPhoneState()

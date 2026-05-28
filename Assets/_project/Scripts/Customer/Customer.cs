@@ -33,6 +33,11 @@ public class Customer : MonoBehaviour
     private bool _passedDoor;
     private static readonly Vector3 DoorWorld = new Vector3(0.5f, 1.5f, 0f);
 
+    // Stair 경유 보조 필드
+    private Stair _pendingStair;
+    private CustomerState _stairAfterState;
+    private bool _leaveInitDone;
+
     public List<MenuData> OrderedMenus { get; private set; }
 
     [Header("머리 위 표시")]
@@ -94,6 +99,7 @@ public class Customer : MonoBehaviour
                 if (_targetCounter != null) FaceToward(_targetCounter.transform.position);
                 break;
             case CustomerState.WALK_TO_SEAT:     WalkToSeatState(); break;
+            case CustomerState.WALK_TO_STAIR:    WalkToStairState(); break;
             case CustomerState.WAIT_AT_SEAT:
                 if (_targetSeat != null) FaceToward(_targetSeat.FoodDropOff.position);
                 break;
@@ -166,15 +172,19 @@ public class Customer : MonoBehaviour
                 eatProgress?.Show();
                 break;
             case CustomerState.LEAVE:
-                _targetSeat?.Release();
-                _targetSeat = null;
-                orderBubble?.Hide();   // 주문 안 받은 채 타임아웃 떠나는 경우 대비
-                eatProgress?.Hide();
-                SatisfactionSystem.Instance.Earn(_satisfaction);
-                FloatingTextSystem.SpawnSatisfaction(transform.position, _satisfaction);
-                ReputationSystem.Instance?.Report(_satisfaction);
                 // 가게 안이면(x≥0) 도어 경유, 이미 사이드워크(x<0)면 도어 건너뛰고 바로 출구로
-                _passedDoor = transform.position.x < 0f;
+                _passedDoor = transform.position.x < 0f;  // 매번 재계산 (stair 후 재진입 대비)
+                if (!_leaveInitDone)
+                {
+                    _leaveInitDone = true;
+                    _targetSeat?.Release();
+                    _targetSeat = null;
+                    orderBubble?.Hide();   // 주문 안 받은 채 타임아웃 떠나는 경우 대비
+                    eatProgress?.Hide();
+                    SatisfactionSystem.Instance.Earn(_satisfaction);
+                    FloatingTextSystem.SpawnSatisfaction(transform.position, _satisfaction);
+                    ReputationSystem.Instance?.Report(_satisfaction);
+                }
                 break;
         }
     }
@@ -228,8 +238,26 @@ public class Customer : MonoBehaviour
         // 좌석이 사라졌으면(가구 철거/preview race) 크래시 대신 퇴장
         if (_targetSeat == null)
         {
-            _targetSeat = null;
             ChangeState(CustomerState.LEAVE);
+            return;
+        }
+
+        // 좌석이 다른 floor면 stair 경유
+        FloorIndex myFloor = GridManager.Instance.GetFloorAt(transform.position);
+        FloorIndex seatFloor = GridManager.Instance.GetFloorAt(_targetSeat.transform.position);
+        if (myFloor != seatFloor)
+        {
+            Stair stair = StairManager.Instance?.FindNearestStairOnFloor(myFloor, transform.position);
+            if (stair == null || !stair.HasPair)
+            {
+                Debug.LogWarning($"[Customer] No stair on {myFloor} to reach {seatFloor} seat — leaving");
+                _satisfaction = 0;
+                ChangeState(CustomerState.LEAVE);
+                return;
+            }
+            _pendingStair = stair;
+            _stairAfterState = CustomerState.WALK_TO_SEAT;
+            ChangeState(CustomerState.WALK_TO_STAIR);
             return;
         }
 
@@ -249,6 +277,28 @@ public class Customer : MonoBehaviour
         MoveTo(target);
         if (HasArrived())
             ChangeState(CustomerState.WAIT_AT_SEAT);
+    }
+
+    private void WalkToStairState()
+    {
+        if (_pendingStair == null || !_pendingStair.HasPair)
+        {
+            _pendingStair = null;
+            ChangeState(_stairAfterState == CustomerState.WALK_TO_SEAT ? CustomerState.LEAVE : _stairAfterState);
+            return;
+        }
+
+        Vector3 approachPos = _pendingStair.GetApproachPos(PathRole.Customer, transform.position);
+        MoveTo(approachPos);
+        if (!HasArrived()) return;
+
+        // 텔레포트
+        Vector3 landingPos = _pendingStair.GetTeleportLandingPos(PathRole.Customer, transform.position);
+        transform.position = landingPos;
+        _mover.Clear();
+
+        _pendingStair = null;
+        ChangeState(_stairAfterState);
     }
 
     // 영업 종료 시 강제 퇴장 (대기 상태 손님용)
@@ -297,6 +347,23 @@ public class Customer : MonoBehaviour
 
     private void LeaveState()
     {
+        // F2에 있으면 먼저 stair로 F1 복귀
+        FloorIndex myFloor = GridManager.Instance.GetFloorAt(transform.position);
+        if (myFloor == FloorIndex.Floor2)
+        {
+            Stair stair = StairManager.Instance?.FindNearestStairOnFloor(myFloor, transform.position);
+            if (stair != null && stair.HasPair)
+            {
+                _pendingStair = stair;
+                _stairAfterState = CustomerState.LEAVE;
+                ChangeState(CustomerState.WALK_TO_STAIR);
+                return;
+            }
+            // stair 없으면 안전장치: 그 자리에서 사라짐
+            Destroy(gameObject);
+            return;
+        }
+
         // 가게 안에서 출발하는 경우(주문/식사 후): 도어 → 출구. 이미 밖이면(자리 대기/큐 중 강제 퇴장) 바로 출구.
         Vector3 dest = _passedDoor ? _exitPoint : DoorWorld;
         MoveTo(dest);

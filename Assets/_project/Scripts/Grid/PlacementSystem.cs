@@ -105,12 +105,8 @@ public class PlacementSystem : MonoBehaviour
     {
         if (Mode != Mode.None) return;
 
-        // 활성 영역의 중앙에 spawn (놓을 수 있는지와 무관하게 일단 가운데)
-        Vector2Int startOrigin = new Vector2Int(
-            (gridManager.StartGridWidth - data.width) / 2,
-            (gridManager.StartGridHeight - data.height) / 2
-        );
-        startOrigin = gridManager.ClampToActiveArea(startOrigin, data.width, data.height);
+        // 현재 floor 활성 영역의 중앙에 spawn (놓을 수 있는지와 무관하게 일단 가운데)
+        Vector2Int startOrigin = gridManager.GetActiveAreaCenter(data.width, data.height);
 
         GameObject preview = Instantiate(data.prefab);
         StripLogicComponents(preview);

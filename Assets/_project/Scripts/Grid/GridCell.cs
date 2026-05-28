@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
-public enum CellZone { Kitchen, Hall, RiderRoom }
+public enum CellZone { Kitchen, Hall, RiderRoom, Floor2_Hall, Floor2_Toilet }
 public class GridCell
 {
     public CellZone zone;
