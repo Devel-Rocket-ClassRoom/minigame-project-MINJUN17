@@ -37,12 +37,29 @@ public class DirectionalCharacterAnimator : MonoBehaviour
     private Animator _animator;
     private Vector3 _prevPos;
     private int _currentDir = -1;     // -1 = 미지정
+    private bool _hasTurnParam;       // 컨트롤러에 Turn 트리거가 있을 때만 발동 (선택 파라미터)
 
     private void Awake()
     {
         _animator = GetComponent<Animator>();
         _prevPos = transform.position;
+        CacheParams();
         ApplyDirection(defaultDirection, fireTurn: false);
+    }
+
+    // 컨트롤러에 "Turn" 트리거 파라미터가 있는지 1회 캐싱 — 없으면 SetTrigger 호출 자체를 스킵
+    private void CacheParams()
+    {
+        _hasTurnParam = false;
+        if (_animator == null) return;
+        foreach (var p in _animator.parameters)
+        {
+            if (p.nameHash == kHashTurn && p.type == AnimatorControllerParameterType.Trigger)
+            {
+                _hasTurnParam = true;
+                break;
+            }
+        }
     }
 
     // 풀링/재활성화·텔레포트 직후 한 프레임의 큰 delta로 오판하지 않도록 기준 위치 리셋
@@ -66,7 +83,7 @@ public class DirectionalCharacterAnimator : MonoBehaviour
             {
                 bool wasUnset = _currentDir < 0;
                 _currentDir = dir;
-                if (!wasUnset) _animator.SetTrigger(kHashTurn);
+                if (!wasUnset && _hasTurnParam) _animator.SetTrigger(kHashTurn);
             }
         }
 
@@ -90,7 +107,7 @@ public class DirectionalCharacterAnimator : MonoBehaviour
 
         if (_animator == null) return;
         _animator.SetInteger(kHashDirection, newDir);
-        if (fireTurn && !wasUnset)
+        if (fireTurn && !wasUnset && _hasTurnParam)
             _animator.SetTrigger(kHashTurn);
     }
 

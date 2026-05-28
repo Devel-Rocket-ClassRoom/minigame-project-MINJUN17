@@ -56,7 +56,6 @@ public class RankingSystem : MonoBehaviour
             long score = autoDummyTopScore - (long)(range * curved);
             dummyTop100.Add(score);
         }
-        Debug.Log($"[RankingSystem] dummyTop100 자동 생성: 1등={dummyTop100[0]}, 50등={dummyTop100[49]}, 100등={dummyTop100[99]}");
     }
 
     private void Start()

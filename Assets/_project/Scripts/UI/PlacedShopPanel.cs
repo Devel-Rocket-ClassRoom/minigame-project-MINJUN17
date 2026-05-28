@@ -71,6 +71,7 @@ public class PlacedShopPanel : MonoBehaviour
 
         foreach (var data in CatalogManager.Instance.UnlockedByZone(zone))
         {
+            if (data.fixedSingle) continue;   // 고정 가구(카운터 등)는 추가 설치 불가 — 상점에 노출 X
             var slot = Instantiate(slotPrefab, content);
             slot.Setup(data, placementSystem, this);
             _spawned.Add(slot);

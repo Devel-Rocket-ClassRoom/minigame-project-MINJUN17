@@ -177,7 +177,18 @@ public class ServerStaff : Staff
         var counters = CounterManager.Instance.Counters;
         var candidates = new List<Vector3>();
         foreach (var c in counters)
-            if (c.StaffPos != null) candidates.Add(c.StaffPos.position);
+        {
+            // 카운터에 지정된 휴식 포지션들(보통 3개) 사용, 없으면 staffPos로 폴백
+            if (c.RestPositions != null && c.RestPositions.Count > 0)
+            {
+                foreach (var rp in c.RestPositions)
+                    if (rp != null) candidates.Add(rp.position);
+            }
+            else if (c.StaffPos != null)
+            {
+                candidates.Add(c.StaffPos.position);
+            }
+        }
 
         var occupiers = new List<Vector3>();
         foreach (var s in StaffManager.Instance.ServerStaffs)

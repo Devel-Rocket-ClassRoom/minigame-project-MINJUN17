@@ -402,9 +402,6 @@ public class TestDebugPanel : MonoBehaviour
     /// <summary>라이더 1명 즉시 고용 (비용 자동 충전).</summary>
     public void HireRider()
     {
-        // 라이더룸 없으면 조용히 무시 (테스트 버튼 안전장치)
-        if (RiderRoomManager.Instance == null || !RiderRoomManager.Instance.HasRiderRoom()) return;
-
         if (StaffManager.Instance == null) { Debug.LogWarning("[TestDebugPanel] StaffManager 없음"); return; }
         if (testRiderData == null) { Debug.LogWarning("[TestDebugPanel] testRiderData 미지정"); return; }
 
@@ -415,21 +412,18 @@ public class TestDebugPanel : MonoBehaviour
         var prefab = prefabField?.GetValue(sm);
         bool prefabOK   = prefab != null && !prefab.Equals(null);
         bool unlockOK   = sm.IsRiderHiringUnlocked;
-        bool roomOK     = RiderRoomManager.Instance == null || RiderRoomManager.Instance.HasRiderRoom();
         bool underCap   = sm.RiderCount < sm.MaxRiderCount;
         long money      = MoneySystem.Instance != null ? MoneySystem.Instance.Money : 0;
 
         Debug.Log(
             $"[HireRider 사전점검]\n" +
             $"  riderStaffPrefab 인스펙터 할당 = {prefabOK}\n" +
-            $"  IsRiderHiringUnlocked (Phone 해금+설치) = {unlockOK}\n" +
-            $"  HasRiderRoom (RiderRoom zone 존재) = {roomOK}\n" +
+            $"  IsRiderHiringUnlocked (전화기 해금) = {unlockOK}\n" +
             $"  RiderCount {sm.RiderCount}/{sm.MaxRiderCount} (상한 미만? {underCap})\n" +
             $"  현재 돈 = {money:N0}, 고용비 = {testRiderData.hireCost:N0}");
 
         if (!prefabOK) { Debug.LogError("[TestDebugPanel] ← StaffManager 인스펙터의 riderStaffPrefab 슬롯 비어있음"); return; }
-        if (!unlockOK) { Debug.LogError("[TestDebugPanel] ← Phone 미설치 또는 미해금 (ForceUnlockPhone + Phone 가구 배치 확인)"); return; }
-        if (!roomOK)   { Debug.LogError("[TestDebugPanel] ← RiderRoom zone 없음 (확장 단계 적용 필요)"); return; }
+        if (!unlockOK) { Debug.LogError("[TestDebugPanel] ← 전화기 미해금 (전화기를 카탈로그에서 해금해야 라이더 고용 가능)"); return; }
         if (!underCap) { Debug.LogError($"[TestDebugPanel] ← 라이더 상한 도달 ({sm.RiderCount}/{sm.MaxRiderCount})"); return; }
 
         // 비용 자동 충전 후 고용

@@ -34,7 +34,6 @@ public class PhoneManager : MonoBehaviour
     public bool IsUnlocked => CatalogManager.Instance != null
                               && CatalogManager.Instance.IsUnlocked(phoneCatalogData);
     public bool HasInstalledPhone => phones.Count > 0;
-    public bool IsRiderHiringUnlocked => HasInstalledPhone;
     public int ActiveDeliveryCount => _activeDeliveryCount;
 
     private void Awake()

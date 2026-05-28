@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class RiderStaff : Staff
@@ -7,10 +6,17 @@ public class RiderStaff : Staff
     private Food _carryingFood;
     private Food _claimedFood;   // 픽업대에 시각적으로 남아있으나 클레임만 한 음식
     private float _deliverDurationCache;
-    private Vector3? _currentRestTarget;
-    private const float kRestBlockRadius = 0.5f;
 
-    public bool IsIdle => _state == RiderState.IDLE_AT_RIDERPOS;
+    // 사이드워크 ↔ 가게 안 횡단 시 도어 셀 (0,1) 경유 — 손님과 같은 문 공유
+    private bool _passedDoor;
+    private static readonly Vector3 DoorWorld = new Vector3(0.5f, 1.5f, 0f);
+
+    // 라이더 대기 슬롯 (인도 y=0 라인). 셀 (-1,0)..(-3,0) → 월드 (-0.5,0.5)..(-2.5,0.5)
+    private const float StandbyY = 0.5f;
+    private const float FirstStandbyX = -0.5f;
+    private const int StandbySlots = 3;
+
+    public bool IsIdle => _state == RiderState.IDLE_OUTSIDE;
     public float EffectiveDeliveryDuration
     {
         get
@@ -18,16 +24,14 @@ public class RiderStaff : Staff
             // hireVariance(+)면 더 빠름, growthMultiplier(>1)면 더 빠름 → 둘 다 분모로
             float divisor = Mathf.Max(0.01f, (1f + _hireVariance) * _growthMultiplier);
             float adjusted = _data.deliveryTime / divisor;
-            return RiderRoomManager.Instance != null
-                ? RiderRoomManager.Instance.GetEffectiveDeliveryDuration(adjusted)
-                : Mathf.Max(5f, adjusted);
+            return Mathf.Max(5f, adjusted);
         }
     }
 
     public void Init(StaffData data, int id, string nameKey, float hireVariance = 0f)
     {
         InitBase(data, id, nameKey, hireVariance);
-        ChangeState(RiderState.IDLE_AT_RIDERPOS);
+        ChangeState(RiderState.IDLE_OUTSIDE);
     }
 
     protected override PathRole GetPathRole() => PathRole.Rider;
@@ -38,38 +42,49 @@ public class RiderStaff : Staff
 
         switch (_state)
         {
-            case RiderState.IDLE_AT_RIDERPOS:   IdleAtRiderPosState(); break;
+            case RiderState.IDLE_OUTSIDE:       IdleOutsideState(); break;
             case RiderState.WALK_TO_PASSWINDOW: WalkToPassWindowState(); break;
             case RiderState.WALK_TO_EXIT:       WalkToExitState(); break;
             case RiderState.DELIVER:            DeliverState(); break;
-            case RiderState.RETURN_TO_ENTRY:    ReturnToEntryState(); break;
         }
         _stateTimer += Time.deltaTime;
     }
 
-    protected override Vector3 GetWorkPosition()
+    // 라이더 인덱스별 대기 슬롯 (인도 y=0 라인, 최대 3슬롯)
+    private Vector3 OutsideWaitPos()
     {
-        Vector3 spot = PickRestSpot();
-        if (spot != Vector3.zero) return spot;
-        var cells = GridManager.Instance.GetWalkableCellsInZone(CellZone.RiderRoom);
-        return cells.Count > 0 ? cells[0] : transform.position;
+        int idx = 0;
+        if (StaffManager.Instance != null)
+        {
+            var list = StaffManager.Instance.RiderStaffs;
+            for (int i = 0; i < list.Count; i++)
+                if (list[i] == this) { idx = i; break; }
+        }
+        int clamped = Mathf.Clamp(idx, 0, StandbySlots - 1);
+        return new Vector3(FirstStandbyX - clamped, StandbyY, 0f);
     }
+
+    private void ChangeStateWithDoor(RiderState next)
+    {
+        ChangeState(next);
+        _passedDoor = false;   // 도어 다시 통과해야 함
+    }
+
+    protected override Vector3 GetWorkPosition() => OutsideWaitPos();
 
     protected override void OnArrivedAtWork()
     {
         SetVisible(true);   // 배달 중 숨겨졌던 경우 대비
-        ChangeState(RiderState.IDLE_AT_RIDERPOS);
+        ChangeState(RiderState.IDLE_OUTSIDE);
     }
 
     private void ChangeState(RiderState next)
     {
         _state = next;
         _stateTimer = 0f;
-        if (next != RiderState.IDLE_AT_RIDERPOS && next != RiderState.RETURN_TO_ENTRY)
-            _currentRestTarget = null;
     }
 
-    private void IdleAtRiderPosState()
+    private void IdleOutsideState()
     {
         // 배달 음식 있으면 클레임 (실제 픽업은 픽업대 도착 시점에)
         if (PassWindowManager.Instance.HasReadyDeliveryFood())
@@ -80,23 +95,14 @@ public class RiderStaff : Staff
                 _claimedFood = PassWindowManager.Instance.ClaimDeliveryFood(this);
                 if (_claimedFood != null)
                 {
-                    ChangeState(RiderState.WALK_TO_PASSWINDOW);
+                    ChangeStateWithDoor(RiderState.WALK_TO_PASSWINDOW);
                     return;
                 }
             }
         }
 
-        // 라이더룸 휴식 위치로 이동 (한 번 정한 목표는 다른 라이더가 차지하기 전까진 유지)
-        if (RiderRoomManager.Instance != null)
-        {
-            if (_currentRestTarget == null
-                || IsRestTargetTakenByOther(_currentRestTarget.Value))
-            {
-                Vector3 picked = PickRestSpot();
-                _currentRestTarget = picked != Vector3.zero ? picked : (Vector3?)null;
-            }
-            if (_currentRestTarget.HasValue) MoveTo(_currentRestTarget.Value);
-        }
+        // 일감 없으면 밖에서 대기
+        MoveTo(OutsideWaitPos());
     }
 
     private bool IsClosestIdleRiderTo(Vector3 target)
@@ -115,13 +121,21 @@ public class RiderStaff : Staff
 
     private void WalkToPassWindowState()
     {
+        // 사이드워크에서 출발 — 1단계: 도어 (0,1) 경유, 2단계: 픽업대로 그리드 길찾기
+        if (!_passedDoor)
+        {
+            MoveTo(DoorWorld);
+            if (HasArrived()) _passedDoor = true;
+            return;
+        }
+
         Vector3 target = PassWindowManager.Instance.GetApproachPosition(PathRole.Rider, transform.position);
         if (target == Vector3.zero)
         {
             // 픽업대 접근 불가: 클레임만 해제하고 음식은 픽업대에 그대로 둠
             if (_claimedFood != null) _claimedFood.claimedBy = null;
             _claimedFood = null;
-            ChangeState(RiderState.WALK_TO_EXIT);
+            ChangeStateWithDoor(RiderState.WALK_TO_EXIT);
             return;
         }
         MoveTo(target);
@@ -134,19 +148,28 @@ public class RiderStaff : Staff
                 _claimedFood = null;
                 if (_carryingFood != null) AttachFood(_carryingFood);
             }
-            ChangeState(RiderState.WALK_TO_EXIT);
+            ChangeStateWithDoor(RiderState.WALK_TO_EXIT);
         }
     }
 
     private void WalkToExitState()
     {
+        // 가게 안에서 출발(또는 픽업대에서) — 1단계: 도어로, 2단계: 출구로
+        if (!_passedDoor)
+        {
+            MoveTo(DoorWorld);
+            if (HasArrived()) _passedDoor = true;
+            return;
+        }
+
         Vector3 exit = CustomerManager.Instance != null
             ? CustomerManager.Instance.ExitPosition
             : transform.position;
         MoveTo(exit);
         if (HasArrived())
         {
-            Destroy(_carryingFood.gameObject);
+            // 음식 들고 나가서 배달 (화면 밖) — 클레임 실패로 빈손인 경우 방어
+            if (_carryingFood != null) Destroy(_carryingFood.gameObject);
             // 배달 시간 캐시 후 시각만 가림 (Update는 계속 돌아야 _stateTimer가 증가)
             _deliverDurationCache = EffectiveDeliveryDuration;
             SetVisible(false);
@@ -158,60 +181,18 @@ public class RiderStaff : Staff
     {
         if (_stateTimer < _deliverDurationCache) return;
 
-        
         _carryingFood = null;
         if (PhoneManager.Instance != null) PhoneManager.Instance.OnDeliveryCompleted();
-        // entryPoint에 재배치 후 다시 보이게
-        if (CustomerManager.Instance != null)
-            transform.position = CustomerManager.Instance.EntryPosition;
-        SetVisible(true);
 
-        ChangeState(RiderState.RETURN_TO_ENTRY);
+        // 배달 끝 → 밖(입구)으로 복귀 후 다시 보이게
+        transform.position = OutsideWaitPos();
+        SetVisible(true);
+        ChangeState(RiderState.IDLE_OUTSIDE);
     }
 
     private void SetVisible(bool visible)
     {
         var sr = GetComponent<SpriteRenderer>();
         if (sr != null) sr.enabled = visible;
-    }
-
-    private void ReturnToEntryState()
-    {
-        if (_currentRestTarget == null
-            || IsRestTargetTakenByOther(_currentRestTarget.Value))
-        {
-            Vector3 picked = PickRestSpot();
-            _currentRestTarget = picked != Vector3.zero ? picked : (Vector3?)null;
-        }
-        if (!_currentRestTarget.HasValue)
-        {
-            ChangeState(RiderState.IDLE_AT_RIDERPOS);
-            return;
-        }
-        MoveTo(_currentRestTarget.Value);
-        if (HasArrived())
-            ChangeState(RiderState.IDLE_AT_RIDERPOS);
-    }
-
-    private Vector3 PickRestSpot()
-    {
-        var candidates = GridManager.Instance.GetWalkableCellsInZone(CellZone.RiderRoom);
-        var occupiers = new List<Vector3>();
-        foreach (var r in StaffManager.Instance.RiderStaffs)
-            if (r != this) occupiers.Add(r.transform.position);
-        return RestSpotPicker.PickClosestFree(
-            transform.position, candidates, occupiers, kRestBlockRadius);
-    }
-
-    private bool IsRestTargetTakenByOther(Vector3 target)
-    {
-        if (Vector3.Distance(transform.position, target) < kRestBlockRadius) return false;
-        foreach (var r in StaffManager.Instance.RiderStaffs)
-        {
-            if (r == this) continue;
-            if (Vector3.Distance(r.transform.position, target) < kRestBlockRadius)
-                return true;
-        }
-        return false;
     }
 }

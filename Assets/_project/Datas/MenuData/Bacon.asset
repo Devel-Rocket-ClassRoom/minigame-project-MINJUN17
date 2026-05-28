@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88ad3a3536494ba42ac37b1a58e4863e, type: 3}
+  m_Name: Bacon
+  m_EditorClassIdentifier: Assembly-CSharp::MenuData
+  saveId: e587258109f5
+  menuName:
+    m_TableReference:
+      m_TableCollectionName: GUID:e8a326a4f684cfd4f828350fbb7606b2
+    m_TableEntryReference:
+      m_KeyId: 1210984387117056
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  description:
+    m_TableReference:
+      m_TableCollectionName: 
+    m_TableEntryReference:
+      m_KeyId: 0
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  foodSprite: {fileID: -7180199569640334435, guid: 76bfd60fac6736242bb8749bae6dfbb5, type: 3}
+  price: 3000
+  cost: 1000
+  tool: {fileID: 11400000, guid: d19e3da870805a242a72292d0739cb8f, type: 2}
+  satisfactionUnlock: 500
+  spawnWeight: 0.5
+  references:
+    version: 2
+    RefIds: []

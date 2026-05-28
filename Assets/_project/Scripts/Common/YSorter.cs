@@ -16,8 +16,8 @@ public class YSorter : MonoBehaviour
     [Tooltip("Y 1유닛당 sortingOrder 차이. 클수록 미세한 Y차도 구분")]
     [SerializeField] private int precision = 100;
 
-    [Tooltip("정렬 기준점 Y 보정. 스프라이트 중심이 아니라 '발밑/바닥 접점'으로 정렬하려면 음수로. " +
-             "캐릭터=발 위치까지, 벽=앞쪽 밑변까지 내려주면 가림/안가림이 자연스러워진다")]
+    [Tooltip("발밑 미세 보정 — 기본 0이면 스프라이트 bounds의 바닥 Y를 사용해서 pivot/크기 무관하게 자동 정렬. " +
+             "예외적으로 끌어올리고(뒤로) 싶으면 양수, 더 내리고(앞으로) 싶으면 음수")]
     [SerializeField] private float sortYOffset = 0f;
 
     [Tooltip("같은 Y에서 항상 앞/뒤로 두고 싶을 때의 고정 가산값 (+면 앞)")]
@@ -25,6 +25,9 @@ public class YSorter : MonoBehaviour
 
     [Tooltip("고정 오브젝트면 체크 — 시작 시 1회만 계산하고 이후 갱신 안 함")]
     [SerializeField] private bool staticObject = false;
+
+    [Tooltip("체크 해제 시 transform.position.y 기준 (옛 방식). 기본은 bounds.min.y 기준 — pivot 무관하게 자동 정렬")]
+    [SerializeField] private bool useSpriteBottom = true;
 
     private Renderer _renderer;
 
@@ -40,7 +43,10 @@ public class YSorter : MonoBehaviour
     private void Apply()
     {
         if (_renderer == null) return;
-        float sortY = transform.position.y + sortYOffset;
+        // 핵심: 스프라이트가 실제로 그려지는 월드 공간 바닥 Y를 기준으로
+        // → pivot이 중심이든 발밑이든 머리든, "그려지는 모양의 밑변"이 자동으로 정렬 기준이 됨
+        float baseY = useSpriteBottom ? _renderer.bounds.min.y : transform.position.y;
+        float sortY = baseY + sortYOffset;
         _renderer.sortingOrder = -Mathf.RoundToInt(sortY * precision) + orderBias;
     }
 }

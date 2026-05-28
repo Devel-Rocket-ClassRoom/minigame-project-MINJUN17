@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88ad3a3536494ba42ac37b1a58e4863e, type: 3}
   m_Name: Burger
   m_EditorClassIdentifier: Assembly-CSharp::MenuData
+  saveId: c8d94b2aef69
   menuName:
     m_TableReference:
       m_TableCollectionName: GUID:e8a326a4f684cfd4f828350fbb7606b2
@@ -34,7 +35,7 @@ MonoBehaviour:
   price: 5000
   cost: 2000
   tool: {fileID: 11400000, guid: d19e3da870805a242a72292d0739cb8f, type: 2}
-  satisfactionUnlock: 0
+  satisfactionUnlock: 800
   spawnWeight: 1
   references:
     version: 2

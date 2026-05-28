@@ -114,17 +114,17 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 9010453533175355055, guid: bfb2bbec5fd28da46bd5e472d8024e54, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.62, y: 0.3}
+  m_Size: {x: 1.8125, y: 1.5625}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
 --- !u!114 &3519273186207132687
 MonoBehaviour:
@@ -139,12 +139,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PassWindow
   readyFoods: []
-  firstSlotOffset: {x: -0.1, y: 0.21, z: 0}
+  firstSlotOffset: {x: -0.1, y: 0.5, z: 0}
   slotSpacing: 0.1
   cookUsePoint: {fileID: 3254291298793987737}
   serverUsePoint: {fileID: 5156495820784023739}
-  pinnedSortingLayer: Default
-  pinnedSortingOrder: 100
 --- !u!114 &-6011862411927331501
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -161,6 +159,7 @@ MonoBehaviour:
   sortYOffset: 0
   orderBias: 0
   staticObject: 0
+  useSpriteBottom: 1
 --- !u!1 &5407030246536276681
 GameObject:
   m_ObjectHideFlags: 0

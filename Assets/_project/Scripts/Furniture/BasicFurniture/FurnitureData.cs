@@ -25,7 +25,9 @@ public class FurnitureData : ScriptableObject, ISaveIdentifiable
     public int height = 1;
     public int anchorX;
     public int anchorY;
-    public float deliveryBonus; // 라이더룸 가구만 의미 있음
+
+    [Tooltip("이동만 가능 — 추가 설치/삭제 불가. 시작 배치로 1개만 존재하는 고정 가구 (예: 카운터).")]
+    public bool fixedSingle;
 
     [Header("카탈로그 / 해금")]
     public LocalizedString displayName;           // 상점 슬롯 표시명 (다국어)

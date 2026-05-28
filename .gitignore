@@ -107,6 +107,7 @@ InitTestScene*.unity*
 
 .vscode/
 Assets/Imported/
+_recovery_backup/
 
 Assets/Scenes/TestScene-ymj.unity
 Assets/Scenes/TestScene-ymj.unity.meta

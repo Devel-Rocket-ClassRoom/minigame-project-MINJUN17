@@ -85,11 +85,23 @@ public abstract class Staff : MonoBehaviour
     private CommuteState _commute = CommuteState.NONE;
     private Vector3 _commuteTarget;
 
+    // 사이드워크 ↔ 가게 안 횡단 시 도어 (0,1) 경유 — 직선이동이 외벽 가로지르는 것 방지
+    private bool _commutePassedDoor;
+    private static readonly Vector3 DoorWorld = new Vector3(0.5f, 1.5f, 0f);
+
     public bool IsCommuting => _commute != CommuteState.NONE;
 
     // 서브클래스가 자기 근무지 좌표 / 도착 시 IDLE 진입을 구현
     protected abstract Vector3 GetWorkPosition();
     protected abstract void OnArrivedAtWork();
+
+    // 출발/도착이 도어를 가로지르는지 (안↔밖 횡단인지) 판단. 같은 쪽이면 도어 경유 불필요.
+    private static bool DoorCrossingNeeded(Vector3 from, Vector3 to)
+    {
+        bool fromInside = from.x >= 0f;
+        bool toInside   = to.x   >= 0f;
+        return fromInside != toInside;
+    }
 
     /// <summary>영업 시작: 입구에서 등장 → 근무지로 이동.</summary>
     public void BeginArriving(Vector3 entryPos)
@@ -99,6 +111,8 @@ public abstract class Staff : MonoBehaviour
         _commuteTarget = GetWorkPosition();
         _mover.Role = PathRole.Commute;
         _mover.Clear();
+        // 입구(밖) → 근무지가 가게 안이면 도어 경유, 라이더처럼 밖→밖이면 바로 직진
+        _commutePassedDoor = !DoorCrossingNeeded(entryPos, _commuteTarget);
         _commute = CommuteState.ARRIVING;
     }
 
@@ -109,6 +123,8 @@ public abstract class Staff : MonoBehaviour
         _commuteTarget = exitPos;
         _mover.Role = PathRole.Commute;
         _mover.Clear();
+        // 현재 위치(근무지)가 안이고 출구가 밖이면 도어 경유, 같은 쪽이면 바로
+        _commutePassedDoor = !DoorCrossingNeeded(transform.position, _commuteTarget);
         _commute = CommuteState.LEAVING;
     }
 
@@ -117,9 +133,13 @@ public abstract class Staff : MonoBehaviour
     {
         if (_commute == CommuteState.NONE) return false;
 
-        MoveTo(_commuteTarget);
+        // 1단계: 도어 경유 필요하면 도어로. 2단계: 진짜 목적지로.
+        Vector3 dest = _commutePassedDoor ? _commuteTarget : DoorWorld;
+        MoveTo(dest);
         if (HasArrived())
         {
+            if (!_commutePassedDoor) { _commutePassedDoor = true; return true; }
+
             if (_commute == CommuteState.ARRIVING)
             {
                 _commute = CommuteState.NONE;

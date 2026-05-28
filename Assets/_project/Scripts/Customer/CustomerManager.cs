@@ -41,10 +41,8 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
 
     public Vector3 GetWaitingSlotPosition(Customer c)
     {
-        int idx = _waitingForSeat.IndexOf(c);
-        if (waitingSlots == null || waitingSlots.Length == 0) return entryPoint.position;
-        int slot = Mathf.Clamp(idx, 0, waitingSlots.Length - 1);
-        return waitingSlots[slot].position;
+        // 자리 대기 손님은 전부 스폰점에 겹쳐 대기 — 자리 비면 사이드워크 큐로 합류해 일자로 늘어섬
+        return entryPoint.position;
     }
 
     private float _spawnInterval;
@@ -139,14 +137,17 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
 
     public void StopSpawning() => _spawning = false;
 
-    // 영업 종료 시 호출 - 아직 자리 못 받은 대기 손님 전원 강제 퇴장
-    // (큐/주문/식사 중인 손님은 정상 흐름 유지)
+    // 영업 종료 시 호출 - 자리 대기 + 카운터 큐 손님 전원 강제 퇴장
+    // (주문/식사 중인 손님은 정상 흐름 유지)
     public void ForceLeaveWaitingCustomers()
     {
         // _waitingForSeat 복사 후 순회 (ForceLeave에서 리스트 변경됨)
         var snapshot = new List<Customer>(_waitingForSeat);
         foreach (var c in snapshot)
             if (c != null) c.ForceLeave();
+
+        // 사이드워크 큐 손님도 전원 퇴장
+        if (queueManager != null) queueManager.ForceLeaveAll();
     }
 
     private void Update()

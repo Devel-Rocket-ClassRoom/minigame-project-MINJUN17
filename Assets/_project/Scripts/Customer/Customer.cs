@@ -29,6 +29,10 @@ public class Customer : MonoBehaviour
     private DirectionalCharacterAnimator _dirAnim;
     private Food _servedFood;
 
+    // 사이드워크 ↔ 가게 안 횡단 시 도어 셀 (0,1)을 경유 — 직선이동이 외벽 가로지르는 것 방지
+    private bool _passedDoor;
+    private static readonly Vector3 DoorWorld = new Vector3(0.5f, 1.5f, 0f);
+
     public List<MenuData> OrderedMenus { get; private set; }
 
     private void Awake()
@@ -134,6 +138,9 @@ public class Customer : MonoBehaviour
     {
         switch (s)
         {
+            case CustomerState.WALK_TO_COUNTER:
+                _passedDoor = false;   // 사이드워크 → 도어 → 카운터
+                break;
             case CustomerState.WAIT_AT_COUNTER:
                 _targetCounter.OnCustomerArrived(this);
                 break;
@@ -148,6 +155,8 @@ public class Customer : MonoBehaviour
                 _targetSeat = null;
                 SatisfactionSystem.Instance.Earn(_satisfaction);
                 ReputationSystem.Instance?.Report(_satisfaction);
+                // 가게 안이면(x≥0) 도어 경유, 이미 사이드워크(x<0)면 도어 건너뛰고 바로 출구로
+                _passedDoor = transform.position.x < 0f;
                 break;
         }
     }
@@ -186,9 +195,14 @@ public class Customer : MonoBehaviour
 
     private void WalkToCounterState()
     {
-        MoveTo(_targetCounter.ServicePos.position);
+        // 1단계: 사이드워크 → 도어. 2단계: 도어 → 카운터 (그리드 안에서 정상 길찾기)
+        Vector3 dest = _passedDoor ? _targetCounter.ServicePos.position : DoorWorld;
+        MoveTo(dest);
         if (HasArrived())
+        {
+            if (!_passedDoor) { _passedDoor = true; return; }
             ChangeState(CustomerState.WAIT_AT_COUNTER);
+        }
     }
     private void WalkToSeatState()
     {
@@ -258,9 +272,14 @@ public class Customer : MonoBehaviour
 
     private void LeaveState()
     {
-        MoveTo(_exitPoint);
+        // 가게 안에서 출발하는 경우(주문/식사 후): 도어 → 출구. 이미 밖이면(자리 대기/큐 중 강제 퇴장) 바로 출구.
+        Vector3 dest = _passedDoor ? _exitPoint : DoorWorld;
+        MoveTo(dest);
         if (HasArrived())
+        {
+            if (!_passedDoor) { _passedDoor = true; return; }
             Destroy(gameObject);
+        }
     }
 
     private void OnDestroy() => OnDespawned?.Invoke(this);
