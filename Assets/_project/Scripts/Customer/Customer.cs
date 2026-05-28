@@ -35,6 +35,14 @@ public class Customer : MonoBehaviour
 
     public List<MenuData> OrderedMenus { get; private set; }
 
+    [Header("머리 위 표시")]
+    [Tooltip("카운터에서 주문 대기 중일 때 보이는 말풍선 (자식 SpriteRenderer + IndicatorIcon)")]
+    [SerializeField] private IndicatorIcon orderBubble;
+    [Tooltip("대기 중 랜덤하게 잠깐씩 뜨는 emote (자식 SpriteRenderer + RandomEmote)")]
+    [SerializeField] private RandomEmote impatienceEmote;
+    [Tooltip("식사 진행도 표시 (자식 SpriteRenderer + CookingProgressDisplay) — 요리사와 같은 8장 시계")]
+    [SerializeField] private CookingProgressDisplay eatProgress;
+
     private void Awake()
     {
         _mover = GetComponent<PathMover>();
@@ -136,6 +144,11 @@ public class Customer : MonoBehaviour
 
     private void OnEnterState(CustomerState s)
     {
+        // 대기 중일 때만 랜덤 emote — 외부 사이드워크/좌석에서. 카운터는 OrderBubble과 겹치므로 제외.
+        bool isWaiting = s == CustomerState.WAIT_FOR_SEAT || s == CustomerState.WAIT_AT_SEAT;
+        if (isWaiting) impatienceEmote?.Begin();
+        else impatienceEmote?.End();
+
         switch (s)
         {
             case CustomerState.WALK_TO_COUNTER:
@@ -143,17 +156,22 @@ public class Customer : MonoBehaviour
                 break;
             case CustomerState.WAIT_AT_COUNTER:
                 _targetCounter.OnCustomerArrived(this);
+                orderBubble?.Show();
                 break;
             case CustomerState.EAT:
                 float waitDuration = _waitStartTime > 0 ? Time.time - _waitStartTime : 0f;
                 if (waitDuration > _data.patience)
                     _satisfaction -= Mathf.FloorToInt((waitDuration - _data.patience) * _data.waitPenaltyRate);
                 _satisfaction = Mathf.Max(0, _satisfaction);
+                eatProgress?.Show();
                 break;
             case CustomerState.LEAVE:
                 _targetSeat?.Release();
                 _targetSeat = null;
+                orderBubble?.Hide();   // 주문 안 받은 채 타임아웃 떠나는 경우 대비
+                eatProgress?.Hide();
                 SatisfactionSystem.Instance.Earn(_satisfaction);
+                FloatingTextSystem.SpawnSatisfaction(transform.position, _satisfaction);
                 ReputationSystem.Instance?.Report(_satisfaction);
                 // 가게 안이면(x≥0) 도어 경유, 이미 사이드워크(x<0)면 도어 건너뛰고 바로 출구로
                 _passedDoor = transform.position.x < 0f;
@@ -174,6 +192,7 @@ public class Customer : MonoBehaviour
             }
             _targetCounter.OnCustomerPaid(totalPrice);
             _targetCounter = null;
+            orderBubble?.Hide();
             ChangeState(CustomerState.WALK_TO_SEAT);
         }
     }
@@ -259,7 +278,13 @@ public class Customer : MonoBehaviour
         if (_targetSeat != null) FaceToward(_targetSeat.FoodDropOff.position);   // 먹는 동안 테이블 바라보기
         _satisfaction += Mathf.FloorToInt(Time.deltaTime * _data.eatGainRate);
 
-        if (_stateTimer >= _data.eatSpeed)
+        // 식사 시간은 주문 개수에 비례 (eatSpeed = 메뉴 1개 기준 시간)
+        int orderCount = OrderedMenus != null ? Mathf.Max(1, OrderedMenus.Count) : 1;
+        float totalEatTime = _data.eatSpeed * orderCount;
+
+        eatProgress?.SetProgress(_stateTimer / totalEatTime);
+
+        if (_stateTimer >= totalEatTime)
         {
             if (_servedFood != null)
             {

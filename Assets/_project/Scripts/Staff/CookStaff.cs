@@ -16,6 +16,10 @@ public class CookStaff : Staff
     [SerializeField] private GameObject foodPrefab;
     private Food _carryingFood;
 
+    [Header("조리 진행도 표시")]
+    [Tooltip("머리 위 자식 SpriteRenderer에 부착된 CookingProgressDisplay")]
+    [SerializeField] private CookingProgressDisplay progressDisplay;
+
     public float EffectiveSpeedMultiplier => _data.speedMultiplier * (1f + _hireVariance) * _growthMultiplier;
 
     public void Init(StaffData data, int id, string nameKey, float hireVariance = 0f)
@@ -122,6 +126,7 @@ public class CookStaff : Staff
             MenuData currentMenu = _remainingMenus.Peek();
             _currentTool = CookingToolManager.Instance.GetToolInstance(currentMenu.tool.toolType);
             _currentTool?.SetCooking(true);
+            progressDisplay?.Show();
             ChangeState(CookState.USING_TOOL);
         }
     }
@@ -135,10 +140,12 @@ public class CookStaff : Staff
         if (toolT != null) FaceToward(toolT.position);
 
         float effectiveDuration = currentMenu.tool.usingDuration / Mathf.Max(0.01f, EffectiveSpeedMultiplier);
+        progressDisplay?.SetProgress(_stateTimer / effectiveDuration);
         if (_stateTimer < effectiveDuration) return;
 
         _currentTool?.SetCooking(false);   // 이 메뉴 조리 끝 → 도구 애니 정지
         _currentTool = null;
+        progressDisplay?.Hide();
 
         _remainingMenus.Dequeue();
 

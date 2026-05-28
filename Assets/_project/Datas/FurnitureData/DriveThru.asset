@@ -19,7 +19,7 @@ MonoBehaviour:
   height: 1
   anchorX: 0
   anchorY: 0
-  fixedSingle: 0
+  fixedSingle: 1
   displayName:
     m_TableReference:
       m_TableCollectionName: GUID:e8a326a4f684cfd4f828350fbb7606b2

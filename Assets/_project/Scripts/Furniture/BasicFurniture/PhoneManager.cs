@@ -151,6 +151,7 @@ public class PhoneManager : MonoBehaviour
             SalesTracker.Instance.RecordSale(menu);
         }
         MoneySystem.Instance.Earn(totalPrice);
+        FloatingTextSystem.SpawnMoney(phone.transform.position, totalPrice);
 
         var order = new Order
         {

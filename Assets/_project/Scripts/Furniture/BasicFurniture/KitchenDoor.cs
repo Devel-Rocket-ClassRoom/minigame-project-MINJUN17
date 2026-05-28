@@ -36,6 +36,29 @@ public class KitchenDoor : MonoBehaviour
             _closeTimer -= Time.deltaTime;            // 멀어지면 카운트다운
             if (_closeTimer <= 0f) { _open = false; SetSpeed(-1f); }
         }
+
+        // Door_Open clip은 LoopTime=false. Speed=-1로 역재생하면 normalizedTime이 0을 넘어
+        // 음수로 무한 누적 → 다음 열림 시 음수 시간 climb-up 동안 보이는 변화가 없는 버그.
+        // 양 끝에 도달하면 Speed=0으로 정지시켜 누적 방지.
+        ClampAtEnds();
+    }
+
+    private void ClampAtEnds()
+    {
+        if (animator == null) return;
+        var info = animator.GetCurrentAnimatorStateInfo(0);
+        float currentSpeed = animator.GetFloat("Speed");
+
+        if (currentSpeed < 0f && info.normalizedTime <= 0f)
+        {
+            animator.Play(info.fullPathHash, 0, 0f);
+            SetSpeed(0f);
+        }
+        else if (currentSpeed > 0f && info.normalizedTime >= 1f)
+        {
+            animator.Play(info.fullPathHash, 0, 1f);
+            SetSpeed(0f);
+        }
     }
 
     private void SetSpeed(float v)
