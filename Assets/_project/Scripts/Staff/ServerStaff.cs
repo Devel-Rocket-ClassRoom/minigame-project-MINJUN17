@@ -365,6 +365,7 @@ public class ServerStaff : Staff
             SalesTracker.Instance?.RecordSale(menu);
         }
         MoneySystem.Instance?.Earn(totalPrice);
+        FloatingTextSystem.SpawnMoney(car.transform.position, totalPrice);
 
         var order = new Order
         {

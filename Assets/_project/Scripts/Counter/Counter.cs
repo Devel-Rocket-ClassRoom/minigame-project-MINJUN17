@@ -52,6 +52,7 @@ public class Counter : MonoBehaviour
         if (price > 0)
         {
             MoneySystem.Instance.Earn(price);
+            FloatingTextSystem.SpawnMoney(transform.position, price);
         }
     }
 

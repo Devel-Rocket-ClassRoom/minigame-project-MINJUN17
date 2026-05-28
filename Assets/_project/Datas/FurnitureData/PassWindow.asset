@@ -19,6 +19,7 @@ MonoBehaviour:
   height: 1
   anchorX: 0
   anchorY: 0
+  fixedSingle: 1
   deliveryBonus: 0
   displayName:
     m_TableReference:

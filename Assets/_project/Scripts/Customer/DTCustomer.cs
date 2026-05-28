@@ -212,6 +212,7 @@ public class DTCustomer : MonoBehaviour
     private void Despawn()
     {
         SatisfactionSystem.Instance?.Earn(_satisfaction);
+        FloatingTextSystem.SpawnSatisfaction(transform.position, _satisfaction);
         ReputationSystem.Instance?.Report(_satisfaction);
 
         _pickupWindow?.ClearFor(this);
