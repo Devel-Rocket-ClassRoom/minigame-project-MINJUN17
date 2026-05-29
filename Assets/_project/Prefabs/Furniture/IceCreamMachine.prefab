@@ -107,9 +107,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b67a047ae3a037b45a2407259e5b06d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CookingToolInstance
-  data: {fileID: 11400000, guid: d19e3da870805a242a72292d0739cb8f, type: 2}
+  data: {fileID: 11400000, guid: 3653e8aae8bcbdf44ad7689a7f334839, type: 2}
   usePoint: {fileID: 3957223773090873218}
-  animator: {fileID: 0}
+  animator: {fileID: 4890226198692027640}
 --- !u!114 &-2631344884034534922
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -126,6 +126,7 @@ MonoBehaviour:
   sortYOffset: 0
   orderBias: 0
   staticObject: 0
+  useSpriteBottom: 1
 --- !u!95 &4890226198692027640
 Animator:
   serializedVersion: 7

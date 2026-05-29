@@ -15,7 +15,10 @@ public class FoodUnlockEntry : IUnlockEntry
     public long Cost                   => _data.satisfactionUnlock;
     public CurrencyType Currency       => CurrencyType.Satisfaction;
 
-    public bool IsVisible    => _data != null;          // 음식엔 zone 조건 없음
+    public bool IsVisible    => _data != null
+                             && (_data.tool == null
+                                 || (CatalogManager.Instance != null
+                                     && CatalogManager.Instance.IsUnlocked(_data.tool)));
     public bool IsPurchased  => CatalogManager.Instance != null
                              && CatalogManager.Instance.IsUnlocked(_data);
     public bool CanAfford    => SatisfactionSystem.Instance != null

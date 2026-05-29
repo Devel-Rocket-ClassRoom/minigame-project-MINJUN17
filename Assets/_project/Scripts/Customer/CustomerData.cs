@@ -19,8 +19,11 @@ public class CustomerData : ScriptableObject, ISaveIdentifiable
     }
 #endif
 
-    [Tooltip("체크 시 게임 시작부터 등장. 해제 시 누적 만족도 임계점(1000마다)에 도달하면 랜덤 해금")]
+    [Tooltip("체크 시 게임 시작부터 등장. 해제 시 preferredMenu가 해금돼야 등장")]
     public bool unlockedFromStart = true;
+
+    [Tooltip("이 손님이 선호하는 음식. 잠긴 손님은 이 음식이 해금되면 자동 해금됨. 시작 손님은 비워두면 선호 없음(아무거나 먹음)")]
+    public MenuData preferredMenu;
 
     public GameObject customerPrefab;
     public LocalizedString customerName;   // 다국어 표시명
