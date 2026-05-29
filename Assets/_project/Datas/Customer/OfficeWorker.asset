@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: OfficeWorker
   m_EditorClassIdentifier: Assembly-CSharp::CustomerData
   saveId: 0cfa458812d1
-  unlockedFromStart: 1
-  customerPrefab: {fileID: 7120179047670830194, guid: 60f45cb430e10d346b8786986c11ac5b, type: 3}
+  unlockedFromStart: 0
+  preferredMenu: {fileID: 11400000, guid: cad2bcd7068434a4c87ce76c10ec4dda, type: 2}
+  customerPrefab: {fileID: 7120179047670830194, guid: 9e14b01bc42b2a84a8aaa81e2d1e8288, type: 3}
   customerName:
     m_TableReference:
       m_TableCollectionName: GUID:e8a326a4f684cfd4f828350fbb7606b2
@@ -25,6 +26,7 @@ MonoBehaviour:
     m_WaitForCompletion: 0
     m_LocalVariables: []
   icon: {fileID: -1497712323169196140, guid: aa66815bab4094649a94aac86a3c60b1, type: 3}
+  wallet: 20000
   minOrderCount: 1
   maxOrderCount: 3
   baseSatisfaction: 40
@@ -34,6 +36,11 @@ MonoBehaviour:
   eatSpeed: 4
   patience: 25
   spawnWeight: 1
+  toiletUrgeProbability: 0.3
+  toiletUseDuration: 5
+  sinkUseDuration: 2
+  toiletStallBonus: 10
+  sinkBonus: 5
   references:
     version: 2
     RefIds: []

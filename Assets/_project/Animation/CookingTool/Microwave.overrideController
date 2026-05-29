@@ -1,0 +1,15 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!221 &22100000
+AnimatorOverrideController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Microwave
+  m_Controller: {fileID: 9100000, guid: 21383c8c2465f774c9de5e973a6b09c8, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: 7400000, guid: e318354955ca4ae43bbd691a04f7e39f, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 303f9a8ab08770e4887a1b4771dbcbc7, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 80678eefea8f8fa4cadf58a0f376e3dc, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 69b242c73968f5b43ad6c2261aaea9a0, type: 2}

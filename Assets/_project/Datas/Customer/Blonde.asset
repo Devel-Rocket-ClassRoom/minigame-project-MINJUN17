@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Blonde
   m_EditorClassIdentifier: Assembly-CSharp::CustomerData
   saveId: 4b0d63c691dc
-  unlockedFromStart: 1
+  unlockedFromStart: 0
+  preferredMenu: {fileID: 11400000, guid: 0fec57a7e933ebe4894afd5d55e0b9d6, type: 2}
   customerPrefab: {fileID: 7120179047670830194, guid: 60f45cb430e10d346b8786986c11ac5b, type: 3}
   customerName:
     m_TableReference:
@@ -25,6 +26,7 @@ MonoBehaviour:
     m_WaitForCompletion: 0
     m_LocalVariables: []
   icon: {fileID: -5127756136648395698, guid: 2ad7b59ba30d87848829cca0d83c943b, type: 3}
+  wallet: 17000
   minOrderCount: 1
   maxOrderCount: 1
   baseSatisfaction: 50

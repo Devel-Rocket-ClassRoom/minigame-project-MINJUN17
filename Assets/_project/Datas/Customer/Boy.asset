@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: Boy
   m_EditorClassIdentifier: Assembly-CSharp::CustomerData
   saveId: 73f3eb8392e3
-  unlockedFromStart: 1
-  customerPrefab: {fileID: 7120179047670830194, guid: 60f45cb430e10d346b8786986c11ac5b, type: 3}
+  unlockedFromStart: 0
+  preferredMenu: {fileID: 11400000, guid: f1c4e779b9e1ab14ebd5a695632aceef, type: 2}
+  customerPrefab: {fileID: 7120179047670830194, guid: c1c18a7a7a51220499ad2ddda3c11411, type: 3}
   customerName:
     m_TableReference:
       m_TableCollectionName: GUID:e8a326a4f684cfd4f828350fbb7606b2
@@ -25,6 +26,7 @@ MonoBehaviour:
     m_WaitForCompletion: 0
     m_LocalVariables: []
   icon: {fileID: 4436524608699681771, guid: c8262d9778e81134aa68b7c2a31ffe95, type: 3}
+  wallet: 7000
   minOrderCount: 1
   maxOrderCount: 1
   baseSatisfaction: 80
@@ -34,6 +36,11 @@ MonoBehaviour:
   eatSpeed: 7
   patience: 15
   spawnWeight: 1
+  toiletUrgeProbability: 0.3
+  toiletUseDuration: 5
+  sinkUseDuration: 2
+  toiletStallBonus: 10
+  sinkBonus: 5
   references:
     version: 2
     RefIds: []

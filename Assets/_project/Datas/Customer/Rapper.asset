@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: Rapper
   m_EditorClassIdentifier: Assembly-CSharp::CustomerData
   saveId: 43371594214f
-  unlockedFromStart: 1
-  customerPrefab: {fileID: 7120179047670830194, guid: 60f45cb430e10d346b8786986c11ac5b, type: 3}
+  unlockedFromStart: 0
+  preferredMenu: {fileID: 11400000, guid: 8adbb6e2b45db4b44a02d607df8ae074, type: 2}
+  customerPrefab: {fileID: 7120179047670830194, guid: 26c7c3ffe4beed143b44d43c36e6909a, type: 3}
   customerName:
     m_TableReference:
       m_TableCollectionName: GUID:e8a326a4f684cfd4f828350fbb7606b2
@@ -25,6 +26,7 @@ MonoBehaviour:
     m_WaitForCompletion: 0
     m_LocalVariables: []
   icon: {fileID: -7603698929028506778, guid: 664a5c85a34a01a418cedd2601d36f5e, type: 3}
+  wallet: 23000
   minOrderCount: 1
   maxOrderCount: 3
   baseSatisfaction: 60
@@ -34,6 +36,11 @@ MonoBehaviour:
   eatSpeed: 2
   patience: 35
   spawnWeight: 1
+  toiletUrgeProbability: 0.3
+  toiletUseDuration: 5
+  sinkUseDuration: 2
+  toiletStallBonus: 10
+  sinkBonus: 5
   references:
     version: 2
     RefIds: []

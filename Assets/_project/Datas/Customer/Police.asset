@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: Police
   m_EditorClassIdentifier: Assembly-CSharp::CustomerData
   saveId: 6f294fb140bd
-  unlockedFromStart: 1
-  customerPrefab: {fileID: 7120179047670830194, guid: 60f45cb430e10d346b8786986c11ac5b, type: 3}
+  unlockedFromStart: 0
+  preferredMenu: {fileID: 11400000, guid: 7ce39d21d9a5b8745ab897c7f33d646c, type: 2}
+  customerPrefab: {fileID: 7120179047670830194, guid: 2ba1bad372e282e44a51aaf703304800, type: 3}
   customerName:
     m_TableReference:
       m_TableCollectionName: 
@@ -25,6 +26,7 @@ MonoBehaviour:
     m_WaitForCompletion: 0
     m_LocalVariables: []
   icon: {fileID: -4537062991207119991, guid: 48440868fa30e234db44fcadda74d1ae, type: 3}
+  wallet: 15000
   minOrderCount: 1
   maxOrderCount: 5
   baseSatisfaction: 55
@@ -34,6 +36,11 @@ MonoBehaviour:
   eatSpeed: 5
   patience: 35
   spawnWeight: 1
+  toiletUrgeProbability: 0.3
+  toiletUseDuration: 5
+  sinkUseDuration: 2
+  toiletStallBonus: 10
+  sinkBonus: 5
   references:
     version: 2
     RefIds: []
