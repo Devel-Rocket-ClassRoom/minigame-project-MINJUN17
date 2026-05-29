@@ -10,38 +10,41 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3f0cc6336acd53945a1d4307bb60037e, type: 3}
-  m_Name: DriveThru
+  m_Name: Toilet_3
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureData
-  saveId: 984ebff7ee10
-  prefab: {fileID: 0}
-  zone: 0
+  saveId: d923144d982b
+  prefab: {fileID: 918655159097183394, guid: 66e9282e22e947c4ebf6159d67e2b92e, type: 3}
+  zone: 3
   width: 1
   height: 1
   anchorX: 0
   anchorY: 0
-  fixedSingle: 1
+  fixedSingle: 0
+  fixedPlacement: 1
+  fixedCell: {x: 7, y: 53}
+  fixedWorldOffset: {x: 0, y: 0.7}
   displayName:
     m_TableReference:
       m_TableCollectionName: GUID:e8a326a4f684cfd4f828350fbb7606b2
     m_TableEntryReference:
-      m_KeyId: 2880882409483
+      m_KeyId: 1765463542198275
       m_Key: 
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
   description:
     m_TableReference:
-      m_TableCollectionName: 
+      m_TableCollectionName: GUID:e8a326a4f684cfd4f828350fbb7606b2
     m_TableEntryReference:
-      m_KeyId: 0
+      m_KeyId: 1765463542198276
       m_Key: 
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
   icon: {fileID: 0}
-  satisfactionUnlock: 1000
-  purchaseCost: 0
-  unlockOnExpansion: {fileID: 0}
+  satisfactionUnlock: 0
+  purchaseCost: 30000
+  unlockOnExpansion: {fileID: 11400000, guid: b99bcd2314cd45e4dbe8328e694d8836, type: 2}
   references:
     version: 2
     RefIds: []

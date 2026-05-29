@@ -8,25 +8,31 @@ public class GridManager : MonoBehaviour
 
     [Header("Grid Size")]
     [SerializeField] private int _gridWidth = 9;
-    [SerializeField] private int _gridHeight = 29;  // 1층 12 + 갭 5 + 2층 12
 
-    [Header("Floor Layout")]
-    [Tooltip("2층 시작 y좌표. -1이면 2층 미정의(전체를 1층 취급)")]
-    [SerializeField] private int floor2YStart = 17;
-    public int Floor2YStart => floor2YStart;
+    [Header("Floor Layout (각 영역 세로 크기)")]
+    [Tooltip("1층 영역 세로 (홀 + 주방). 기본 12")]
+    [SerializeField] private int floor1Height = 12;
+    [Tooltip("1층/2층 사이 빈 영역 — 크게 잡으면 카메라 fit해도 2층 절대 안 보임 (권장 ≥ 20)")]
+    [SerializeField] private int gapHeight = 30;
+    [Tooltip("2층 영역 세로 (홀 + 화장실). 기본 12")]
+    [SerializeField] private int floor2Height = 12;
+    [Tooltip("1층 주방 / 2층 화장실 세로 (공통). 기본 4")]
+    [SerializeField] private int kitchenAndToiletRows = 4;
 
     [Header("Floor Tilemap")]
     [SerializeField] private Tilemap floorTilemap;
 
     public int GridWidth => _gridWidth;
-    public int GridHeight => _gridHeight;
+    public int GridHeight => floor1Height + gapHeight + floor2Height;
+    public int Floor2YStart => floor1Height + gapHeight;
     public int ActiveCellCount
     {
         get
         {
             int count = 0;
+            int h = GridHeight;
             for (int x = 0; x < _gridWidth; x++)
-                for (int y = 0; y < _gridHeight; y++)
+                for (int y = 0; y < h; y++)
                     if (_cells[x, y].isActive) count++;
             return count;
         }
@@ -43,6 +49,9 @@ public class GridManager : MonoBehaviour
     [Header("직원 통근용 주방 문 (벽으로 안 막는 1칸)")]
     [SerializeField] private Vector2Int kitchenDoorCell = new Vector2Int(1, 8);
     public Vector2Int KitchenDoorCell => kitchenDoorCell;
+
+    [Header("진입 금지 셀 (길찾기 X, 가구 설치 O — 화장실 칸막이 등)")]
+    [SerializeField] private List<Vector2Int> blockedCells;
 
     private void Awake()
     {
@@ -71,9 +80,10 @@ public class GridManager : MonoBehaviour
 
     public bool IsCellOnFloor(int y, FloorIndex floor)
     {
-        if (floor2YStart < 0) return floor == FloorIndex.Floor1; // 2층 미정의: 전부 1층
-        if (floor == FloorIndex.Floor1) return y < floor2YStart;
-        return y >= floor2YStart;
+        int f2start = Floor2YStart;
+        if (f2start < 0) return floor == FloorIndex.Floor1; // 2층 미정의: 전부 1층
+        if (floor == FloorIndex.Floor1) return y < f2start;
+        return y >= f2start;
     }
 
     public FloorIndex GetFloorAt(Vector3 worldPos)
@@ -84,17 +94,17 @@ public class GridManager : MonoBehaviour
 
     private void CreateGrid()
     {
-        _cells = new GridCell[_gridWidth, _gridHeight];
-        const int floor1Height = 12;
-        const int floorKitchenRows = 4; // 상단 4행 = 주방/화장실
-        int kitchen1YStart = floor1Height - floorKitchenRows; // 8
+        int gridH = GridHeight;
+        int f2start = Floor2YStart;
+        _cells = new GridCell[_gridWidth, gridH];
+        int kitchen1YStart = floor1Height - kitchenAndToiletRows;
 
-        bool hasFloor2 = floor2YStart >= 0 && floor2YStart < _gridHeight;
-        int floor2Height = hasFloor2 ? _gridHeight - floor2YStart : 0;
-        int toilet2YStart = hasFloor2 ? floor2YStart + Mathf.Max(0, floor2Height - floorKitchenRows) : -1;
+        bool hasFloor2 = f2start >= 0 && f2start < gridH;
+        int floor2H = hasFloor2 ? gridH - f2start : 0;
+        int toilet2YStart = hasFloor2 ? f2start + Mathf.Max(0, floor2H - kitchenAndToiletRows) : -1;
 
         for (int x = 0; x < _gridWidth; x++)
-        for (int y = 0; y < _gridHeight; y++)
+        for (int y = 0; y < gridH; y++)
         {
             bool isReserved = _reservedCells.Contains(new Vector2Int(x, y));
             CellZone zone;
@@ -106,7 +116,7 @@ public class GridManager : MonoBehaviour
                 isActive = true;
                 zone = (y >= kitchen1YStart) ? CellZone.Kitchen : CellZone.Hall;
             }
-            else if (hasFloor2 && y >= floor2YStart)
+            else if (hasFloor2 && y >= f2start)
             {
                 // Floor 2: 셀은 비활성으로 시작 (2단/3단 확장 시 활성화)
                 isActive = false;
@@ -121,6 +131,10 @@ public class GridManager : MonoBehaviour
 
             _cells[x, y] = new GridCell(x, y, isActive, isReserved, zone);
         }
+
+        if (blockedCells != null)
+            foreach (var pos in blockedCells)
+                SetWall(pos, true);
     }
 
     public GridCell GetCell(Vector2Int pos)
@@ -136,7 +150,7 @@ public class GridManager : MonoBehaviour
 
     public bool IsInBounds(Vector2Int pos)
     {
-        return pos.x >= 0 && pos.x < _gridWidth && pos.y >= 0 && pos.y < _gridHeight;
+        return pos.x >= 0 && pos.x < _gridWidth && pos.y >= 0 && pos.y < GridHeight;
     }
 
     // 길찾기용 walkability — 역할별 zone 필터 + 가구 회피 + 벽
@@ -201,7 +215,7 @@ public class GridManager : MonoBehaviour
     public void BuildKitchenLWalls(IEnumerable<Vector2Int> openings)
     {
         var openSet = new HashSet<Vector2Int>(openings);
-        const int kitchenYStart = 12 - 4; // y=8 (1층 주방 바닥)
+        int kitchenYStart = floor1Height - kitchenAndToiletRows; // 기본 8 (1층 주방 바닥)
 
         for (int x = 0; x < _gridWidth; x++)
         {
@@ -217,9 +231,10 @@ public class GridManager : MonoBehaviour
         minX = int.MaxValue; minY = int.MaxValue;
         maxX = int.MinValue; maxY = int.MinValue;
         if (_cells == null) return false;
+        int gridH = GridHeight;
         bool any = false;
         for (int x = 0; x < _gridWidth; x++)
-        for (int y = 0; y < _gridHeight; y++)
+        for (int y = 0; y < gridH; y++)
         {
             if (_cells[x, y] == null || !_cells[x, y].isActive) continue;
             if (!IsCellOnFloor(y, floor)) continue;
@@ -270,8 +285,9 @@ public class GridManager : MonoBehaviour
             Debug.LogWarning("[GridManager] floorTilemap 미할당 — 인스펙터에서 Floor Tilemap 슬롯에 Tilemap을 드래그하세요");
             return;
         }
+        int gridH = GridHeight;
         for (int x = 0; x < _gridWidth; x++)
-        for (int y = 0; y < _gridHeight; y++)
+        for (int y = 0; y < gridH; y++)
         {
             var cell = _cells[x, y];
             var pos = new Vector3Int(x, y, 0);
@@ -359,8 +375,9 @@ public class GridManager : MonoBehaviour
     public List<Vector3> GetWalkableCellsInZone(CellZone zone)
     {
         var list = new List<Vector3>();
+        int gridH = GridHeight;
         for (int x = 0; x < _gridWidth; x++)
-            for (int y = 0; y < _gridHeight; y++)
+            for (int y = 0; y < gridH; y++)
             {
                 var pos = new Vector2Int(x, y);
                 var cell = GetCell(pos);
@@ -428,7 +445,6 @@ public class GridManager : MonoBehaviour
                     floorTilemap.SetTile(new Vector3Int(pos.x, pos.y, 0), cell.cachedTile);
             }
         }
-        // 확장 후 카메라 자동 재정렬 (현재 floor 기준)
-        CameraController.Instance?.Refresh();
+        // 카메라 재정렬 없음 — 확장 자체로 카메라 변경 X. 토글/DT 해금 시에만 재계산.
     }
 }

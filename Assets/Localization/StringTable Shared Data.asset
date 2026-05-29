@@ -63,6 +63,38 @@ MonoBehaviour:
     m_Key: furniture.dtPickupWindow
     m_Metadata:
       m_Items: []
+  - m_Id: 1765463525421056
+    m_Key: furniture.toilet1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1765463542198272
+    m_Key: furniture.toilet1.desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1765463542198273
+    m_Key: furniture.toilet2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1765463542198274
+    m_Key: furniture.toilet2.desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1765463542198275
+    m_Key: furniture.toilet3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1765463542198276
+    m_Key: furniture.toilet3.desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1765463542198277
+    m_Key: furniture.sink
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1765463542198278
+    m_Key: furniture.sink.desc
+    m_Metadata:
+      m_Items: []
   - m_Id: 1715406962691
     m_Key: menu.burger
     m_Metadata:
@@ -525,6 +557,30 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 2880882409480
     m_Key: expansion.riderRoom
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1753014067785728
+    m_Key: expansion.stage1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1753014097145856
+    m_Key: expansion.stage1.desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1753014097145857
+    m_Key: expansion.stage2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1753014097145858
+    m_Key: expansion.stage2.desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1753014097145859
+    m_Key: expansion.stage3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1753014097145860
+    m_Key: expansion.stage3.desc
     m_Metadata:
       m_Items: []
   - m_Id: 2880882409481

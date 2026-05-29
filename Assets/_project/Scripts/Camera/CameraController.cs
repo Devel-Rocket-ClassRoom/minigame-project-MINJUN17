@@ -17,6 +17,10 @@ public class CameraController : MonoBehaviour
     [Header("Floor 토글 시 cullingMask 제어")]
     [Tooltip("이 Layer는 Floor1 카메라에서만 보임 (Floor2에선 숨김). 보통 DT 차로/차들.")]
     [SerializeField] private string dtLayerName = "DT";
+    [Tooltip("Floor1에 속한 visual Layer. Floor1 카메라에서만 보임.")]
+    [SerializeField] private string floor1LayerName = "Floor1";
+    [Tooltip("Floor2에 속한 visual Layer. Floor2 카메라에서만 보임.")]
+    [SerializeField] private string floor2LayerName = "Floor2";
 
     [Header("디버그 키 (정식 UI 만들면 제거)")]
     [SerializeField] private Key debugToggleKey = Key.Space;
@@ -46,7 +50,7 @@ public class CameraController : MonoBehaviour
 
     private void Start()
     {
-        SetFloor(FloorIndex.Floor1, animated: false);
+        Refresh();   // 초기 1층 fit + ortho 계산
 
         // DT 해금 시 카메라 영역에 차로 bbox를 자동 포함시키기 위해 구독
         if (DTSystem.Instance != null)
@@ -62,31 +66,62 @@ public class CameraController : MonoBehaviour
     private void OnDTUnlocked() => Refresh();
 
     // 외부에서 floor 전환 (UI 버튼 / 디버그용)
+    // 줌(orthoSize)은 그대로 유지하고 y만 floor 중앙으로 즉시 이동.
     public void SetFloor(FloorIndex floor, bool animated = true)
     {
         _currentFloor = floor;
         ApplyVisibility(floor);
-        var target = ComputeCameraTarget(floor);
-        if (!target.valid) return;
+
+        if (GridManager.Instance == null || mainCamera == null)
+        {
+            Debug.LogWarning("[CameraController] SetFloor: GridManager/mainCamera 없음");
+            return;
+        }
+        Bounds? boundsOpt = GridManager.Instance.GetActiveBoundsForFloor(floor);
+        if (!boundsOpt.HasValue)
+        {
+            Debug.LogWarning($"[CameraController] SetFloor({floor}): 활성 셀 없음 — stage 확장됐는지 확인");
+            return;
+        }
+        Bounds bounds = boundsOpt.Value;
+
+        Vector3 currentPos = mainCamera.transform.position;
+        Vector3 newPos = new Vector3(currentPos.x, bounds.center.y, currentPos.z);
+        float ortho = GetCurrentOrthoSize();
+        Debug.Log($"[CameraController] SetFloor({floor}): y {currentPos.y:F1}→{newPos.y:F1}, bounds y={bounds.center.y:F1}");
+
         if (_toggleCo != null) StopCoroutine(_toggleCo);
-        if (animated && mainCamera != null && Application.isPlaying)
-            _toggleCo = StartCoroutine(LerpTo(target.position, target.orthoSize, toggleDuration));
-        else
-            ApplyImmediate(target.position, target.orthoSize);
+        ApplyImmediate(newPos, ortho);   // 애니메이션 X, 즉시 점프
     }
 
-    // 현재 floor에 따라 cullingMask에서 DT Layer를 토글
+    // 현재 floor에 따라 cullingMask에서 DT / Floor1 / Floor2 Layer 토글
     private void ApplyVisibility(FloorIndex floor)
     {
         if (mainCamera == null) return;
-        int dtLayer = LayerMask.NameToLayer(dtLayerName);
-        if (dtLayer < 0) return; // Layer 미설정 시 패스
+        int dt = LayerMask.NameToLayer(dtLayerName);
+        int f1 = LayerMask.NameToLayer(floor1LayerName);
+        int f2 = LayerMask.NameToLayer(floor2LayerName);
 
-        int bit = 1 << dtLayer;
         if (floor == FloorIndex.Floor1)
-            mainCamera.cullingMask |= bit;   // DT 보이게
+        {
+            SetMask(dt, true);
+            SetMask(f1, true);
+            SetMask(f2, false);
+        }
         else
-            mainCamera.cullingMask &= ~bit;  // DT 숨김
+        {
+            SetMask(dt, false);
+            SetMask(f1, false);
+            SetMask(f2, true);
+        }
+    }
+
+    private void SetMask(int layer, bool visible)
+    {
+        if (layer < 0) return;   // Layer 미등록 시 패스 (회귀 없음)
+        int bit = 1 << layer;
+        if (visible) mainCamera.cullingMask |= bit;
+        else         mainCamera.cullingMask &= ~bit;
     }
 
     public void ToggleFloor()

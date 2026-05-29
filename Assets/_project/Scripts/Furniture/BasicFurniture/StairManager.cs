@@ -10,6 +10,10 @@ public class StairManager : MonoBehaviour
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
+
+        // Stair.OnEnable이 Awake보다 먼저 불려 Instance가 null이었던 경우 회수
+        foreach (var s in FindObjectsByType<Stair>(FindObjectsSortMode.None))
+            Register(s);
     }
 
     public void Register(Stair s)

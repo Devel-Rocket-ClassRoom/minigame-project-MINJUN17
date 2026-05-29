@@ -29,6 +29,7 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
     /// <summary>SaveIdRegistry용 — 전체 손님 풀 노출.</summary>
     public IReadOnlyList<CustomerData> Pool => pool;
     public int ActiveCount => _active.Count; // 남은 손님 없어야 영업종료
+    public IReadOnlyCollection<Customer> ActiveCustomers => _active;
     public void Register(Customer c) => _active.Add(c);
     public void Unregister(Customer c) { _active.Remove(c); _waitingForSeat.Remove(c); }
 

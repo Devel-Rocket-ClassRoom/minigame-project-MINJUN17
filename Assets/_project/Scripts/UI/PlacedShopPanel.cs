@@ -92,6 +92,13 @@ public class PlacedShopPanel : MonoBehaviour
 
         SelectSlot(null);
         CloseWindow();
+
+        if (slot.Data.fixedPlacement)
+        {
+            placementSystem.InstantPlace(slot.Data);
+            return;   // 즉시 설치 — placement 모드 안 들어감
+        }
+
         placementSystem.StartPlace(slot.Data);
         if (placementModeUI != null) placementModeUI.ShowPlace();
     }

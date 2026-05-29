@@ -148,6 +148,7 @@ public class ServerStaff : Staff
             _currentRestTarget = picked != Vector3.zero ? picked : (Vector3?)null;
         }
         if (_currentRestTarget.HasValue) MoveTo(_currentRestTarget.Value);
+        _dirAnim?.FaceDirection(DirectionalCharacterAnimator.DIR_DOWN);  // 휴식 시 정면 (이동 중엔 LateUpdate가 덮어씀)
     }
 
     private bool IsRestTargetTakenByOther(Vector3 target)

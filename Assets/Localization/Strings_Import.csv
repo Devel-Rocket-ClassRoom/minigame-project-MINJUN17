@@ -11,6 +11,14 @@ furniture.iceCreamMachine,,아이스크림 기계,Ice Cream Machine
 furniture.phone,,전화기,Phone
 furniture.dtOrderWindow,,DT 주문창구,DT Order Window
 furniture.dtPickupWindow,,DT 픽업창구,DT Pickup Window
+furniture.toilet1,,변기 1,Toilet 1
+furniture.toilet1.desc,,손님이 사용 시 만족도를 얻습니다,Customers gain satisfaction when used
+furniture.toilet2,,변기 2,Toilet 2
+furniture.toilet2.desc,,손님이 사용 시 만족도를 얻습니다,Customers gain satisfaction when used
+furniture.toilet3,,변기 3,Toilet 3
+furniture.toilet3.desc,,손님이 사용 시 만족도를 얻습니다,Customers gain satisfaction when used
+furniture.sink,,세면대,Sink
+furniture.sink.desc,,손님이 사용 시 추가 만족도를 얻습니다,Customers gain extra satisfaction when used
 menu.burger,,햄버거,Burger
 menu.sushi,,초밥,Sushi
 menu.bread,,빵,Bread
@@ -127,6 +135,12 @@ expansion.hall1,,홀 확장 1,Hall Expansion 1
 expansion.hall2,,홀 확장 2,Hall Expansion 2
 expansion.kitchen1,,주방 확장 1,Kitchen Expansion 1
 expansion.riderRoom,,라이더룸 확장,Rider Room Expansion
+expansion.stage1,,드라이브 쓰루 개점,Drive Thru Opening
+expansion.stage1.desc,,드라이브 쓰루 창구를 설치할 수 있게 됩니다,Unlocks Drive Thru order and pickup windows
+expansion.stage2,,2층 개방,Second Floor Opening
+expansion.stage2.desc,,가게 2층을 사용할 수 있게 됩니다,Opens the second floor of the restaurant
+expansion.stage3,,화장실 설치,Restroom Installation
+expansion.stage3.desc,,2층에 손님용 화장실을 설치할 수 있게 됩니다,Unlocks restrooms for customers on the second floor
 customer.regular,,일반 손님,Regular Customer
 customer.test1,,테스트 손님 1,Test Customer 1
 customer.dt.default,,드라이브 쓰루 손님,Drive Thru Customer

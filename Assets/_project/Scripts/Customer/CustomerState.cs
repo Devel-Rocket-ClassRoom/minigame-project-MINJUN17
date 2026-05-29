@@ -9,5 +9,7 @@ public enum CustomerState
     WALK_TO_STAIR,
     WAIT_AT_SEAT,
     EAT,
+    WALK_TO_TOILET,
+    USING_TOILET,
     LEAVE,
 }

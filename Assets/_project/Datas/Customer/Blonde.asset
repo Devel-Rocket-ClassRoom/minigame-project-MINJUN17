@@ -34,6 +34,11 @@ MonoBehaviour:
   eatSpeed: 7
   patience: 30
   spawnWeight: 1
+  toiletUrgeProbability: 0.3
+  toiletUseDuration: 5
+  sinkUseDuration: 4
+  toiletStallBonus: 10
+  sinkBonus: 5
   references:
     version: 2
     RefIds: []

@@ -39,4 +39,16 @@ public class CustomerData : ScriptableObject, ISaveIdentifiable
     public float patience = 20f;
 
     public float spawnWeight = 1f; // 스폰 매니저에서 스폰 빈도
+
+    [Header("화장실")]
+    [Tooltip("식사 후 화장실 가고 싶어할 확률 (0~1)")]
+    [Range(0f, 1f)] public float toiletUrgeProbability = 0.3f;
+    [Tooltip("변기 사용 시간 (초)")]
+    public float toiletUseDuration = 5f;
+    [Tooltip("세면대 사용 시간 (초)")]
+    public float sinkUseDuration = 2f;
+    [Tooltip("변기 사용 완료 시 만족도 보너스")]
+    public int toiletStallBonus = 10;
+    [Tooltip("세면대 사용 완료 시 만족도 보너스 (독립 — 변기와 합산)")]
+    public int sinkBonus = 5;
 }

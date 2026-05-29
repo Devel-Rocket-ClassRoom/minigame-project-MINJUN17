@@ -103,6 +103,7 @@ public class RiderStaff : Staff
 
         // 일감 없으면 밖에서 대기
         MoveTo(OutsideWaitPos());
+        _dirAnim?.FaceDirection(DirectionalCharacterAnimator.DIR_DOWN);  // 휴식 시 정면 (이동 중엔 LateUpdate가 덮어씀)
     }
 
     private bool IsClosestIdleRiderTo(Vector3 target)

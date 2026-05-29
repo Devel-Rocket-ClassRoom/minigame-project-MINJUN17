@@ -702,6 +702,62 @@ MonoBehaviour:
     m_Localized: Waffle
     m_Metadata:
       m_Items: []
+  - m_Id: 1753014067785728
+    m_Localized: Drive Thru Opening
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1753014097145856
+    m_Localized: Unlocks Drive Thru order and pickup windows
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1753014097145857
+    m_Localized: Second Floor Opening
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1753014097145858
+    m_Localized: Opens the second floor of the restaurant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1753014097145859
+    m_Localized: Restroom Installation
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1753014097145860
+    m_Localized: Unlocks restrooms for customers on the second floor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1765463525421056
+    m_Localized: Toilet 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1765463542198272
+    m_Localized: Customers gain satisfaction when used
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1765463542198273
+    m_Localized: Toilet 2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1765463542198274
+    m_Localized: Customers gain satisfaction when used
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1765463542198275
+    m_Localized: Toilet 3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1765463542198276
+    m_Localized: Customers gain satisfaction when used
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1765463542198277
+    m_Localized: Sink
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1765463542198278
+    m_Localized: Customers gain extra satisfaction when used
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

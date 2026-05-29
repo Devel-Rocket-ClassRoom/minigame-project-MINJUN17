@@ -372,9 +372,9 @@ public class TestDebugPanel : MonoBehaviour
     // ============================== 돈 ==============================
 
     [Header("돈")]
-    [SerializeField] private long addMoneyAmount = 10000;
+    [SerializeField] private long addMoneyAmount = 100000;
 
-    /// <summary>설정된 금액(기본 10000) 즉시 획득.</summary>
+    /// <summary>설정된 금액(기본 100000) 즉시 획득.</summary>
     public void AddMoney()
     {
         if (MoneySystem.Instance == null) { Debug.LogWarning("[TestDebugPanel] MoneySystem 없음"); return; }
