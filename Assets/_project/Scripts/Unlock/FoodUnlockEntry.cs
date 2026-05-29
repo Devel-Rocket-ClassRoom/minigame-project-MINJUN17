@@ -9,8 +9,11 @@ public class FoodUnlockEntry : IUnlockEntry
 
     public MenuData Data => _data;
 
+    private static readonly LocalizedString SharedDesc =
+        new("StringTable", "unlock.food");
+
     public LocalizedString DisplayName => _data.menuName;
-    public LocalizedString Description => _data.description;
+    public LocalizedString Description => SharedDesc;
     public Sprite Icon                 => _data.foodSprite;
     public long Cost                   => _data.satisfactionUnlock;
     public CurrencyType Currency       => CurrencyType.Satisfaction;

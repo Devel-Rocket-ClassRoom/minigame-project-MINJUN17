@@ -34,7 +34,9 @@ public class FurnitureData : ScriptableObject, ISaveIdentifiable
     public bool fixedPlacement;
     [Tooltip("fixedPlacement=true일 때 설치될 셀 좌표 (좌하단 origin)")]
     public Vector2Int fixedCell;
-    [Tooltip("fixedPlacement=true일 때 셀 중앙에서 추가로 줄 월드 오프셋 (스프라이트 미세조정용)")]
+
+    [Header("위치 보정")]
+    [Tooltip("셀 중앙에서 추가로 줄 월드 오프셋 (스프라이트 미세조정용). 드래그 배치/이동/로드 전부 적용됨.")]
     public Vector2 fixedWorldOffset;
 
     [Header("카탈로그 / 해금")]

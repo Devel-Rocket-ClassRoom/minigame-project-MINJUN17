@@ -29,6 +29,11 @@ public class CustomerData : ScriptableObject, ISaveIdentifiable
     public LocalizedString customerName;   // 다국어 표시명
     public Sprite icon;
 
+    [Header("지갑 (매장 손님용)")]
+    [Tooltip("주문 가능 금액. 선호 음식 먼저 담고 잔액으로 추가 주문")]
+    public int wallet = 10;
+
+    [Header("주문 수 (DT·배달 손님용)")]
     public int minOrderCount = 1;      // 최소 주문 개수
     public int maxOrderCount = 1;      // 최대 주문 개수
 

@@ -90,9 +90,23 @@ public class Customer : MonoBehaviour
         _satisfaction = _data.baseSatisfaction;
         _spawnTime = Time.time;
 
-        int orderCount = Random.Range(_data.minOrderCount, _data.maxOrderCount + 1);
+        int wallet = _data.wallet;
         OrderedMenus = new List<MenuData>();
-        for (int i = 0; i < orderCount; i++)
+
+        if (_data.preferredMenu != null)
+        {
+            OrderedMenus.Add(_data.preferredMenu);
+            wallet -= _data.preferredMenu.price;
+        }
+
+        MenuData extra;
+        while (Random.value < 0.5f && (extra = PickAffordable(wallet)) != null)
+        {
+            OrderedMenus.Add(extra);
+            wallet -= extra.price;
+        }
+
+        if (OrderedMenus.Count == 0)
             OrderedMenus.Add(MenuManager.Instance.PickRandomByWeight());
 
         CustomerManager.Instance.RegisterWaitingForSeat(this);
@@ -525,6 +539,26 @@ public class Customer : MonoBehaviour
             if (!_passedDoor) { _passedDoor = true; return; }
             Destroy(gameObject);
         }
+    }
+
+    private MenuData PickAffordable(int budget)
+    {
+        var unlocked = MenuManager.Instance.UnlockedMenus;
+        float total = 0f;
+        foreach (var m in unlocked) if (m.price <= budget) total += m.spawnWeight;
+        if (total <= 0f) return null;
+
+        float r = Random.Range(0f, total);
+        float acc = 0f;
+        MenuData last = null;
+        foreach (var m in unlocked)
+        {
+            if (m.price > budget) continue;
+            acc += m.spawnWeight;
+            last = m;
+            if (r <= acc) return m;
+        }
+        return last;
     }
 
     private void OnDestroy() => OnDespawned?.Invoke(this);

@@ -4,5 +4,8 @@ public enum ToolType
     WorkTable,
     Fryer,
     Beverage,
-    IceCreamMachine
+    IceCreamMachine,
+    Microwave,
+    BreadRack,
+    FishCuttingTable
 }

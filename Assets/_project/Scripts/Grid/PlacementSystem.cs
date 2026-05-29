@@ -94,7 +94,7 @@ public class PlacementSystem : MonoBehaviour
     {
         GameObject instance = Instantiate(
             data.prefab,
-            gridManager.CellToWorld(pos, data.width, data.height),
+            gridManager.CellToWorld(pos, data.width, data.height) + (Vector3)data.fixedWorldOffset,
             Quaternion.Euler(0, 0, -90 * rotationStep));
 
         PlacedObject placed = new PlacedObject(data, instance, pos, rotationStep);
@@ -136,12 +136,6 @@ public class PlacementSystem : MonoBehaviour
         }
 
         PlaceInitial(data, data.fixedCell, 0);
-        if (data.fixedWorldOffset != Vector2.zero)
-        {
-            var cell = gridManager.GetCell(data.fixedCell);
-            if (cell?.placedObject?.Instance != null)
-                cell.placedObject.Instance.transform.position += (Vector3)data.fixedWorldOffset;
-        }
         return true;
     }
 
@@ -313,7 +307,7 @@ public class PlacementSystem : MonoBehaviour
 
         GameObject instance = Instantiate(
             _previewData.prefab,
-            gridManager.CellToWorld(_currentOrigin, PreviewWidth, PreviewHeight),
+            gridManager.CellToWorld(_currentOrigin, PreviewWidth, PreviewHeight) + (Vector3)_previewData.fixedWorldOffset,
             Quaternion.Euler(0, 0, -90 * _previewRotationStep));
 
         PlacedObject placed = new PlacedObject(_previewData, instance, _currentOrigin, _previewRotationStep);
@@ -330,7 +324,7 @@ public class PlacementSystem : MonoBehaviour
         _movingOriginal.Origin = _currentOrigin;
         _movingOriginal.RotationStep = _previewRotationStep;
         _movingOriginal.Instance.transform.position =
-            gridManager.CellToWorld(_currentOrigin, PreviewWidth, PreviewHeight);
+            gridManager.CellToWorld(_currentOrigin, PreviewWidth, PreviewHeight) + (Vector3)_movingOriginal.Data.fixedWorldOffset;
         _movingOriginal.Instance.transform.rotation = Quaternion.Euler(0, 0, -90 * _previewRotationStep);
         _movingOriginal.Instance.SetActive(true);
         gridManager.PlaceObject(_movingOriginal);
@@ -371,7 +365,7 @@ public class PlacementSystem : MonoBehaviour
     private void UpdatePreviewVisuals()
     {
         _previewInstance.transform.position =
-            gridManager.CellToWorld(_currentOrigin, PreviewWidth, PreviewHeight);
+            gridManager.CellToWorld(_currentOrigin, PreviewWidth, PreviewHeight) + (Vector3)_previewData.fixedWorldOffset;
         Color color = gridManager.CanPlace(_currentOrigin, PreviewWidth, PreviewHeight, gridManager.GetZone(_currentOrigin))
             ? validColor : invalidColor;
         if (_previewRenderers != null)

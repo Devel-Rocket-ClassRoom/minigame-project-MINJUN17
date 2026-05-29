@@ -72,6 +72,7 @@ public class PlacedShopPanel : MonoBehaviour
         foreach (var data in CatalogManager.Instance.UnlockedByZone(zone))
         {
             if (data.fixedSingle) continue;   // 고정 가구(카운터 등)는 추가 설치 불가 — 상점에 노출 X
+            if (data.fixedPlacement && placementSystem != null && placementSystem.IsAlreadyPlaced(data)) continue; // 고정 위치 가구는 설치 후 슬롯 숨김
             var slot = Instantiate(slotPrefab, content);
             slot.Setup(data, placementSystem, this);
             _spawned.Add(slot);
@@ -96,7 +97,8 @@ public class PlacedShopPanel : MonoBehaviour
         if (slot.Data.fixedPlacement)
         {
             placementSystem.InstantPlace(slot.Data);
-            return;   // 즉시 설치 — placement 모드 안 들어감
+            Refresh();   // 설치 직후 슬롯 갱신 (중복 설치 방지)
+            return;
         }
 
         placementSystem.StartPlace(slot.Data);

@@ -8,6 +8,11 @@ furniture.grill,,그릴,Grill
 furniture.fryer,,튀김기,Fryer
 furniture.workTable,,조리대,Work Table
 furniture.iceCreamMachine,,아이스크림 기계,Ice Cream Machine
+furniture.microwave,,전자레인지,Microwave
+furniture.breadRack,,빵 보관함,Bread Rack
+furniture.fishCuttingTable,,생선 손질대,Fish Cutting Table
+unlock.cookingtool,,구매하면 이 도구로 만드는 메뉴가 해금 목록에 등장합니다.,Purchase to unlock menus made with this tool.
+unlock.food,,새로운 손님이 등장할지도 모릅니다.,A new customer might appear.
 furniture.phone,,전화기,Phone
 furniture.dtOrderWindow,,DT 주문창구,DT Order Window
 furniture.dtPickupWindow,,DT 픽업창구,DT Pickup Window
