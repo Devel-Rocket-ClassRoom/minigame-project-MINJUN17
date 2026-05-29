@@ -5,7 +5,7 @@ using Random = UnityEngine.Random;
 
 /// <summary>
 /// 드라이브 쓰루 매니저 + 스포너.
-/// - 해금 상태는 CatalogManager가 보관 (dtCatalogData가 해금됐는지 조회)
+/// - 해금 상태는 ExpansionManager의 stage 진행 여부로 조회 (dtUnlockStage가 통과됐는지)
 /// - 해금 + 영업 중일 때 차 스폰. 영업 종료 시 스폰만 멈추고 차는 정상 흐름 유지.
 /// - 차로 점유 한도(DTLane.IsFull) 체크.
 /// </summary>
@@ -13,9 +13,9 @@ public class DTSystem : MonoBehaviour
 {
     public static DTSystem Instance;
 
-    [Header("카탈로그 식별")]
-    [Tooltip("DT 시스템을 나타내는 카탈로그 항목 (보통 DTOrderWindow나 DT 마커 FurnitureData)")]
-    [SerializeField] private FurnitureData dtCatalogData;
+    [Header("해금 트리거")]
+    [Tooltip("이 ExpansionStage가 완료되면 DT가 해금됨 (보통 1단 Stage1_DTUnlock)")]
+    [SerializeField] private ExpansionStageData dtUnlockStage;
 
     [Header("스폰")]
     [SerializeField] private GameObject dtCustomerPrefab;
@@ -29,11 +29,18 @@ public class DTSystem : MonoBehaviour
     private float _spawnInterval;
     private bool _spawning;
 
-    public event Action OnUnlocked;            // CatalogManager 프록시 (외부 호환)
+    public event Action OnUnlocked;            // ExpansionManager 프록시 (외부 호환)
 
-    public FurnitureData DTCatalogData => dtCatalogData;
-    public bool IsUnlocked => CatalogManager.Instance != null
-                              && CatalogManager.Instance.IsUnlocked(dtCatalogData);
+    /// <summary>
+    /// [Deprecated] 옛 가구 기반 해금 시절 잔재. 새 메커니즘에서는 항상 null.
+    /// TestDebugPanel 등 옛 호출처는 null check로 no-op 처리됨.
+    /// </summary>
+    [System.Obsolete("DT는 이제 ExpansionStage 기반으로 해금됨. dtUnlockStage 사용. " +
+                     "ExpansionManager.TryExpand()로 해금하거나 ExpansionManager.IsStageCompleted(stage) 조회.")]
+    public FurnitureData DTCatalogData => null;
+
+    public bool IsUnlocked => ExpansionManager.Instance != null
+                              && ExpansionManager.Instance.IsStageCompleted(dtUnlockStage);
     public bool IsSpawning => _spawning;
     public int ActiveCarCount => DTLane.Instance != null ? DTLane.Instance.ActiveCarCount : 0;
 
@@ -46,19 +53,19 @@ public class DTSystem : MonoBehaviour
     private void Start()
     {
         _spawnInterval = RollSpawnInterval();
-        if (CatalogManager.Instance != null)
-            CatalogManager.Instance.OnFurnitureUnlocked += HandleFurnitureUnlocked;
+        if (ExpansionManager.Instance != null)
+            ExpansionManager.Instance.OnExpanded += HandleExpanded;
     }
 
     private void OnDestroy()
     {
-        if (CatalogManager.Instance != null)
-            CatalogManager.Instance.OnFurnitureUnlocked -= HandleFurnitureUnlocked;
+        if (ExpansionManager.Instance != null)
+            ExpansionManager.Instance.OnExpanded -= HandleExpanded;
     }
 
-    private void HandleFurnitureUnlocked(FurnitureData f)
+    private void HandleExpanded(ExpansionStageData stage)
     {
-        if (f == dtCatalogData) OnUnlocked?.Invoke();
+        if (stage == dtUnlockStage) OnUnlocked?.Invoke();
     }
 
     public void StartSpawning()
@@ -94,6 +101,7 @@ public class DTSystem : MonoBehaviour
     {
         if (DTLane.Instance == null || DTLane.Instance.WaypointCount == 0) return false;
         if (DTLane.Instance.IsFull) return false;
+        if (DTLane.Instance.HasCarPendingOrder()) return false;
         if (DTWindowManager.Instance == null) return false;
         if (DTWindowManager.Instance.FirstOrderWindow == null) return false;
         if (DTWindowManager.Instance.FirstPickupWindow == null) return false;

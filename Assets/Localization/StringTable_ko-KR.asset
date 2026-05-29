@@ -703,6 +703,69 @@ MonoBehaviour:
     m_Localized: "\uC640\uD50C"
     m_Metadata:
       m_Items: []
+  - m_Id: 1753014067785728
+    m_Localized: "\uB4DC\uB77C\uC774\uBE0C \uC4F0\uB8E8 \uAC1C\uC810"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1753014097145856
+    m_Localized: "\uB4DC\uB77C\uC774\uBE0C \uC4F0\uB8E8 \uCC3D\uAD6C\uB97C \uC124\uCE58\uD560
+      \uC218 \uC788\uAC8C \uB429\uB2C8\uB2E4"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1753014097145857
+    m_Localized: "2\uCE35 \uAC1C\uBC29"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1753014097145858
+    m_Localized: "\uAC00\uAC8C 2\uCE35\uC744 \uC0AC\uC6A9\uD560 \uC218 \uC788\uAC8C
+      \uB429\uB2C8\uB2E4"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1753014097145859
+    m_Localized: "\uD654\uC7A5\uC2E4 \uC124\uCE58"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1753014097145860
+    m_Localized: "2\uCE35\uC5D0 \uC190\uB2D8\uC6A9 \uD654\uC7A5\uC2E4\uC744 \uC124\uCE58\uD560
+      \uC218 \uC788\uAC8C \uB429\uB2C8\uB2E4"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1765463525421056
+    m_Localized: "\uBCC0\uAE30 1"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1765463542198272
+    m_Localized: "\uC190\uB2D8\uC774 \uC0AC\uC6A9 \uC2DC \uB9CC\uC871\uB3C4\uB97C
+      \uC5BB\uC2B5\uB2C8\uB2E4"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1765463542198273
+    m_Localized: "\uBCC0\uAE30 2"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1765463542198274
+    m_Localized: "\uC190\uB2D8\uC774 \uC0AC\uC6A9 \uC2DC \uB9CC\uC871\uB3C4\uB97C
+      \uC5BB\uC2B5\uB2C8\uB2E4"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1765463542198275
+    m_Localized: "\uBCC0\uAE30 3"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1765463542198276
+    m_Localized: "\uC190\uB2D8\uC774 \uC0AC\uC6A9 \uC2DC \uB9CC\uC871\uB3C4\uB97C
+      \uC5BB\uC2B5\uB2C8\uB2E4"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1765463542198277
+    m_Localized: "\uC138\uBA74\uB300"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1765463542198278
+    m_Localized: "\uC190\uB2D8\uC774 \uC0AC\uC6A9 \uC2DC \uCD94\uAC00 \uB9CC\uC871\uB3C4\uB97C
+      \uC5BB\uC2B5\uB2C8\uB2E4"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

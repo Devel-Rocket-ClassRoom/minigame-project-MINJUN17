@@ -101,16 +101,56 @@ public class PlacementSystem : MonoBehaviour
         gridManager.PlaceObject(placed);
     }
     // ========== UI: 진입점 ==========
+    /// <summary>현재 PlacedObject 중 같은 FurnitureData의 인스턴스가 존재하는지.</summary>
+    public bool IsAlreadyPlaced(FurnitureData data)
+    {
+        if (data == null) return false;
+        foreach (var po in CollectPlacedObjects())
+            if (po.Data == data) return true;
+        return false;
+    }
+
+    /// <summary>고정 위치 가구를 즉시 설치. 카탈로그 슬롯 클릭에서 호출.</summary>
+    public bool InstantPlace(FurnitureData data)
+    {
+        if (data == null || !data.fixedPlacement) return false;
+        if (Mode != Mode.None) return false;
+        if (IsAlreadyPlaced(data)) { Debug.Log("[PlacementSystem] 이미 설치됨"); return false; }
+
+        var zone = gridManager.GetZone(data.fixedCell);
+        if (!gridManager.CanPlace(data.fixedCell, data.width, data.height, zone))
+        {
+            Debug.LogWarning($"[PlacementSystem] InstantPlace 실패 — 셀 {data.fixedCell} 점유/비활성/존 불일치");
+            return false;
+        }
+
+        long cost = data.purchaseCost;
+        if (cost > 0)
+        {
+            if (MoneySystem.Instance == null || !MoneySystem.Instance.CanAfford(cost))
+            {
+                Debug.Log($"[PlacementSystem] 돈 부족 (필요 {cost:N0}원)");
+                return false;
+            }
+            MoneySystem.Instance.Spend(cost);
+        }
+
+        PlaceInitial(data, data.fixedCell, 0);
+        if (data.fixedWorldOffset != Vector2.zero)
+        {
+            var cell = gridManager.GetCell(data.fixedCell);
+            if (cell?.placedObject?.Instance != null)
+                cell.placedObject.Instance.transform.position += (Vector3)data.fixedWorldOffset;
+        }
+        return true;
+    }
+
     public void StartPlace(FurnitureData data)
     {
         if (Mode != Mode.None) return;
 
-        // 활성 영역의 중앙에 spawn (놓을 수 있는지와 무관하게 일단 가운데)
-        Vector2Int startOrigin = new Vector2Int(
-            (gridManager.StartGridWidth - data.width) / 2,
-            (gridManager.StartGridHeight - data.height) / 2
-        );
-        startOrigin = gridManager.ClampToActiveArea(startOrigin, data.width, data.height);
+        // 현재 floor 활성 영역의 중앙에 spawn (놓을 수 있는지와 무관하게 일단 가운데)
+        Vector2Int startOrigin = gridManager.GetActiveAreaCenter(data.width, data.height);
 
         GameObject preview = Instantiate(data.prefab);
         StripLogicComponents(preview);
@@ -176,6 +216,7 @@ public class PlacementSystem : MonoBehaviour
     private void TrySelectForMove()
     {
         if (!TryGetTappedObject(out PlacedObject target)) return;
+        if (target.Data != null && target.Data.fixedPlacement) return;   // 고정 위치 가구는 이동 불가 (fixedSingle은 이동 OK)
 
         _movingOriginal = target;
         _originalOrigin = target.Origin;
@@ -191,7 +232,7 @@ public class PlacementSystem : MonoBehaviour
     private void TrySelectForRemove()
     {
         if (!TryGetTappedObject(out PlacedObject target)) return;
-        if (target.Data != null && target.Data.fixedSingle) return;   // 고정 가구(카운터 등)는 삭제 불가
+        if (target.Data != null && (target.Data.fixedSingle || target.Data.fixedPlacement)) return;   // 고정 가구(카운터/화장실 등)는 삭제 불가
 
         if (_removeTarget != null)
             _removeTargetRenderer.color = _removeTargetOriginalColor;

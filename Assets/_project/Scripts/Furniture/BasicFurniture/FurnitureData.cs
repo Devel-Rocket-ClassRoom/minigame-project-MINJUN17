@@ -29,6 +29,14 @@ public class FurnitureData : ScriptableObject, ISaveIdentifiable
     [Tooltip("이동만 가능 — 추가 설치/삭제 불가. 시작 배치로 1개만 존재하는 고정 가구 (예: 카운터).")]
     public bool fixedSingle;
 
+    [Header("고정 위치 즉시 설치 (드래그 X)")]
+    [Tooltip("체크 시 카탈로그 클릭하면 fixedCell 위치에 즉시 spawn. 이동/삭제/회전 불가, 1회만 설치 가능.")]
+    public bool fixedPlacement;
+    [Tooltip("fixedPlacement=true일 때 설치될 셀 좌표 (좌하단 origin)")]
+    public Vector2Int fixedCell;
+    [Tooltip("fixedPlacement=true일 때 셀 중앙에서 추가로 줄 월드 오프셋 (스프라이트 미세조정용)")]
+    public Vector2 fixedWorldOffset;
+
     [Header("카탈로그 / 해금")]
     public LocalizedString displayName;           // 상점 슬롯 표시명 (다국어)
     public LocalizedString description;           // 다국어 설명 (해금 슬롯 표시용)

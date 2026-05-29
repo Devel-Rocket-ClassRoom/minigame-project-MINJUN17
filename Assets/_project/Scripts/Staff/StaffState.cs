@@ -13,6 +13,7 @@ public enum ServerState
     TAKING_ORDER,
     WALK_TO_PASS_WINDOW,
     WALK_TO_SEAT,
+    WALK_TO_STAIR,
     DELIVER,
     WALK_TO_PHONE,
     TAKING_DELIVERY_ORDER,

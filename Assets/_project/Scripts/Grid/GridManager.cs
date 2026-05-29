@@ -8,28 +8,31 @@ public class GridManager : MonoBehaviour
 
     [Header("Grid Size")]
     [SerializeField] private int _gridWidth = 9;
-    [SerializeField] private int _gridHeight = 12;
-    [SerializeField] private int _startGridWidth = 4;
-    [SerializeField] private int _startGridHeight = 9;
 
-    [Header("Camera")]
-    [SerializeField] private Camera mainCamera;
-    [SerializeField] private float cameraPadding = 1f;
+    [Header("Floor Layout (각 영역 세로 크기)")]
+    [Tooltip("1층 영역 세로 (홀 + 주방). 기본 12")]
+    [SerializeField] private int floor1Height = 12;
+    [Tooltip("1층/2층 사이 빈 영역 — 크게 잡으면 카메라 fit해도 2층 절대 안 보임 (권장 ≥ 20)")]
+    [SerializeField] private int gapHeight = 30;
+    [Tooltip("2층 영역 세로 (홀 + 화장실). 기본 12")]
+    [SerializeField] private int floor2Height = 12;
+    [Tooltip("1층 주방 / 2층 화장실 세로 (공통). 기본 4")]
+    [SerializeField] private int kitchenAndToiletRows = 4;
 
     [Header("Floor Tilemap")]
     [SerializeField] private Tilemap floorTilemap;
 
     public int GridWidth => _gridWidth;
-    public int GridHeight => _gridHeight;
-    public int StartGridWidth => _startGridWidth;
-    public int StartGridHeight => _startGridHeight;
+    public int GridHeight => floor1Height + gapHeight + floor2Height;
+    public int Floor2YStart => floor1Height + gapHeight;
     public int ActiveCellCount
     {
         get
         {
             int count = 0;
+            int h = GridHeight;
             for (int x = 0; x < _gridWidth; x++)
-                for (int y = 0; y < _gridHeight; y++)
+                for (int y = 0; y < h; y++)
                     if (_cells[x, y].isActive) count++;
             return count;
         }
@@ -47,79 +50,91 @@ public class GridManager : MonoBehaviour
     [SerializeField] private Vector2Int kitchenDoorCell = new Vector2Int(1, 8);
     public Vector2Int KitchenDoorCell => kitchenDoorCell;
 
+    [Header("진입 금지 셀 (길찾기 X, 가구 설치 O — 화장실 칸막이 등)")]
+    [SerializeField] private List<Vector2Int> blockedCells;
+
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
-        if (mainCamera == null) mainCamera = Camera.main;
         CreateGrid();
         HideInactiveFloorTiles();
-        CenterCameraOnActiveGrid();
-
+        // 카메라 정렬은 CameraController가 Start에서 수행
     }
 
-    // 실제 활성화된 셀들의 bounding box 중앙으로 카메라 정렬 + ortho size 자동 조정
-    // 확장될 때마다 자동 호출됨 (ActivateCells 내부에서)
-    // DTLane이 존재하면 그 bbox도 합집합으로 포함 (DT 차로가 그리드 바깥에 있어도 화면에 들어옴)
+    // 호환성 유지용 — 실제 동작은 CameraController가 담당.
     public void CenterCameraOnActiveGrid()
     {
-        if (mainCamera == null) return;
-        if (_cells == null) return;
+        CameraController.Instance?.Refresh();
+    }
 
-        // 활성 셀 bounds 계산
-        int minX = int.MaxValue, minY = int.MaxValue;
-        int maxX = int.MinValue, maxY = int.MinValue;
-        bool anyActive = false;
-        for (int x = 0; x < _gridWidth; x++)
-        for (int y = 0; y < _gridHeight; y++)
-        {
-            if (!_cells[x, y].isActive) continue;
-            anyActive = true;
-            if (x < minX) minX = x;
-            if (y < minY) minY = y;
-            if (x > maxX) maxX = x;
-            if (y > maxY) maxY = y;
-        }
-        if (!anyActive) return;
-
-        // 셀 bbox → world bounds 변환 (셀 좌표 corner-origin, 1셀=1유닛)
-        Bounds combined = new Bounds(
+    // 특정 floor의 활성 셀 world bbox. 활성 셀 없으면 null.
+    public Bounds? GetActiveBoundsForFloor(FloorIndex floor)
+    {
+        if (!TryGetActiveCellBboxForFloor(floor, out int minX, out int minY, out int maxX, out int maxY))
+            return null;
+        return new Bounds(
             new Vector3((minX + maxX + 1) * 0.5f, (minY + maxY + 1) * 0.5f, 0f),
             new Vector3(maxX - minX + 1, maxY - minY + 1, 0f));
+    }
 
-        // DT 해금 후에만 차로 영역을 카메라에 포함 (전엔 그리드 기준만)
-        if (DTLane.Instance != null && DTLane.Instance.WaypointCount > 0
-            && DTSystem.Instance != null && DTSystem.Instance.IsUnlocked)
-            combined.Encapsulate(DTLane.Instance.GetVisibleBounds());
+    public bool IsCellOnFloor(int y, FloorIndex floor)
+    {
+        int f2start = Floor2YStart;
+        if (f2start < 0) return floor == FloorIndex.Floor1; // 2층 미정의: 전부 1층
+        if (floor == FloorIndex.Floor1) return y < f2start;
+        return y >= f2start;
+    }
 
-        Vector3 pos = mainCamera.transform.position;
-        mainCamera.transform.position = new Vector3(combined.center.x, combined.center.y, pos.z);
-
-        if (mainCamera.orthographic)
-        {
-            float aspect = mainCamera.aspect > 0.01f ? mainCamera.aspect : 1f;
-            float halfH = combined.extents.y;
-            float halfW = combined.extents.x / aspect;
-            mainCamera.orthographicSize = Mathf.Max(halfH, halfW) + cameraPadding;
-        }
+    public FloorIndex GetFloorAt(Vector3 worldPos)
+    {
+        Vector2Int cell = WorldToCell(worldPos);
+        return IsCellOnFloor(cell.y, FloorIndex.Floor2) ? FloorIndex.Floor2 : FloorIndex.Floor1;
     }
 
     private void CreateGrid()
     {
-        _cells = new GridCell[_gridWidth, _gridHeight];
-        int activeYStart = _gridHeight - _startGridHeight;   // 12 - 9 = 3
-        int kitchenYStart = _gridHeight - 4;                 // 12 - 4 = 8 (위 4행이 주방)
+        int gridH = GridHeight;
+        int f2start = Floor2YStart;
+        _cells = new GridCell[_gridWidth, gridH];
+        int kitchen1YStart = floor1Height - kitchenAndToiletRows;
+
+        bool hasFloor2 = f2start >= 0 && f2start < gridH;
+        int floor2H = hasFloor2 ? gridH - f2start : 0;
+        int toilet2YStart = hasFloor2 ? f2start + Mathf.Max(0, floor2H - kitchenAndToiletRows) : -1;
 
         for (int x = 0; x < _gridWidth; x++)
+        for (int y = 0; y < gridH; y++)
         {
-            for (int y = 0; y < _gridHeight; y++)
+            bool isReserved = _reservedCells.Contains(new Vector2Int(x, y));
+            CellZone zone;
+            bool isActive;
+
+            if (y < floor1Height)
             {
-                bool isActive = x < _startGridWidth && y >= activeYStart;
-                bool isReserved = _reservedCells.Contains(new Vector2Int(x, y));
-                CellZone zone = (x < 4 && y >= kitchenYStart) ? CellZone.Kitchen : CellZone.Hall;
-                _cells[x, y] = new GridCell(x, y, isActive, isReserved, zone);
+                // Floor 1: 시작부터 전체 활성
+                isActive = true;
+                zone = (y >= kitchen1YStart) ? CellZone.Kitchen : CellZone.Hall;
             }
+            else if (hasFloor2 && y >= f2start)
+            {
+                // Floor 2: 셀은 비활성으로 시작 (2단/3단 확장 시 활성화)
+                isActive = false;
+                zone = (y >= toilet2YStart) ? CellZone.Floor2_Toilet : CellZone.Floor2_Hall;
+            }
+            else
+            {
+                // Gap: 영구 비활성
+                isActive = false;
+                zone = CellZone.Hall;
+            }
+
+            _cells[x, y] = new GridCell(x, y, isActive, isReserved, zone);
         }
+
+        if (blockedCells != null)
+            foreach (var pos in blockedCells)
+                SetWall(pos, true);
     }
 
     public GridCell GetCell(Vector2Int pos)
@@ -135,7 +150,7 @@ public class GridManager : MonoBehaviour
 
     public bool IsInBounds(Vector2Int pos)
     {
-        return pos.x >= 0 && pos.x < _gridWidth && pos.y >= 0 && pos.y < _gridHeight;
+        return pos.x >= 0 && pos.x < _gridWidth && pos.y >= 0 && pos.y < GridHeight;
     }
 
     // 길찾기용 walkability — 역할별 zone 필터 + 가구 회피 + 벽
@@ -150,9 +165,12 @@ public class GridManager : MonoBehaviour
         // 역할별 zone 제한
         switch (role)
         {
-            case PathRole.Customer: return c.zone == CellZone.Hall;
+            case PathRole.Customer:
+                return c.zone == CellZone.Hall
+                    || c.zone == CellZone.Floor2_Hall
+                    || c.zone == CellZone.Floor2_Toilet;
             case PathRole.Cook:     return c.zone == CellZone.Kitchen;
-            case PathRole.Server:   return true; // 주방/홀 둘 다 OK
+            case PathRole.Server:   return true; // 모든 zone 통과
             case PathRole.Rider:    return c.zone == CellZone.Hall;
             case PathRole.Commute:  return true; // 통근: 존 무시 (단 벽/가구/비활성은 위에서 이미 차단)
             default: return true;
@@ -192,57 +210,72 @@ public class GridManager : MonoBehaviour
         BuildKitchenLWalls(openings);
     }
 
-    // 주방을 L자로 둘러싸는 벽 (바닥 가로 + 우측 세로)
-    // openings에 포함된 셀은 벽 X (PassWindow 위치)
-    // 호출 예: BuildKitchenLWalls(new[] { new Vector2Int(1, 8) });
+    // 1층 주방을 가로로 막는 벽 (y=8 한 줄, 전체 폭)
+    // openings에 포함된 셀은 벽 X (PassWindow 위치 + 직원 통근 문)
     public void BuildKitchenLWalls(IEnumerable<Vector2Int> openings)
     {
         var openSet = new HashSet<Vector2Int>(openings);
-        int kitchenYStart = _gridHeight - 4; // 주방 바닥 행 (y=8)
-        int kitchenXEnd = 3;                 // 주방 우측 열 (x=3)
+        int kitchenYStart = floor1Height - kitchenAndToiletRows; // 기본 8 (1층 주방 바닥)
 
-        // 가로벽: 주방 바닥 (y=8), x=0..3
-        for (int x = 0; x <= kitchenXEnd; x++)
+        for (int x = 0; x < _gridWidth; x++)
         {
             var pos = new Vector2Int(x, kitchenYStart);
             if (!openSet.Contains(pos)) SetWall(pos);
         }
-
-        // 세로벽: 주방 우측 (x=3), y=9..11 (y=8 코너는 위 루프에서 이미 처리)
-        for (int y = kitchenYStart + 1; y < _gridHeight; y++)
-        {
-            var pos = new Vector2Int(kitchenXEnd, y);
-            if (!openSet.Contains(pos)) SetWall(pos);
-        }
     }
 
-    // 가구 footprint(width × height)가 활성 영역(현재 활성 셀들의 bounding box) 안에 들어오도록 origin을 클램프
-    // 확장될 때마다 활성 셀이 늘어나면 클램프 범위도 자동으로 늘어남
-    public Vector2Int ClampToActiveArea(Vector2Int origin, int width, int height)
+    // 특정 floor의 활성 셀 cell-coord bbox. 활성 셀 없으면 false.
+    private bool TryGetActiveCellBboxForFloor(FloorIndex floor,
+        out int minX, out int minY, out int maxX, out int maxY)
     {
-        // 현재 활성 셀들의 bounding box 계산
-        int minX = int.MaxValue, minY = int.MaxValue;
-        int maxX = int.MinValue, maxY = int.MinValue;
+        minX = int.MaxValue; minY = int.MaxValue;
+        maxX = int.MinValue; maxY = int.MinValue;
+        if (_cells == null) return false;
+        int gridH = GridHeight;
         bool any = false;
         for (int x = 0; x < _gridWidth; x++)
-        for (int y = 0; y < _gridHeight; y++)
+        for (int y = 0; y < gridH; y++)
         {
             if (_cells[x, y] == null || !_cells[x, y].isActive) continue;
+            if (!IsCellOnFloor(y, floor)) continue;
             any = true;
             if (x < minX) minX = x;
             if (y < minY) minY = y;
             if (x > maxX) maxX = x;
             if (y > maxY) maxY = y;
         }
-        if (!any) return origin;
+        return any;
+    }
 
-        // footprint가 bbox 안에 들어오도록 origin 상한 조정
+    // 현재 카메라 floor 기준으로 가구 footprint를 활성 영역 안에 들어오도록 클램프
+    public Vector2Int ClampToActiveArea(Vector2Int origin, int width, int height)
+    {
+        FloorIndex floor = CameraController.Instance != null
+            ? CameraController.Instance.CurrentFloor
+            : FloorIndex.Floor1;
+
+        if (!TryGetActiveCellBboxForFloor(floor, out int minX, out int minY, out int maxX, out int maxY))
+            return origin;
+
         int clampMaxX = Mathf.Max(minX, maxX - width + 1);
         int clampMaxY = Mathf.Max(minY, maxY - height + 1);
         return new Vector2Int(
             Mathf.Clamp(origin.x, minX, clampMaxX),
             Mathf.Clamp(origin.y, minY, clampMaxY)
         );
+    }
+
+    // PlacementSystem 스폰용: 현재 floor 활성 영역 중앙
+    public Vector2Int GetActiveAreaCenter(int width, int height)
+    {
+        FloorIndex floor = CameraController.Instance != null
+            ? CameraController.Instance.CurrentFloor
+            : FloorIndex.Floor1;
+        if (!TryGetActiveCellBboxForFloor(floor, out int minX, out int minY, out int maxX, out int maxY))
+            return Vector2Int.zero;
+        int cx = (minX + maxX) / 2 - width / 2;
+        int cy = (minY + maxY) / 2 - height / 2;
+        return ClampToActiveArea(new Vector2Int(cx, cy), width, height);
     }
     // 시작 시 호출: 비활성 셀의 Tilemap 타일을 캐싱하고 화면에서 제거
     private void HideInactiveFloorTiles()
@@ -252,8 +285,9 @@ public class GridManager : MonoBehaviour
             Debug.LogWarning("[GridManager] floorTilemap 미할당 — 인스펙터에서 Floor Tilemap 슬롯에 Tilemap을 드래그하세요");
             return;
         }
+        int gridH = GridHeight;
         for (int x = 0; x < _gridWidth; x++)
-        for (int y = 0; y < _gridHeight; y++)
+        for (int y = 0; y < gridH; y++)
         {
             var cell = _cells[x, y];
             var pos = new Vector3Int(x, y, 0);
@@ -341,8 +375,9 @@ public class GridManager : MonoBehaviour
     public List<Vector3> GetWalkableCellsInZone(CellZone zone)
     {
         var list = new List<Vector3>();
+        int gridH = GridHeight;
         for (int x = 0; x < _gridWidth; x++)
-            for (int y = 0; y < _gridHeight; y++)
+            for (int y = 0; y < gridH; y++)
             {
                 var pos = new Vector2Int(x, y);
                 var cell = GetCell(pos);
@@ -410,7 +445,6 @@ public class GridManager : MonoBehaviour
                     floorTilemap.SetTile(new Vector3Int(pos.x, pos.y, 0), cell.cachedTile);
             }
         }
-        // 확장 후 카메라 자동 재정렬
-        CenterCameraOnActiveGrid();
+        // 카메라 재정렬 없음 — 확장 자체로 카메라 변경 X. 토글/DT 해금 시에만 재계산.
     }
 }
