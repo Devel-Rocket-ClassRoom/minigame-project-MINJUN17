@@ -24,9 +24,9 @@ MonoBehaviour:
     m_LocalVariables: []
   description:
     m_TableReference:
-      m_TableCollectionName: 
+      m_TableCollectionName: GUID:e8a326a4f684cfd4f828350fbb7606b2
     m_TableEntryReference:
-      m_KeyId: 0
+      m_KeyId: 1932484748574720
       m_Key: 
     m_FallbackState: 0
     m_WaitForCompletion: 0
@@ -34,7 +34,7 @@ MonoBehaviour:
   foodSprite: {fileID: -5149061395951716579, guid: 44e73cfca95054741a0504318c4b288b, type: 3}
   price: 7000
   cost: 2500
-  tool: {fileID: 11400000, guid: a0adb67b1fa100f439f9f2255c7c2adb, type: 2}
+  tool: {fileID: 11400000, guid: 2a1d9f639cba9db4a86e149b0fa1e3b4, type: 2}
   satisfactionUnlock: 1000
   spawnWeight: 0.5
   references:

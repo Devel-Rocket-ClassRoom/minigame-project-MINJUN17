@@ -758,6 +758,34 @@ MonoBehaviour:
     m_Localized: Customers gain extra satisfaction when used
     m_Metadata:
       m_Items: []
+  - m_Id: 1907972556521472
+    m_Localized: Microwave
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1910565768855552
+    m_Localized: Purchase to unlock menus made with this tool.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1923244189351936
+    m_Localized: Bread Rack
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1926785658322944
+    m_Localized: Kitchen Sink
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1927140576133120
+    m_Localized: Fish Cutting Table
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1931850414620672
+    m_Localized: Purchase to unlock menus made with this tool.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1932484748574720
+    m_Localized: A new customer might appear.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

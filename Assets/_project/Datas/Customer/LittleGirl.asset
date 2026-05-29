@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: LittleGirl
   m_EditorClassIdentifier: Assembly-CSharp::CustomerData
   saveId: e4f095548963
-  unlockedFromStart: 1
-  customerPrefab: {fileID: 7120179047670830194, guid: 60f45cb430e10d346b8786986c11ac5b, type: 3}
+  unlockedFromStart: 0
+  preferredMenu: {fileID: 11400000, guid: d54037787bbf96241946204b6093abff, type: 2}
+  customerPrefab: {fileID: 7120179047670830194, guid: f8d01e94cd49a67439256ca1d00a3688, type: 3}
   customerName:
     m_TableReference:
       m_TableCollectionName: GUID:e8a326a4f684cfd4f828350fbb7606b2
@@ -25,6 +26,7 @@ MonoBehaviour:
     m_WaitForCompletion: 0
     m_LocalVariables: []
   icon: {fileID: 6190246913227733084, guid: e3a7f01c099561d4ab97e7a5f68727ff, type: 3}
+  wallet: 7000
   minOrderCount: 1
   maxOrderCount: 1
   baseSatisfaction: 80
@@ -34,6 +36,11 @@ MonoBehaviour:
   eatSpeed: 9
   patience: 17
   spawnWeight: 1
+  toiletUrgeProbability: 0.3
+  toiletUseDuration: 5
+  sinkUseDuration: 2
+  toiletStallBonus: 10
+  sinkBonus: 5
   references:
     version: 2
     RefIds: []

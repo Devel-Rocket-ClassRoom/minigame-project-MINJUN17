@@ -51,6 +51,26 @@ MonoBehaviour:
     m_Key: furniture.iceCreamMachine
     m_Metadata:
       m_Items: []
+  - m_Id: 1907972556521472
+    m_Key: furniture.microwave
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1923244189351936
+    m_Key: furniture.breadRack
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1927140576133120
+    m_Key: furniture.fishCuttingTable
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1931850414620672
+    m_Key: unlock.cookingtool
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1932484748574720
+    m_Key: unlock.food
+    m_Metadata:
+      m_Items: []
   - m_Id: 1715406962688
     m_Key: furniture.phone
     m_Metadata:
@@ -753,6 +773,14 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 721454686269459
     m_Key: ui.zone.delivery
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1910565768855552
+    m_Key: furniture.cookingtool.desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1926785658322944
+    m_Key: furniture.kitchenSink
     m_Metadata:
       m_Items: []
   m_Metadata:
