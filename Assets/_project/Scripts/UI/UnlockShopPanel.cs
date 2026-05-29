@@ -21,6 +21,9 @@ public class UnlockShopPanel : MonoBehaviour
     [SerializeField] private Sprite satisfactionIcon;   // ♥
     [SerializeField] private Sprite moneyIcon;          // 💰
 
+    [Header("참조")]
+    [SerializeField] private PlacementSystem placementSystem;
+
     private readonly List<UnlockSlot> _spawned = new();
 
     public UnlockCategory CurrentCategory => currentCategory;
@@ -172,7 +175,10 @@ public class UnlockShopPanel : MonoBehaviour
                     if (f == null) continue;
                     if (f.satisfactionUnlock <= 0) continue;       // 시작 해금
                     if (f.unlockOnExpansion != null) continue;     // 확장으로 자동 해금되는 가구
-                    yield return new FurnitureUnlockEntry(f);
+                    if (f.fixedSingle && placementSystem != null && placementSystem.IsAlreadyPlaced(f)) continue; // 1회 설치 가구는 설치 후 숨김
+                    yield return f is CookingToolData ct
+                        ? (IUnlockEntry)new CookingToolUnlockEntry(ct)
+                        : new FurnitureUnlockEntry(f);
                 }
                 yield break;
 

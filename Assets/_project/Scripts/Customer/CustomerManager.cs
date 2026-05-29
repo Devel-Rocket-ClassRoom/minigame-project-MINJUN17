@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -10,8 +9,6 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
 
     [SerializeField] private CounterManager counterManager;
     [SerializeField] private CustomerData[] pool;
-    [Tooltip("이 누적 만족도마다 잠긴 손님 1종을 랜덤 해금")]
-    [SerializeField] private int customerUnlockThreshold = 1000;
     [SerializeField] private QueueManager queueManager;
     [SerializeField] private SeatManager seatManager;
     [SerializeField] private Transform entryPoint;
@@ -23,7 +20,7 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
     private readonly HashSet<Customer> _active = new();
     private readonly List<Customer> _waitingForSeat = new();
 
-    /// <summary>현재 방문 가능한(해금된) 손님들. 잠긴 손님은 누적 만족도 임계점에서 랜덤 해금된다.</summary>
+    /// <summary>현재 방문 가능한(해금된) 손님들. 잠긴 손님은 preferredMenu가 해금되면 자동 해금된다.</summary>
     private readonly HashSet<CustomerData> _unlocked = new();
 
     /// <summary>SaveIdRegistry용 — 전체 손님 풀 노출.</summary>
@@ -74,17 +71,19 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
         _spawnInterval = RollSpawnInterval();
 
         EnsureStartingUnlocked();
-        if (SatisfactionSystem.Instance != null)
+        if (CatalogManager.Instance != null)
         {
-            SatisfactionSystem.Instance.OnLifetimeSatisfactionChanged += CheckUnlocks;
-            CheckUnlocks(SatisfactionSystem.Instance.LifetimeSatisfaction);  // 로드 직후 누락분 캐치업
+            CatalogManager.Instance.OnMenuUnlocked += HandleMenuUnlocked;
+            // 로드/시작 직후 catch-up: 이미 해금된 메뉴들에 매칭되는 손님 해금
+            foreach (var m in CatalogManager.Instance.UnlockedMenus)
+                HandleMenuUnlocked(m);
         }
     }
 
     private void OnDestroy()
     {
-        if (SatisfactionSystem.Instance != null)
-            SatisfactionSystem.Instance.OnLifetimeSatisfactionChanged -= CheckUnlocks;
+        if (CatalogManager.Instance != null)
+            CatalogManager.Instance.OnMenuUnlocked -= HandleMenuUnlocked;
     }
 
     // ─── 손님 해금 ───
@@ -97,36 +96,19 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
             if (d != null && d.unlockedFromStart) _unlocked.Add(d);
     }
 
-    private int CountStartingUnlocked()
+    /// <summary>음식이 해금되면 그 음식을 preferredMenu로 가진 손님을 해금.</summary>
+    private void HandleMenuUnlocked(MenuData menu)
     {
-        int n = 0;
-        if (pool != null)
-            foreach (var d in pool)
-                if (d != null && d.unlockedFromStart) n++;
-        return n;
-    }
-
-    /// <summary>누적 만족도가 임계점(threshold)을 넘은 만큼 잠긴 손님을 랜덤 해금.</summary>
-    private void CheckUnlocks(long lifetimeSatisfaction)
-    {
-        if (customerUnlockThreshold <= 0) return;
-        int target  = (int)(lifetimeSatisfaction / customerUnlockThreshold);  // 허용되는 임계점 해금 수
-        int granted = _unlocked.Count - CountStartingUnlocked();              // 이미 임계점으로 해금한 수
-        while (granted < target)
+        if (menu == null || pool == null) return;
+        foreach (var d in pool)
         {
-            if (!UnlockRandomLocked()) break;   // 더 잠긴 손님 없음
-            granted++;
+            if (d == null || _unlocked.Contains(d)) continue;
+            if (d.preferredMenu == menu)
+            {
+                _unlocked.Add(d);
+                Debug.Log($"[CustomerManager] 신규 손님 해금 (선호 음식 {menu.name} 해금): {d.name}");
+            }
         }
-    }
-
-    private bool UnlockRandomLocked()
-    {
-        var locked = pool.Where(d => d != null && !_unlocked.Contains(d)).ToList();
-        if (locked.Count == 0) return false;
-        var pick = locked[Random.Range(0, locked.Count)];
-        _unlocked.Add(pick);
-        Debug.Log($"[CustomerManager] 신규 손님 해금: {pick.name}");
-        return true;
     }
 
     public void StartSpawning()

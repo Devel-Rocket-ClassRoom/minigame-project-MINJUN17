@@ -19,7 +19,10 @@ MonoBehaviour:
   height: 1
   anchorX: 0
   anchorY: 0
-  deliveryBonus: 0
+  fixedSingle: 0
+  fixedPlacement: 0
+  fixedCell: {x: 0, y: 0}
+  fixedWorldOffset: {x: 0, y: 0}
   displayName:
     m_TableReference:
       m_TableCollectionName: GUID:e8a326a4f684cfd4f828350fbb7606b2
@@ -39,7 +42,7 @@ MonoBehaviour:
     m_WaitForCompletion: 0
     m_LocalVariables: []
   icon: {fileID: 186124937400214635, guid: 42b3767372e8b434fbdc37c5196fc2dc, type: 3}
-  satisfactionUnlock: 0
+  satisfactionUnlock: 1000
   purchaseCost: 30000
   unlockOnExpansion: {fileID: 0}
   toolType: 2

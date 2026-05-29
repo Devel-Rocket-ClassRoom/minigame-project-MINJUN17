@@ -14,12 +14,16 @@ public class CookingToolInstance : MonoBehaviour
 
     private void Awake()
     {
-        CookingToolManager.Instance.Register(this);
-        if (animator == null) animator = GetComponent<Animator>();
+        if (animator == null) animator = GetComponentInChildren<Animator>();
         // Animator 없거나, 컨트롤러 없거나, IsCooking 파라미터 없으면 애니 비활성 (도구마다 자유롭게 섞어 써도 안전)
         _canAnimate = animator != null
                    && animator.runtimeAnimatorController != null
                    && HasParam(animator, "IsCooking");
+    }
+
+    private void Start()
+    {
+        CookingToolManager.Instance.Register(this);
     }
 
     private void OnDestroy() => CookingToolManager.Instance?.Unregister(this);

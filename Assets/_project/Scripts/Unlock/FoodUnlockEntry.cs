@@ -9,13 +9,19 @@ public class FoodUnlockEntry : IUnlockEntry
 
     public MenuData Data => _data;
 
+    private static readonly LocalizedString SharedDesc =
+        new("StringTable", "unlock.food");
+
     public LocalizedString DisplayName => _data.menuName;
-    public LocalizedString Description => _data.description;
+    public LocalizedString Description => SharedDesc;
     public Sprite Icon                 => _data.foodSprite;
     public long Cost                   => _data.satisfactionUnlock;
     public CurrencyType Currency       => CurrencyType.Satisfaction;
 
-    public bool IsVisible    => _data != null;          // 음식엔 zone 조건 없음
+    public bool IsVisible    => _data != null
+                             && (_data.tool == null
+                                 || (CatalogManager.Instance != null
+                                     && CatalogManager.Instance.IsUnlocked(_data.tool)));
     public bool IsPurchased  => CatalogManager.Instance != null
                              && CatalogManager.Instance.IsUnlocked(_data);
     public bool CanAfford    => SatisfactionSystem.Instance != null
