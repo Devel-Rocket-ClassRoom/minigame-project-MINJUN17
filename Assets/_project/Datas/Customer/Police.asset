@@ -18,9 +18,9 @@ MonoBehaviour:
   customerPrefab: {fileID: 7120179047670830194, guid: 2ba1bad372e282e44a51aaf703304800, type: 3}
   customerName:
     m_TableReference:
-      m_TableCollectionName: 
+      m_TableCollectionName: GUID:e8a326a4f684cfd4f828350fbb7606b2
     m_TableEntryReference:
-      m_KeyId: 0
+      m_KeyId: 1089519903043589
       m_Key: 
     m_FallbackState: 0
     m_WaitForCompletion: 0

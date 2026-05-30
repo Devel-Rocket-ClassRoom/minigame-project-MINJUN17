@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f0cc6336acd53945a1d4307bb60037e, type: 3}
   m_Name: Sink
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureData
-  saveId: d923144d982b
+  saveId: d127a7a99607
   prefab: {fileID: 4165227450889701098, guid: d8c2444ba05f1714f9e5493d62ea7f95, type: 3}
   zone: 3
   width: 2

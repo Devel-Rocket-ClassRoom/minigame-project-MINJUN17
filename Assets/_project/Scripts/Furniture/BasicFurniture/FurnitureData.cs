@@ -11,11 +11,25 @@ public class FurnitureData : ScriptableObject, ISaveIdentifiable
 #if UNITY_EDITOR
     private void OnValidate()
     {
-        if (string.IsNullOrEmpty(saveId))
+        // 비어있거나, 다른 FurnitureData와 중복(에셋 복제 시)이면 새 ID 발급.
+        if (string.IsNullOrEmpty(saveId) || IsSaveIdDuplicated())
         {
             saveId = System.Guid.NewGuid().ToString("N").Substring(0, 12);
             UnityEditor.EditorUtility.SetDirty(this);
         }
+    }
+
+    private bool IsSaveIdDuplicated()
+    {
+        // CookingToolData 등 서브클래스 포함 전체 FurnitureData 에셋 검사.
+        foreach (var guid in UnityEditor.AssetDatabase.FindAssets("t:FurnitureData"))
+        {
+            var path  = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
+            var other = UnityEditor.AssetDatabase.LoadAssetAtPath<FurnitureData>(path);
+            if (other != null && other != this && other.saveId == saveId)
+                return true;
+        }
+        return false;
     }
 #endif
 

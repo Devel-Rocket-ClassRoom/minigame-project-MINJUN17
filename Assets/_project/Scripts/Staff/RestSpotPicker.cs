@@ -35,6 +35,30 @@ public static class RestSpotPicker
         return best;
     }
 
+    // candidates를 "우선순위(리스트 순서)"대로 검사해서 점유되지 않은 첫 자리를 반환.
+    // 맨 앞이 1순위. 전부 점유 상태면 from에서 가장 가까운 후보로 폴백(겹쳐도 이동 최소화).
+    public static Vector3 PickByPriority(
+        Vector3 from,
+        IList<Vector3> candidates,
+        IList<Vector3> occupiers,
+        float blockRadius)
+    {
+        if (candidates == null || candidates.Count == 0) return Vector3.zero;
+
+        foreach (var c in candidates)
+            if (!IsBlocked(c, occupiers, blockRadius)) return c;
+
+        // 전부 찼음 → 가장 가까운 자리로 폴백
+        Vector3 best = candidates[0];
+        float bestDist = float.MaxValue;
+        foreach (var c in candidates)
+        {
+            float d = Vector3.Distance(from, c);
+            if (d < bestDist) { bestDist = d; best = c; }
+        }
+        return best;
+    }
+
     private static bool IsBlocked(Vector3 pos, IList<Vector3> occupiers, float blockRadius)
     {
         if (occupiers == null) return false;

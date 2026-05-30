@@ -39,6 +39,9 @@ public class DTCustomer : MonoBehaviour
     private float _spawnTime;
     private int _satisfaction;
 
+    // 주문/픽업 대기 시작 시각 — _data.patience("응대/음식 대기 한계") 초과 시 포기.
+    private float _waitStateStartTime;
+
     private DTOrderWindow _orderWindow;
     private DTPickupWindow _pickupWindow;
     public DTPickupWindow PickupWindow => _pickupWindow;
@@ -58,10 +61,14 @@ public class DTCustomer : MonoBehaviour
         _animator = GetComponent<Animator>();
 
         // 주문 메뉴 미리 결정 (서버가 응대 시 이 리스트 사용)
+        // 만들 수 있는 메뉴만 담음 — null(도구 미설치)은 제외. 0개면 주문 없이 통과(아래 정류장 스킵).
         int n = Random.Range(_data.minOrderCount, _data.maxOrderCount + 1);
         _orderedMenus = new List<MenuData>();
         for (int i = 0; i < n; i++)
-            _orderedMenus.Add(MenuManager.Instance.PickRandomByWeight());
+        {
+            var m = MenuManager.Instance.PickRandomByWeight();
+            if (m != null) _orderedMenus.Add(m);
+        }
 
         // Entry waypoint에 배치 + 첫 segment 방향으로 초기 Direction 세팅 (스폰 시 Turn 트리거 X)
         if (_lane.WaypointCount > 0)
@@ -83,12 +90,11 @@ public class DTCustomer : MonoBehaviour
 
     private void Update()
     {
-        // DT 차량은 patience 무한 — 무조건 응대/음식 받을 때까지 대기
         switch (_state)
         {
             case DTState.DRIVE:           DriveState(); break;
-            case DTState.WAIT_AT_ORDER:   /* 외부 트리거(OnOrderTaken) 대기 */ break;
-            case DTState.WAIT_AT_PICKUP:  PickupCheck(); break;
+            case DTState.WAIT_AT_ORDER:   WaitTimeoutCheck(); break;   // 외부 트리거(OnOrderTaken) 대기 + 타임아웃
+            case DTState.WAIT_AT_PICKUP:  PickupCheck(); WaitTimeoutCheck(); break;
         }
     }
 
@@ -155,10 +161,27 @@ public class DTCustomer : MonoBehaviour
         _currentWaypointIndex = next;
     }
 
+    private bool HasNoOrder => _orderedMenus == null || _orderedMenus.Count == 0;
+
+    // 주문/픽업 대기가 patience("응대/음식 대기 한계")를 넘으면 포기하고 퇴장 — 무한대기 방지
+    private void WaitTimeoutCheck()
+    {
+        if (_state != DTState.WAIT_AT_ORDER && _state != DTState.WAIT_AT_PICKUP) return;   // 이미 빠져나감
+        if (_data.patience <= 0f) return;
+        if (Time.time - _waitStateStartTime < _data.patience) return;
+
+        _satisfaction = 0;
+        ForceLeave();
+    }
+
     // ===== OrderStop =====
     private void EnterOrderStop()
     {
+        // 주문할 게 없으면(만들 수 있는 메뉴 0개) 정류장에 서지 않고 그냥 통과
+        if (HasNoOrder) { TryAdvance(); return; }
+
         _state = DTState.WAIT_AT_ORDER;
+        _waitStateStartTime = Time.time;
         _orderWindow?.OnCarArrived(this);
     }
 
@@ -175,7 +198,11 @@ public class DTCustomer : MonoBehaviour
     // ===== PickupStop =====
     private void EnterPickupStop()
     {
+        // 주문이 없었으면 받을 음식도 없음 → 픽업 정류장도 통과
+        if (HasNoOrder) { TryAdvance(); return; }
+
         _state = DTState.WAIT_AT_PICKUP;
+        _waitStateStartTime = Time.time;
         _pickupWindow?.OnCarArrived(this);
     }
 
@@ -211,9 +238,13 @@ public class DTCustomer : MonoBehaviour
 
     private void Despawn()
     {
-        SatisfactionSystem.Instance?.Earn(_satisfaction);
-        FloatingTextSystem.SpawnSatisfaction(transform.position, _satisfaction);
-        ReputationSystem.Instance?.Report(_satisfaction);
+        // 만들 수 있는 메뉴가 없어 그냥 지나간 차는 만족도/평판에 반영하지 않음(중립)
+        if (!HasNoOrder)
+        {
+            SatisfactionSystem.Instance?.Earn(_satisfaction);
+            FloatingTextSystem.SpawnSatisfaction(transform.position, _satisfaction);
+            ReputationSystem.Instance?.Report(_satisfaction);
+        }
 
         _pickupWindow?.ClearFor(this);
         _lane.UnregisterCar(this);

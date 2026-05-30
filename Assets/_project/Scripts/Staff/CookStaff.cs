@@ -22,6 +22,9 @@ public class CookStaff : Staff
 
     public float EffectiveSpeedMultiplier => _data.speedMultiplier * (1f + _hireVariance) * _growthMultiplier;
 
+    /// <summary>현재 향하고 있는(찜한) 휴식 자리. 다른 요리사가 같은 자리를 고르지 않도록 점유 판정에 사용.</summary>
+    public Vector3? CurrentRestTarget => _currentRestTarget;
+
     public void Init(StaffData data, int id, string nameKey, float hireVariance = 0f)
     {
         InitBase(data, id, nameKey, hireVariance);
@@ -86,6 +89,28 @@ public class CookStaff : Staff
 
     private Vector3 PickRestSpot()
     {
+        // ① 지정된 휴식장소(CookRestArea)가 있으면 우선순위(배열 순서)대로 채우기
+        var area = CookRestArea.Instance;
+        if (area != null && area.RestPositions != null && area.RestPositions.Count > 0)
+        {
+            var spots = new List<Vector3>();
+            foreach (var rp in area.RestPositions)
+                if (rp != null) spots.Add(rp.position);
+
+            if (spots.Count > 0)
+            {
+                var occ = new List<Vector3>();
+                foreach (var c in StaffManager.Instance.CookStaffs)
+                {
+                    if (c == this) continue;
+                    occ.Add(c.transform.position);
+                    if (c.CurrentRestTarget.HasValue) occ.Add(c.CurrentRestTarget.Value);   // 찜한 자리도 점유로
+                }
+                return RestSpotPicker.PickByPriority(transform.position, spots, occ, kRestBlockRadius);
+            }
+        }
+
+        // ② 폴백: 지정 자리가 없으면 기존처럼 주방 빈 칸 중 가까운 곳
         var candidates = GridManager.Instance.GetWalkableCellsInZone(CellZone.Kitchen);
 
         // 문 앞에서 쉬지 않도록 문 주변 셀 제외

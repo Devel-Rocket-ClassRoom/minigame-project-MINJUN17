@@ -194,8 +194,8 @@ MonoBehaviour:
   servicePos: {fileID: 3347014073710301111}
   staffPos: {fileID: 8590984694525552567}
   restPositions:
-  - {fileID: 7924452283057258718}
   - {fileID: 934861935617894374}
+  - {fileID: 7924452283057258718}
   - {fileID: 667923623659864687}
 --- !u!1 &7942496716868979495
 GameObject:

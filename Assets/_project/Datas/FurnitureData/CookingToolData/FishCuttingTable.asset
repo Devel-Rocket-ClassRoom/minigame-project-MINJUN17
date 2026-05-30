@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0ea88a793e072c4a93ff59edf571335, type: 3}
   m_Name: FishCuttingTable
   m_EditorClassIdentifier: Assembly-CSharp::CookingToolData
-  saveId: d59b4248d0ef
+  saveId: cff5c8900275
   prefab: {fileID: 2173106673545200348, guid: 559c1cdb7fefc14498b57d1a3bec6d66, type: 3}
   zone: 0
   width: 2

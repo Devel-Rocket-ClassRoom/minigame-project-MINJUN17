@@ -23,8 +23,27 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
     /// <summary>현재 방문 가능한(해금된) 손님들. 잠긴 손님은 preferredMenu가 해금되면 자동 해금된다.</summary>
     private readonly HashSet<CustomerData> _unlocked = new();
 
+    /// <summary>"새 손님 등장!" 팝업을 이미 띄운 손님 (첫 방문 1회만 노출).</summary>
+    private readonly HashSet<CustomerData> _introduced = new();
+
+    /// <summary>새로 해금된 손님이 처음 스폰될 때 발화 (인자: 해당 CustomerData). 팝업 UI가 구독.</summary>
+    public event Action<CustomerData> OnNewCustomerIntroduced;
+
     /// <summary>SaveIdRegistry용 — 전체 손님 풀 노출.</summary>
     public IReadOnlyList<CustomerData> Pool => pool;
+
+    /// <summary>특정 손님이 해금됐는지.</summary>
+    public bool IsUnlocked(CustomerData d) => d != null && _unlocked.Contains(d);
+
+    /// <summary>해금된 손님 목록 (pool 순서 유지). 손님 도감 UI용.</summary>
+    public List<CustomerData> GetUnlockedCustomers()
+    {
+        var list = new List<CustomerData>();
+        if (pool != null)
+            foreach (var d in pool)
+                if (d != null && _unlocked.Contains(d)) list.Add(d);
+        return list;
+    }
     public int ActiveCount => _active.Count; // 남은 손님 없어야 영업종료
     public IReadOnlyCollection<Customer> ActiveCustomers => _active;
     public void Register(Customer c) => _active.Add(c);
@@ -156,6 +175,17 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
         c.Init(data, counterManager, seatManager, queueManager, exitPoint.position);
     }
 
+    /// <summary>
+    /// 손님이 처음 "가게에 들어왔을 때" 1회만 소개 이벤트 발화 (시작 손님 포함 — 완전 첫 손님도 소개).
+    /// 스폰은 화면 밖이라, 손님이 문 통과(가게 진입) 시점에 Customer가 직접 호출한다.
+    /// </summary>
+    public void TryIntroduceNewCustomer(CustomerData data)
+    {
+        if (data == null) return;
+        if (!_introduced.Add(data)) return;   // 손님별 최초 1회만
+        OnNewCustomerIntroduced?.Invoke(data);
+    }
+
     private void HandleDespawn(Customer c)
     {
         Unregister(c);
@@ -197,17 +227,20 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
     public CustomerUnlockData ToData()
     {
         var ids = new List<string>();
+        var introduced = new List<string>();
         foreach (var d in pool)
         {
-            if (d == null || !_unlocked.Contains(d)) continue;
-            if (d is ISaveIdentifiable s && !string.IsNullOrEmpty(s.SaveId)) ids.Add(s.SaveId);
+            if (d is not ISaveIdentifiable s || string.IsNullOrEmpty(s.SaveId)) continue;
+            if (_unlocked.Contains(d))   ids.Add(s.SaveId);
+            if (_introduced.Contains(d)) introduced.Add(s.SaveId);
         }
-        return new CustomerUnlockData { unlockedIds = ids };
+        return new CustomerUnlockData { unlockedIds = ids, introducedIds = introduced };
     }
 
     public void FromData(CustomerUnlockData data)
     {
         _unlocked.Clear();
+        _introduced.Clear();
         EnsureStartingUnlocked();                       // 시작 손님은 항상 포함
         if (data?.unlockedIds != null)
         {
@@ -215,6 +248,14 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
             {
                 var cd = SaveIdRegistry.GetById<CustomerData>(id);
                 if (cd != null) _unlocked.Add(cd);
+            }
+        }
+        if (data?.introducedIds != null)
+        {
+            foreach (var id in data.introducedIds)
+            {
+                var cd = SaveIdRegistry.GetById<CustomerData>(id);
+                if (cd != null) _introduced.Add(cd);
             }
         }
     }

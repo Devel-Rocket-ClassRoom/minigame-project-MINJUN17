@@ -42,7 +42,8 @@ public class SaveData
 [Serializable]
 public class CustomerUnlockData
 {
-    public List<string> unlockedIds;   // CustomerData saveId 목록
+    public List<string> unlockedIds;     // CustomerData saveId 목록
+    public List<string> introducedIds;   // "새 손님 등장" 팝업을 이미 띄운 손님 saveId 목록 (중복 노출 방지)
 }
 
 [Serializable]

@@ -23,6 +23,31 @@ public class MenuManager : MonoBehaviour
     public bool Unlock(MenuData menu)
         => CatalogManager.Instance != null && CatalogManager.Instance.TryUnlock(menu);
 
+    /// <summary>
+    /// 지금 실제로 만들 수 있는 메뉴인지. (해금 ≠ 제조 가능)
+    /// 도구가 필요 없거나(menu.tool == null), 필요한 조리도구가 씬에 설치돼 있어야 true.
+    /// 해금만 되고 도구 미설치인 메뉴를 손님이 주문해 무한대기에 빠지는 것 방지.
+    /// </summary>
+    public bool IsMakeable(MenuData menu)
+    {
+        if (menu == null) return false;
+        if (menu.tool == null) return true;   // 조리도구 불필요 메뉴 (예: 음료)
+        return CookingToolManager.Instance != null
+            && CookingToolManager.Instance.GetToolInstance(menu.tool.toolType) != null;
+    }
+
+    /// <summary>설치된 조리도구로 만들 수 있는 해금 메뉴가 하나라도 있는가.</summary>
+    public bool HasAnyMakeable()
+    {
+        foreach (var m in UnlockedMenus)
+            if (IsMakeable(m)) return true;
+        return false;
+    }
+
+    /// <summary>
+    /// 만들 수 있는(IsMakeable) 메뉴 중에서 가중치 랜덤 픽.
+    /// 만들 수 있는 메뉴가 하나도 없으면 null (호출측에서 "주문 없음" 처리).
+    /// </summary>
     public MenuData PickRandomByWeight()
     {
         var unlocked = UnlockedMenus;
@@ -34,20 +59,15 @@ public class MenuManager : MonoBehaviour
         }
 
         float total = 0;
-        foreach (var m in unlocked) total += m.spawnWeight;
-        if (total <= 0f)
-        {
-            Debug.LogWarning("[MenuManager] 해금된 메뉴는 있지만 spawnWeight 합이 0 — MenuData.spawnWeight 확인");
-            // 폴백: 첫 메뉴 반환 (null보단 낫게)
-            foreach (var m in unlocked) return m;
-            return null;
-        }
+        foreach (var m in unlocked) if (IsMakeable(m)) total += m.spawnWeight;
+        if (total <= 0f) return null;   // 만들 수 있는 메뉴 없음 (도구 미설치) 또는 가중치 합 0
 
         float r = Random.Range(0f, total);
         float acc = 0;
         MenuData last = null;
         foreach (var m in unlocked)
         {
+            if (!IsMakeable(m)) continue;
             acc += m.spawnWeight;
             last = m;
             if (r <= acc) return m;

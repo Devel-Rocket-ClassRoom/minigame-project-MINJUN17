@@ -75,23 +75,23 @@ public class SettlementPanel : MonoBehaviour
         // 1) 직원월급 — 인스펙터에 연결돼 있을 때만
         if (salaryRow != null)
         {
-            _seq.AppendCallback(() => Appear(salaryRow))
+            _seq.AppendCallback(() => AppearItem(salaryRow))
                 .Append(CountUp(salaryText, r.SalaryCost))
                 .AppendInterval(stepDelay);
         }
 
         // 2) 재료비
-        _seq.AppendCallback(() => Appear(materialRow))
+        _seq.AppendCallback(() => AppearItem(materialRow))
             .Append(CountUp(materialText, r.MaterialCost))
             .AppendInterval(stepDelay)
 
             // 3) 임대료 (운영비)
-            .AppendCallback(() => Appear(operationRow))
+            .AppendCallback(() => AppearItem(operationRow))
             .Append(CountUp(operationText, r.OperationCost))
             .AppendInterval(stepDelay)
 
             // 4) 총합 (항상 음수 — 빨강 텍스트로 인스펙터 설정)
-            .AppendCallback(() => Appear(totalRow, emphasizeTotal ? totalPunchStrength : punchStrength))
+            .AppendCallback(() => AppearItem(totalRow, emphasizeTotal ? totalPunchStrength : punchStrength))
             .Append(CountUp(totalText, r.NetProfit))
             .AppendInterval(stepDelay)
 
@@ -103,6 +103,16 @@ public class SettlementPanel : MonoBehaviour
             .OnComplete(() => _seq = null)
             .SetUpdate(true)            // 일시정지 영향 X
             .SetLink(gameObject);       // 파괴 시 자동 Kill
+    }
+
+    /// <summary>정산 내역 행: 효과음과 함께 등장 (한 줄씩 뜰 때마다).</summary>
+    private void AppearItem(GameObject row) => AppearItem(row, punchStrength);
+
+    private void AppearItem(GameObject row, float strength)
+    {
+        if (row == null) return;   // 연결 안 된 행은 소리도 스킵
+        SoundManager.Get()?.PlaySfx(SfxId.SettlementItem);
+        Appear(row, strength);
     }
 
     /// <summary>행을 켜고 살짝 튀어오르게.</summary>

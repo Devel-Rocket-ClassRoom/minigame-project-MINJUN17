@@ -1979,6 +1979,7 @@ GameObject:
   - component: {fileID: 1516997804}
   - component: {fileID: 1516997803}
   - component: {fileID: 1516997802}
+  - component: {fileID: 1516997806}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -2071,6 +2072,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1516997806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1516997801}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c48edaba8a100448999f366f218346c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonClickSfx
+  clickSfx: 1
+  includeInactive: 1
 --- !u!1 &1666238746
 GameObject:
   m_ObjectHideFlags: 0
@@ -2598,6 +2613,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1911226122}
   - component: {fileID: 1911226121}
+  - component: {fileID: 1911226123}
   m_Layer: 0
   m_Name: StartManager
   m_TagString: Untagged
@@ -2650,6 +2666,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1911226123
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1911226120}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e501009152ef17f48a571af3d2639ac0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SceneBgm
+  bgm: {fileID: 8300000, guid: c9a23b9ff85546e478269d51dd1959c0, type: 3}
+  fadeDuration: 0.5
 --- !u!1 &1930322004
 GameObject:
   m_ObjectHideFlags: 0

@@ -39,6 +39,14 @@ public class Customer : MonoBehaviour
     private CustomerState _stairAfterState;
     private bool _leaveInitDone;
 
+    // 만들 수 있는(도구 설치된) 메뉴가 0개라 주문 못 하는 손님 — 계산대만 찍고 퇴장
+    private bool _noServeableMenu;
+    private const float kNoOrderCounterDwell = 1.2f;   // 카운터에서 잠깐 머무는 시간
+
+    // 총 대기가 patience의 이 배수를 넘으면 포기하고 퇴장 (무한대기 안전망).
+    // patience 자체는 "만족도 차감 시작점"이라, 그 N배를 "완전 포기" 임계로 재활용.
+    private const float kGiveUpPatienceMult = 2.5f;
+
     // 화장실 사이클
     public enum ToiletPhase { None, Stall, Sink }
     private ToiletPhase _toiletPhase = ToiletPhase.None;
@@ -93,7 +101,8 @@ public class Customer : MonoBehaviour
         int wallet = _data.wallet;
         OrderedMenus = new List<MenuData>();
 
-        if (_data.preferredMenu != null)
+        // 선호 메뉴도 "만들 수 있을 때만" 주문 (도구 미설치면 스킵)
+        if (_data.preferredMenu != null && MenuManager.Instance.IsMakeable(_data.preferredMenu))
         {
             OrderedMenus.Add(_data.preferredMenu);
             wallet -= _data.preferredMenu.price;
@@ -107,7 +116,23 @@ public class Customer : MonoBehaviour
         }
 
         if (OrderedMenus.Count == 0)
-            OrderedMenus.Add(MenuManager.Instance.PickRandomByWeight());
+        {
+            var fallback = MenuManager.Instance.PickRandomByWeight();   // 만들 수 있는 메뉴 중 픽 (없으면 null)
+            if (fallback != null) OrderedMenus.Add(fallback);
+        }
+
+        // 만들 수 있는 메뉴가 하나도 없음 → 자리 안 잡고 줄 서서 계산대만 찍고 퇴장
+        if (OrderedMenus.Count == 0)
+        {
+            _noServeableMenu = true;
+            if (!_queueManager.TryEnqueue(this))
+            {
+                ChangeState(CustomerState.LEAVE);   // 줄이 꽉 차면 그냥 떠남
+                return;
+            }
+            ChangeState(CustomerState.Enter);
+            return;
+        }
 
         CustomerManager.Instance.RegisterWaitingForSeat(this);
         ChangeState(CustomerState.WAIT_FOR_SEAT);
@@ -122,11 +147,33 @@ public class Customer : MonoBehaviour
             case CustomerState.WALK_TO_COUNTER:  WalkToCounterState(); break;
             case CustomerState.WAIT_AT_COUNTER:
                 if (_targetCounter != null) FaceToward(_targetCounter.transform.position);
+                // 주문할 게 없는 손님: 잠깐 머물다 카운터 비우고 퇴장 (중립)
+                if (_noServeableMenu && _stateTimer >= kNoOrderCounterDwell)
+                {
+                    _targetCounter?.OnCustomerPaid(0);   // Enter에서 Reserve된 카운터 해제
+                    _targetCounter = null;
+                    ChangeState(CustomerState.LEAVE);
+                }
+                // 참을성 한계(patience×배수) 넘게 주문 접수가 안 되면 포기하고 퇴장 (불만족)
+                else if (!_noServeableMenu && GaveUpWaiting())
+                {
+                    _satisfaction = 0;
+                    _targetCounter?.OnCustomerPaid(0);
+                    _targetCounter = null;
+                    ChangeState(CustomerState.LEAVE);
+                }
                 break;
             case CustomerState.WALK_TO_SEAT:     WalkToSeatState(); break;
             case CustomerState.WALK_TO_STAIR:    WalkToStairState(); break;
             case CustomerState.WAIT_AT_SEAT:
                 if (_servedFood != null) { ChangeState(CustomerState.EAT); break; }
+                // 음식이 참을성 한계(patience×배수)를 넘게 안 나오면 포기하고 퇴장 (무한대기 안전망)
+                if (GaveUpWaiting())
+                {
+                    _satisfaction = 0;
+                    ChangeState(CustomerState.LEAVE);
+                    break;
+                }
                 if (_targetSeat != null) FaceToward(_targetSeat.FoodDropOff.position);
                 break;
             case CustomerState.EAT:              EatState(); break;
@@ -189,8 +236,12 @@ public class Customer : MonoBehaviour
                 _passedDoor = false;   // 사이드워크 → 도어 → 카운터
                 break;
             case CustomerState.WAIT_AT_COUNTER:
-                _targetCounter.OnCustomerArrived(this);
-                orderBubble?.Show();
+                // 주문할 게 없는 손님은 서버를 부르지 않음(OnCustomerArrived 생략) → Update에서 곧 퇴장
+                if (!_noServeableMenu)
+                {
+                    _targetCounter.OnCustomerArrived(this);
+                    orderBubble?.Show();
+                }
                 break;
             case CustomerState.EAT:
                 float waitDuration = _waitStartTime > 0 ? Time.time - _waitStartTime : 0f;
@@ -218,9 +269,13 @@ public class Customer : MonoBehaviour
                     _targetSink = null;
                     orderBubble?.Hide();   // 주문 안 받은 채 타임아웃 떠나는 경우 대비
                     eatProgress?.Hide();
-                    SatisfactionSystem.Instance.Earn(_satisfaction);
-                    FloatingTextSystem.SpawnSatisfaction(transform.position, _satisfaction);
-                    ReputationSystem.Instance?.Report(_satisfaction);
+                    // 만들 수 있는 메뉴가 없어 그냥 돌아가는 손님은 만족도/평판에 반영하지 않음(중립)
+                    if (!_noServeableMenu)
+                    {
+                        SatisfactionSystem.Instance.Earn(_satisfaction);
+                        FloatingTextSystem.SpawnSatisfaction(transform.position, _satisfaction);
+                        ReputationSystem.Instance?.Report(_satisfaction);
+                    }
                 }
                 break;
         }
@@ -266,7 +321,13 @@ public class Customer : MonoBehaviour
         MoveTo(dest);
         if (HasArrived())
         {
-            if (!_passedDoor) { _passedDoor = true; return; }
+            if (!_passedDoor)
+            {
+                _passedDoor = true;
+                // 문 통과 = 가게 진입. 새로 해금된 손님이면 이 시점에 "새 손님 등장!" 팝업.
+                CustomerManager.Instance?.TryIntroduceNewCustomer(_data);
+                return;
+            }
             ChangeState(CustomerState.WAIT_AT_COUNTER);
         }
     }
@@ -541,11 +602,17 @@ public class Customer : MonoBehaviour
         }
     }
 
+    /// <summary>총 대기(_waitStartTime 기준)가 참을성 한계를 넘었는가 — 서비스 포기 임계.</summary>
+    private bool GaveUpWaiting()
+        => _waitStartTime > 0f
+        && (Time.time - _waitStartTime) > _data.patience * kGiveUpPatienceMult;
+
     private MenuData PickAffordable(int budget)
     {
         var unlocked = MenuManager.Instance.UnlockedMenus;
         float total = 0f;
-        foreach (var m in unlocked) if (m.price <= budget) total += m.spawnWeight;
+        foreach (var m in unlocked)
+            if (m.price <= budget && MenuManager.Instance.IsMakeable(m)) total += m.spawnWeight;
         if (total <= 0f) return null;
 
         float r = Random.Range(0f, total);
@@ -553,7 +620,7 @@ public class Customer : MonoBehaviour
         MenuData last = null;
         foreach (var m in unlocked)
         {
-            if (m.price > budget) continue;
+            if (m.price > budget || !MenuManager.Instance.IsMakeable(m)) continue;
             acc += m.spawnWeight;
             last = m;
             if (r <= acc) return m;

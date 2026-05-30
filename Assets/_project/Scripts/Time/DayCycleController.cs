@@ -62,9 +62,21 @@ public class DayCycleController : MonoBehaviour
 
     private void HandleDayStarted()
     {
+        CleanupLeftoverFoodAndOrders();   // 영업 시작 전 클린 슬레이트 보장
         customerManager.StartSpawning();
         DTSystem.Instance?.StartSpawning();
         StaffManager.Instance?.OnBusinessOpen();
+    }
+
+    /// <summary>맵에 남은 음식 프리팹 + 미처리 주문 전부 제거. 손님/차 다 빠진 뒤 호출.</summary>
+    private void CleanupLeftoverFoodAndOrders()
+    {
+        // 픽업대 주문 큐 + 픽업대 위 음식 정리
+        PassWindowManager.Instance?.ClearAll();
+
+        // 테이블/직원 손/DT 픽업창구 등 어디든 남아있는 음식 프리팹 전부 제거
+        foreach (var f in UnityEngine.Object.FindObjectsByType<Food>(FindObjectsSortMode.None))
+            if (f != null) Destroy(f.gameObject);
     }
 
     private void HandleClose()
@@ -103,6 +115,7 @@ public class DayCycleController : MonoBehaviour
         _waitingToClear = false;
         _safetyApplied = false;
         StaffManager.Instance?.OnBusinessClose(); // 손님 다 나간 뒤에야 직원 퇴근
+        CleanupLeftoverFoodAndOrders();           // 영업 종료 시 남은 음식/주문 정리
         OnSettlementReady?.Invoke();
     }
 
