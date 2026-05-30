@@ -40,6 +40,14 @@ public class SoundManager : MonoBehaviour
 
     private const string kBgmPref = "audio.bgm";
     private const string kSfxPref = "audio.sfx";
+    private const string kBgmMutePref = "audio.bgm.muted";
+    private const string kSfxMutePref = "audio.sfx.muted";
+
+    private bool _bgmMuted;
+    private bool _sfxMuted;
+
+    // 실제 재생 볼륨(음소거면 0, 볼륨값은 보존)
+    private float BgmPlaybackVolume => _bgmMuted ? 0f : bgmVolume;
 
     private void Awake()
     {
@@ -49,6 +57,8 @@ public class SoundManager : MonoBehaviour
 
         bgmVolume = PlayerPrefs.GetFloat(kBgmPref, bgmVolume);
         sfxVolume = PlayerPrefs.GetFloat(kSfxPref, sfxVolume);
+        _bgmMuted = PlayerPrefs.GetInt(kBgmMutePref, 0) == 1;
+        _sfxMuted = PlayerPrefs.GetInt(kSfxMutePref, 0) == 1;
 
         if (sfxLibrary != null && sfxLibrary.entries != null)
             foreach (var e in sfxLibrary.entries)
@@ -59,13 +69,13 @@ public class SoundManager : MonoBehaviour
                 _map[entry.id] = entry;
             }
 
-        if (bgmSource != null) { bgmSource.loop = true; bgmSource.volume = bgmVolume; }
+        if (bgmSource != null) { bgmSource.loop = true; bgmSource.volume = BgmPlaybackVolume; }
     }
 
     // ─────────────────────────────────────── SFX
     public void PlaySfx(SfxId id)
     {
-        if (id == SfxId.None || sfxSource == null) return;
+        if (id == SfxId.None || sfxSource == null || _sfxMuted) return;
         if (!_map.TryGetValue(id, out var e) || e.clip == null) return;
         float v = (e.volume <= 0f ? 1f : e.volume) * sfxVolume;
         sfxSource.PlayOneShot(e.clip, v);
@@ -108,13 +118,13 @@ public class SoundManager : MonoBehaviour
             {
                 bgmSource.clip = clip;
                 bgmSource.Play();
-                bgmSource.DOFade(bgmVolume, fade);
+                bgmSource.DOFade(BgmPlaybackVolume, fade);
             });
         }
         else
         {
             bgmSource.clip = clip;
-            bgmSource.volume = bgmVolume;
+            bgmSource.volume = BgmPlaybackVolume;
             bgmSource.Play();
         }
     }
@@ -134,7 +144,7 @@ public class SoundManager : MonoBehaviour
     public void SetBgmVolume(float v)
     {
         bgmVolume = Mathf.Clamp01(v);
-        if (bgmSource != null) bgmSource.volume = bgmVolume;
+        if (bgmSource != null) bgmSource.volume = BgmPlaybackVolume;
         PlayerPrefs.SetFloat(kBgmPref, bgmVolume);
         PlayerPrefs.Save();
     }
@@ -145,4 +155,29 @@ public class SoundManager : MonoBehaviour
         PlayerPrefs.SetFloat(kSfxPref, sfxVolume);
         PlayerPrefs.Save();
     }
+
+    // ─────────────────────────────────────── 음소거 (설정 UI 토글 버튼에서 호출)
+    public bool IsBgmMuted => _bgmMuted;
+    public bool IsSfxMuted => _sfxMuted;
+
+    public void SetBgmMuted(bool muted)
+    {
+        _bgmMuted = muted;
+        if (bgmSource != null) bgmSource.volume = BgmPlaybackVolume;   // 볼륨값은 보존, 재생만 0
+        PlayerPrefs.SetInt(kBgmMutePref, muted ? 1 : 0);
+        PlayerPrefs.Save();
+    }
+
+    public void SetSfxMuted(bool muted)
+    {
+        _sfxMuted = muted;
+        PlayerPrefs.SetInt(kSfxMutePref, muted ? 1 : 0);
+        PlayerPrefs.Save();
+    }
+
+    /// <summary>BGM 음소거 토글. 새 상태(true=음소거) 반환.</summary>
+    public bool ToggleBgmMuted() { SetBgmMuted(!_bgmMuted); return _bgmMuted; }
+
+    /// <summary>SFX 음소거 토글. 새 상태(true=음소거) 반환.</summary>
+    public bool ToggleSfxMuted() { SetSfxMuted(!_sfxMuted); return _sfxMuted; }
 }
