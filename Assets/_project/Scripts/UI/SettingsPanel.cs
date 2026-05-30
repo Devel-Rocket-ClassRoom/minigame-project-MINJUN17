@@ -37,6 +37,8 @@ public class SettingsPanel : MonoBehaviour
     [SerializeField] private GameObject panelRoot;   // 패널 본체 (없으면 this.gameObject)
     [SerializeField] private Button openButton;
     [SerializeField] private Button closeButton;
+    [Tooltip("풀스크린 투명 버튼(모달 막). 누르면 닫히고 뒤 버튼 클릭 차단.")]
+    [SerializeField] private Button dimBackdrop;
 
     private List<Locale> _locales;
 
@@ -52,6 +54,7 @@ public class SettingsPanel : MonoBehaviour
 
         if (openButton  != null) openButton.onClick.AddListener(Open);
         if (closeButton != null) closeButton.onClick.AddListener(Close);
+        if (dimBackdrop != null) dimBackdrop.onClick.AddListener(Close);
     }
 
     private void Start()
@@ -124,6 +127,15 @@ public class SettingsPanel : MonoBehaviour
     // 여기서도 gameObject로 폴백한다. (패널 자체가 루트인 경우 대응)
     private GameObject ResolveRoot() => panelRoot != null ? panelRoot : gameObject;
 
-    public void Open()  => ResolveRoot().SetActive(true);
-    public void Close() => ResolveRoot().SetActive(false);
+    public void Open()
+    {
+        if (dimBackdrop != null) dimBackdrop.gameObject.SetActive(true);
+        ResolveRoot().SetActive(true);
+    }
+
+    public void Close()
+    {
+        if (dimBackdrop != null) dimBackdrop.gameObject.SetActive(false);
+        ResolveRoot().SetActive(false);
+    }
 }

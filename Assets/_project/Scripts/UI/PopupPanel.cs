@@ -13,6 +13,8 @@ public class PopupPanel : MonoBehaviour
     [SerializeField] private RectTransform panel;        // 애니메이션 대상 (보통 자기 자신 또는 자식 루트)
     [SerializeField] private CanvasGroup canvasGroup;    // 없으면 자동 추가
     [SerializeField] private Button closeButton;         // 옵션 (있으면 자동 연결)
+    [Tooltip("풀스크린 투명 버튼(모달 막). 패널 뒤·다른 버튼 앞에 배치. 누르면 닫히고, 뒤 버튼 클릭을 차단.")]
+    [SerializeField] private Button dimBackdrop;         // 옵션 (있으면 패널과 함께 켜지고 클릭 시 Close)
 
     [Header("Animation")]
     [SerializeField] private float animDuration = 0.2f;
@@ -56,6 +58,7 @@ public class PopupPanel : MonoBehaviour
         _closedPos = _openPos + new Vector2(0f, -slideOffset);
 
         if (closeButton != null) closeButton.onClick.AddListener(Close);
+        if (dimBackdrop != null) dimBackdrop.onClick.AddListener(Close);
 
         Apply(startOpen, instant: true);   // _inited=true 이후라 재귀 안 됨
     }
@@ -72,6 +75,8 @@ public class PopupPanel : MonoBehaviour
         _isOpen = open;
         panel.DOKill();
         canvasGroup.DOKill();
+
+        if (dimBackdrop != null) dimBackdrop.gameObject.SetActive(open);   // 막은 패널과 함께 즉시 켜고 끔
 
         if (open)
         {
