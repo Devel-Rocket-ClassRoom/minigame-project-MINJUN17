@@ -54,6 +54,8 @@ public class RankingPanel : MonoBehaviour
     [Header("연출 타이밍")]
     [SerializeField] private float countUpSec = 0.6f;
     [SerializeField] private float stepDelay  = 0.5f;
+    [Tooltip("드럼롤 재생 후 순위 공개까지 긴장감 텀(초)")]
+    [SerializeField] private float drumrollLead = 1.5f;
 
     [Header("Punch 효과")]
     [SerializeField] private float punchStrength = 0.15f;
@@ -129,8 +131,13 @@ public class RankingPanel : MonoBehaviour
             .Append(CountUp(reputationText, result.Reputation, "점"))
             .AppendInterval(stepDelay)
 
-            // 4) 순위 (강조)
+            // 3.5) 순위 발표 직전 드럼롤 (긴장감 텀)
+            .AppendCallback(() => SoundManager.Get()?.PlaySfx(SfxId.Drumroll))
+            .AppendInterval(drumrollLead)
+
+            // 4) 순위 (강조) — 발표 효과음과 함께
             .AppendCallback(() => {
+                SoundManager.Get()?.PlaySfx(SfxId.RankingReveal);
                 Appear(rankRow, emphasizeRank ? rankPunchStrength : punchStrength);
                 if (rankText != null) rankText.text = rankLabel;
             })

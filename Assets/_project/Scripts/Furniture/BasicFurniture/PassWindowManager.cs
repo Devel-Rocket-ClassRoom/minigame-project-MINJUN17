@@ -123,6 +123,12 @@ public class PassWindowManager : MonoBehaviour
         passWindows[0].SubmitOrder(order);
     }
 
+    /// <summary>모든 픽업대의 미처리 주문/음식 정리 (영업 종료/시작 시).</summary>
+    public void ClearAll()
+    {
+        foreach (var pw in passWindows) pw.ClearAll();
+    }
+
     public void PlaceFood(Food food)
     {
         if (passWindows.Count == 0) return;

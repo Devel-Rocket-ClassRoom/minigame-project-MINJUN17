@@ -108,6 +108,8 @@ public class PhoneManager : MonoBehaviour
     private bool CanGenerateNewCall()
     {
         if (StaffManager.Instance == null) return false;
+        // 만들 수 있는 메뉴가 하나도 없으면 콜 자체를 발생시키지 않음 (배달 무한대기 방지)
+        if (MenuManager.Instance == null || !MenuManager.Instance.HasAnyMakeable()) return false;
         int riderCount = StaffManager.Instance.RiderCount;
         if (riderCount <= 0) return false;
         if (timeSystem != null && !timeSystem.IsOpen) return false;
@@ -141,7 +143,17 @@ public class PhoneManager : MonoBehaviour
         int orderCount = Random.Range(minOrderCount, maxOrderCount + 1);
         var menus = new List<MenuData>();
         for (int i = 0; i < orderCount; i++)
-            menus.Add(MenuManager.Instance.PickRandomByWeight());
+        {
+            var m = MenuManager.Instance.PickRandomByWeight();
+            if (m != null) menus.Add(m);   // 만들 수 있는 메뉴만 (null = 도구 미설치)
+        }
+
+        // 응대 직전에 도구가 사라지는 등으로 만들 수 있는 메뉴가 0개면 주문 불성립
+        if (menus.Count == 0)
+        {
+            _activeDeliveryCount = Mathf.Max(0, _activeDeliveryCount - 1);
+            return null;
+        }
 
         // ★ 배달 매출/판매 통계 기록 (전화 응대 시점)
         int totalPrice = 0;

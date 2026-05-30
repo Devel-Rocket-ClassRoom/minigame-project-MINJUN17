@@ -34,6 +34,34 @@ public class FloorToggleButton : MonoBehaviour
         Refresh(animated: true);
     }
 
+    private void Start()
+    {
+        // 2층 확장 시점에 버튼을 노출. (비활성 상태여도 델리게이트는 살아있어 콜백 수신됨)
+        if (ExpansionManager.Instance != null)
+            ExpansionManager.Instance.OnExpanded += OnExpanded;
+
+        // 세이브 로드(SaveLoadManager, 실행순서 -50)가 끝난 뒤 호출되므로 복원된 해금 상태도 반영됨.
+        UpdateVisibility();
+    }
+
+    private void OnDestroy()
+    {
+        if (ExpansionManager.Instance != null)
+            ExpansionManager.Instance.OnExpanded -= OnExpanded;
+    }
+
+    private void OnExpanded(ExpansionStageData _) => UpdateVisibility();
+
+    /// <summary>2층이 해금(활성 셀 존재)됐을 때만 버튼 노출.</summary>
+    private void UpdateVisibility()
+    {
+        bool unlocked = GridManager.Instance != null
+                     && GridManager.Instance.GetActiveBoundsForFloor(FloorIndex.Floor2).HasValue;
+
+        if (gameObject.activeSelf != unlocked)
+            gameObject.SetActive(unlocked);
+    }
+
     private void OnEnable() => Refresh(animated: false);
 
     private void Refresh(bool animated)

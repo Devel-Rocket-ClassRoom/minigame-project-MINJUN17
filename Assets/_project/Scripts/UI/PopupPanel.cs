@@ -25,10 +25,26 @@ public class PopupPanel : MonoBehaviour
     private bool _isOpen;
     private Vector2 _openPos;
     private Vector2 _closedPos;
+    private bool _inited;
 
-    private void Awake()
+    private void Awake() => EnsureInit();
+
+    /// <summary>
+    /// 초기화. Awake에서 1회 실행되지만, 비활성 상태에서 Open()이 먼저 호출되는 경우
+    /// (Awake 미실행)에도 대비해 Apply에서 호출 → null 크래시 방지.
+    /// </summary>
+    private void EnsureInit()
     {
+        if (_inited) return;
+        _inited = true;
+
         if (panel == null) panel = transform as RectTransform;
+        if (panel == null)
+        {
+            Debug.LogError($"[PopupPanel] panel 미지정 + 이 오브젝트가 RectTransform이 아님 — " +
+                           $"인스펙터에서 panel을 지정하세요: {name}", this);
+            return;
+        }
 
         if (canvasGroup == null)
         {
@@ -41,7 +57,7 @@ public class PopupPanel : MonoBehaviour
 
         if (closeButton != null) closeButton.onClick.AddListener(Close);
 
-        Apply(startOpen, instant: true);
+        Apply(startOpen, instant: true);   // _inited=true 이후라 재귀 안 됨
     }
 
     public void Open()   => Apply(true,  instant: false);
@@ -50,6 +66,9 @@ public class PopupPanel : MonoBehaviour
 
     private void Apply(bool open, bool instant)
     {
+        EnsureInit();
+        if (panel == null) return;   // 초기화 실패(RectTransform 아님) 시 크래시 방지
+
         _isOpen = open;
         panel.DOKill();
         canvasGroup.DOKill();

@@ -25,6 +25,9 @@ public class ServerStaff : Staff
 
     public bool IsIdle => _state == ServerState.IDLE_AT_COUNTER;
 
+    /// <summary>현재 향하고 있는(찜한) 휴식 자리. 다른 서버가 같은 자리를 고르지 않도록 점유 판정에 사용.</summary>
+    public Vector3? CurrentRestTarget => _currentRestTarget;
+
     public void Init(StaffData data, int id, string nameKey, float hireVariance = 0f)
     {
         InitBase(data, id, nameKey, hireVariance);
@@ -200,9 +203,14 @@ public class ServerStaff : Staff
 
         var occupiers = new List<Vector3>();
         foreach (var s in StaffManager.Instance.ServerStaffs)
-            if (s != this) occupiers.Add(s.transform.position);
+        {
+            if (s == this) continue;
+            occupiers.Add(s.transform.position);
+            if (s.CurrentRestTarget.HasValue) occupiers.Add(s.CurrentRestTarget.Value);   // 찜한 자리도 점유로
+        }
 
-        return RestSpotPicker.PickClosestFree(
+        // 우선순위(restPositions 배열 순서)대로 빈 자리 채우기
+        return RestSpotPicker.PickByPriority(
             transform.position, candidates, occupiers, kRestBlockRadius);
     }
 

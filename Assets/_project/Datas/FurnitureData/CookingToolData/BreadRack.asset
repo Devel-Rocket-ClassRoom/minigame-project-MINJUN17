@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0ea88a793e072c4a93ff59edf571335, type: 3}
   m_Name: BreadRack
   m_EditorClassIdentifier: Assembly-CSharp::CookingToolData
-  saveId: d59b4248d0ef
+  saveId: 7e32caa53be6
   prefab: {fileID: 4284249007116402630, guid: 6b07b35848420fd46868c706cde8880d, type: 3}
   zone: 0
   width: 2

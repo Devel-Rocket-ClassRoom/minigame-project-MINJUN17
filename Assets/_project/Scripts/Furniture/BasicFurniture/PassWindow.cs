@@ -77,6 +77,15 @@ public class PassWindow : MonoBehaviour
     public void SubmitOrder(Order order) => pendingOrders.Enqueue(order);
     public Order DequeueOrder() => pendingOrders.Dequeue();
 
+    /// <summary>영업 정리: 미처리 주문 큐 비우고 픽업대에 남은 음식 프리팹 제거.</summary>
+    public void ClearAll()
+    {
+        pendingOrders.Clear();
+        foreach (var f in readyFoods)
+            if (f != null) Destroy(f.gameObject);
+        readyFoods.Clear();
+    }
+
     public void PlaceFood(Food food)
     {
         readyFoods.Add(food);

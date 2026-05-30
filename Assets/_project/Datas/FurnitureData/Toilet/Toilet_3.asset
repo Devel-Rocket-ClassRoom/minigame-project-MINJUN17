@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f0cc6336acd53945a1d4307bb60037e, type: 3}
   m_Name: Toilet_3
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureData
-  saveId: d923144d982b
+  saveId: 75558ed08360
   prefab: {fileID: 918655159097183394, guid: 66e9282e22e947c4ebf6159d67e2b92e, type: 3}
   zone: 3
   width: 1
