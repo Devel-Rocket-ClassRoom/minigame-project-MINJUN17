@@ -11,10 +11,8 @@ public class RiderStaff : Staff
     private bool _passedDoor;
     private static readonly Vector3 DoorWorld = new Vector3(0.5f, 1.5f, 0f);
 
-    // 라이더 대기 슬롯 (인도 y=0 라인). 셀 (-1,0)..(-3,0) → 월드 (-0.5,0.5)..(-2.5,0.5)
-    private const float StandbyY = 0.5f;
-    private const float FirstStandbyX = -0.5f;
-    private const int StandbySlots = 3;
+    // 라이더 대기 위치 — 화면 밖 한 점에 전부 겹쳐 대기 (겹쳐도 안 보이므로 무관)
+    private static readonly Vector3 StandbyPos = new Vector3(-6.5f, 1.5f, 0f);
 
     public bool IsIdle => _state == RiderState.IDLE_OUTSIDE;
     public float EffectiveDeliveryDuration
@@ -50,19 +48,8 @@ public class RiderStaff : Staff
         _stateTimer += Time.deltaTime;
     }
 
-    // 라이더 인덱스별 대기 슬롯 (인도 y=0 라인, 최대 3슬롯)
-    private Vector3 OutsideWaitPos()
-    {
-        int idx = 0;
-        if (StaffManager.Instance != null)
-        {
-            var list = StaffManager.Instance.RiderStaffs;
-            for (int i = 0; i < list.Count; i++)
-                if (list[i] == this) { idx = i; break; }
-        }
-        int clamped = Mathf.Clamp(idx, 0, StandbySlots - 1);
-        return new Vector3(FirstStandbyX - clamped, StandbyY, 0f);
-    }
+    // 모든 라이더가 같은 대기 지점에 겹쳐 대기
+    private Vector3 OutsideWaitPos() => StandbyPos;
 
     private void ChangeStateWithDoor(RiderState next)
     {

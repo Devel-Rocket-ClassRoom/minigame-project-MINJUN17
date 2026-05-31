@@ -131,7 +131,10 @@ public class PhoneManager : MonoBehaviour
     public Vector3 GetPhoneApproachPosition(PathRole role, Vector3 from)
     {
         if (phones.Count == 0) return Vector3.zero;
-        return GridManager.Instance.GetFurnitureApproachPosition(phones[0].transform.position, role, from);
+        var phone = phones[0];
+        // usePoint가 지정돼 있으면 그 자리로, 없으면 주변 빈 칸 자동 계산
+        if (phone.UsePoint != null) return phone.UsePoint.position;
+        return GridManager.Instance.GetFurnitureApproachPosition(phone.transform.position, role, from);
     }
 
     // 서버가 도착해서 ring 받은 시점에 호출 → 배달 Order 생성하여 PassWindow에 제출

@@ -63,7 +63,14 @@ public class CameraController : MonoBehaviour
             DTSystem.Instance.OnUnlocked -= OnDTUnlocked;
     }
 
-    private void OnDTUnlocked() => Refresh();
+    private void OnDTUnlocked()
+    {
+        // 1) DT까지 포함해 줌(orthoSize) + 가로중심 맞춤
+        Refresh();
+        // 2) 세로(Y)는 "2층 갔다 1층 온" 토글처럼 해당 층 건물 중심으로 재정렬
+        //    (Refresh가 잡은 줌/가로는 SetFloor가 그대로 유지하고 Y만 건물 중심으로)
+        SetFloor(_currentFloor);
+    }
 
     // 외부에서 floor 전환 (UI 버튼 / 디버그용)
     // 줌(orthoSize)은 그대로 유지하고 y만 floor 중앙으로 즉시 이동.

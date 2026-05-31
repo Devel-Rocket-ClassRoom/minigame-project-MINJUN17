@@ -172,6 +172,7 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
         var c = go.GetComponent<Customer>();
         c.OnDespawned += HandleDespawn;
         Register(c);
+        SalesTracker.Instance?.RecordCustomerVisit();   // 누적 방문 손님 수
         c.Init(data, counterManager, seatManager, queueManager, exitPoint.position);
     }
 
