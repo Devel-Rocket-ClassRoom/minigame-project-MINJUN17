@@ -41,8 +41,13 @@ public class DayCycleController : MonoBehaviour
             DTLane.Instance.OnEmpty += HandleDTEmpty;
         }
 
-        time.BeginDay();
+        // 튜토리얼 중엔 영업 시작 보류 → 튜토리얼 끝나면 TutorialManager가 StartBusiness() 호출
+        if (!TutorialManager.IsActive)
+            time.BeginDay();
     }
+
+    /// <summary>튜토리얼 완료 등 외부에서 영업(시간) 시작.</summary>
+    public void StartBusiness() => time.BeginDay();
 
     private void Update()
     {

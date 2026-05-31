@@ -18,6 +18,7 @@ public class CustomerCatalogPanel : MonoBehaviour
     [SerializeField] private TextMeshProUGUI nameText;    // 손님 이름
     [SerializeField] private TextMeshProUGUI walletText;  // "지갑: 20,000원"
     [SerializeField] private TextMeshProUGUI indexText;   // "1/5"
+    [SerializeField] private Image favoriteFoodIcon;      // 최애 음식 아이콘 (preferredMenu)
     [SerializeField] private Button prevButton;           // ◀
     [SerializeField] private Button nextButton;           // ▶
 
@@ -92,9 +93,10 @@ public class CustomerCatalogPanel : MonoBehaviour
 
         if (!hasAny)
         {
-            if (iconImage != null)   iconImage.enabled = false;
-            if (nameText != null)    nameText.text = "";
-            if (walletText != null)  walletText.text = "";
+            if (iconImage != null)        iconImage.enabled = false;
+            if (nameText != null)         nameText.text = "";
+            if (walletText != null)       walletText.text = "";
+            if (favoriteFoodIcon != null) favoriteFoodIcon.enabled = false;
             UnbindName();
             return;
         }
@@ -108,6 +110,14 @@ public class CustomerCatalogPanel : MonoBehaviour
         }
         if (walletText != null)
             walletText.text = string.Format(walletFormat, data.wallet);
+
+        // 최애 음식 아이콘 (선호 메뉴의 음식 스프라이트)
+        if (favoriteFoodIcon != null)
+        {
+            Sprite fav = data.preferredMenu != null ? data.preferredMenu.foodSprite : null;
+            favoriteFoodIcon.sprite  = fav;
+            favoriteFoodIcon.enabled = fav != null;
+        }
 
         BindName(data);
     }

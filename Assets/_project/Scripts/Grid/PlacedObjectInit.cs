@@ -37,7 +37,8 @@ public class PlacedObjectInit : MonoBehaviour
         GridManager.Instance.SetupPassWindow(passWindowCells);
 
         // 세이브 있으면 SaveLoadManager가 RestoreFromData 호출함 → Init 스킵
-        if (!hasSave)
+        // 튜토리얼 중엔 starter 직원 자동생성 스킵 (플레이어가 직접 고용)
+        if (!hasSave && !TutorialManager.IsActive)
             StaffManager.Instance.Init();
         //placementSystem.PlaceInitial(counterData, new Vector2Int(1, 3));
         //placementSystem.PlaceInitial(counterData, new Vector2Int(2, 3));

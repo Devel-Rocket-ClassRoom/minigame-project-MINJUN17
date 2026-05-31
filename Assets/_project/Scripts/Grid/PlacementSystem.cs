@@ -136,6 +136,7 @@ public class PlacementSystem : MonoBehaviour
         }
 
         PlaceInitial(data, data.fixedCell, 0);
+        OnFurniturePlaced?.Invoke(data);
         return true;
     }
 
@@ -150,6 +151,7 @@ public class PlacementSystem : MonoBehaviour
         StripLogicComponents(preview);
         BeginDragging(data, preview, startOrigin, 0);
         Mode = Mode.Place;
+        OnEnterPlaceMode?.Invoke();
     }
 
     // Preview용: 매니저 자동등록되는 로직 컴포넌트 즉시 제거.
@@ -313,6 +315,7 @@ public class PlacementSystem : MonoBehaviour
         PlacedObject placed = new PlacedObject(_previewData, instance, _currentOrigin, _previewRotationStep);
         gridManager.PlaceObject(placed);
         Destroy(_previewInstance);
+        OnFurniturePlaced?.Invoke(_previewData);
         return true;
     }
 
@@ -441,6 +444,12 @@ public class PlacementSystem : MonoBehaviour
 
     /// <summary>가구가 복원된 직후 발화. PlacedObjectInit 등이 PassWindow 셀 재설정에 사용.</summary>
     public event System.Action OnPlacementsRestored;
+
+    /// <summary>플레이어가 가구를 새로 설치 완료했을 때 (드래그 확정 / 고정설치). 튜토리얼 등에서 사용.</summary>
+    public event System.Action<FurnitureData> OnFurniturePlaced;
+
+    /// <summary>설치(드래그) 모드로 진입했을 때. 튜토리얼 단계 진행용.</summary>
+    public event System.Action OnEnterPlaceMode;
 
     public PlacementData[] ToData()
     {
