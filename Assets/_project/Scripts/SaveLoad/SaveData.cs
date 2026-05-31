@@ -80,6 +80,12 @@ public class SalesData
 {
     public long annualRevenue;
     public List<MonthlySaleEntry> monthlySales;
+
+    // 정보 탭 통계 (구버전 세이브엔 없음 → 로드 시 0/빈 값으로 들어옴, 호환 OK)
+    public long lifetimeRevenue;     // 총매출 (누적, 리셋 없음)
+    public long monthlyRevenueAcc;   // 진행 중인 이번 달 매출 (아직 정산 안 됨)
+    public long totalCustomers;      // 누적 방문 손님 수
+    public List<MonthlyRevenueEntry> monthlyHistory;   // 월별 매출 기록 (그래프용)
 }
 
 [Serializable]
@@ -87,6 +93,14 @@ public class MonthlySaleEntry
 {
     public string menuId;
     public int    count;
+}
+
+[Serializable]
+public class MonthlyRevenueEntry
+{
+    public int  year;
+    public int  month;     // 1~12
+    public long revenue;
 }
 
 [Serializable]
@@ -174,4 +188,5 @@ public class RankingData
     public int  rank;
     public long revenue;
     public long reputation;
+    public int  bestRank;        // 역대 최고(가장 낮은 숫자) 순위. 0=기록 없음.
 }

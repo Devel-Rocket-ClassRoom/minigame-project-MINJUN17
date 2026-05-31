@@ -122,6 +122,8 @@ public class DayCycleController : MonoBehaviour
     // 정산 UI의 "다음 날" 버튼이 호출
     public void ConfirmSettlement()
     {
+        // 방금 끝난 달의 매출을 히스토리에 기록 (SettleMonthly의 ResetMonthly 전에 호출)
+        SalesTracker.Instance?.CloseMonth(time.Year, time.Month);
         MoneySystem.Instance.SettleMonthly();
         time.BeginDay();
     }

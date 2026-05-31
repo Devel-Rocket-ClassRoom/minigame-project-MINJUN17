@@ -33,6 +33,9 @@ public class RankingSystem : MonoBehaviour
     public event Action<YearResult> OnYearRanked;
     public YearResult LastResult { get; private set; }
 
+    /// <summary>역대 최고(가장 낮은 숫자) 순위. 0 = 아직 입상 기록 없음.</summary>
+    public int BestRank { get; private set; }
+
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
@@ -86,6 +89,10 @@ public class RankingSystem : MonoBehaviour
         if (result.Qualified)
             result.Rank = ComputeRank(score);
 
+        // 역대 최고 순위 갱신 (입상했고, 더 낮은 숫자=더 높은 순위일 때)
+        if (result.Qualified && result.Rank > 0 && (BestRank == 0 || result.Rank < BestRank))
+            BestRank = result.Rank;
+
         LastResult = result;
         OnYearRanked?.Invoke(result);
 
@@ -106,7 +113,7 @@ public class RankingSystem : MonoBehaviour
     {
         // 정산 한 번도 안 했으면 default 구조체 — Score/Revenue/Reputation 모두 0
         if (LastResult.Score == 0 && LastResult.Revenue == 0 && LastResult.Reputation == 0 && LastResult.Rank == 0)
-            return new RankingData { hasLastResult = false };
+            return new RankingData { hasLastResult = false, bestRank = BestRank };
 
         return new RankingData
         {
@@ -116,12 +123,22 @@ public class RankingSystem : MonoBehaviour
             rank          = LastResult.Rank,
             revenue       = LastResult.Revenue,
             reputation    = LastResult.Reputation,
+            bestRank      = BestRank,
         };
     }
 
     public void FromData(RankingData data)
     {
-        if (data == null || !data.hasLastResult)
+        if (data == null)
+        {
+            LastResult = default;
+            BestRank = 0;
+            return;
+        }
+
+        BestRank = data.bestRank;
+
+        if (!data.hasLastResult)
         {
             LastResult = default;
             return;
