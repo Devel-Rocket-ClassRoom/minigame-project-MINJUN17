@@ -42,7 +42,7 @@ MonoBehaviour:
     m_WaitForCompletion: 0
     m_LocalVariables: []
   icon: {fileID: 1989365053788644909, guid: 42b3767372e8b434fbdc37c5196fc2dc, type: 3}
-  satisfactionUnlock: 0
+  satisfactionUnlock: 50
   purchaseCost: 30000
   unlockOnExpansion: {fileID: 0}
   toolType: 0

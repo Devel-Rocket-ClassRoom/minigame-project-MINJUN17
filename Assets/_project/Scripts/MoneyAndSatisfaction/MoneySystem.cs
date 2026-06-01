@@ -40,6 +40,13 @@ public class MoneySystem : MonoBehaviour
         OnMoneyChanged?.Invoke(_money);
     }
 
+    /// <summary>잔액을 직접 설정 (튜토리얼 지급/리셋용).</summary>
+    public void SetMoney(long amount)
+    {
+        _money = amount;
+        OnMoneyChanged?.Invoke(_money);
+    }
+
     // 잔액 부족해도 강제로 차감 (마이너스 허용). 정산 등에서 사용.
     public void ForceSpend(long amount)
     {

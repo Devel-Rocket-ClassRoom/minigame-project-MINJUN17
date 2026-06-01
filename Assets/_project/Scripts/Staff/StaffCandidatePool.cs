@@ -94,6 +94,28 @@ public class StaffCandidatePool : MonoBehaviour
         while (_applicants.Count > poolCap) _applicants.RemoveAt(0);
     }
 
+    /// <summary>튜토리얼용 — 대기 중인 모집 티켓 전부 제거 (모집 즉시처리 후 잔여 티켓이 나중에 후보를 또 뱉지 않게).</summary>
+    public void CancelAllPendingTickets()
+    {
+        if (_pendingTickets.Count == 0) return;
+        _pendingTickets.Clear();
+        OnPendingTicketsChanged?.Invoke();
+    }
+
+    /// <summary>튜토리얼용 — 모집 대기 없이 지정 역할/등급 후보를 즉시 풀에 추가.</summary>
+    public void SeedApplicant(StaffRole role, StaffType grade)
+    {
+        var baseData = StaffManager.Instance != null ? StaffManager.Instance.GetGrade(role, grade) : null;
+        if (baseData == null) return;
+        AddApplicant(new StaffCandidate
+        {
+            candidateName = PickName(),
+            baseData      = baseData,
+            hireVariance  = 0f,
+        });
+        OnApplicantsChanged?.Invoke();
+    }
+
     private StaffCandidate MakeApplicant(RecruitmentTier tier)
     {
         var cfg = GetConfig(tier);

@@ -32,6 +32,13 @@ public class SatisfactionSystem : MonoBehaviour
         return true;
     }
 
+    /// <summary>만족도 잔액을 직접 설정 (누적 lifetime은 건드리지 않음 → 손님 해금 트리거 안 됨). 튜토리얼용.</summary>
+    public void SetSatisfaction(int amount)
+    {
+        _satisfaction = Mathf.Max(0, amount);
+        OnSatisfactionChanged?.Invoke(_satisfaction);
+    }
+
     public void Earn(int amount)
     {
         _satisfaction += amount;

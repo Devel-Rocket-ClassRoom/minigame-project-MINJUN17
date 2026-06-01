@@ -35,7 +35,7 @@ MonoBehaviour:
   price: 1500
   cost: 300
   tool: {fileID: 11400000, guid: d19e3da870805a242a72292d0739cb8f, type: 2}
-  satisfactionUnlock: 0
+  satisfactionUnlock: 50
   spawnWeight: 0.5
   references:
     version: 2
