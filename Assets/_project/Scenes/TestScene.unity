@@ -5831,8 +5831,8 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 0
-  m_Spacing: 0
-  m_ChildForceExpandWidth: 1
+  m_Spacing: 5
+  m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 0
   m_ChildControlHeight: 0
@@ -5853,13 +5853,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MarketingIndicatorView
   manager: {fileID: 0}
   slots:
-  - data: {fileID: 0}
+  - data: {fileID: 11400000, guid: 53b972f305739c34db8e4289917a5159, type: 2}
     root: {fileID: 65927634}
     icon: {fileID: 0}
-  - data: {fileID: 0}
+  - data: {fileID: 11400000, guid: 635ab891f01b3b54b9790a625fc34f76, type: 2}
     root: {fileID: 479260060}
     icon: {fileID: 0}
-  - data: {fileID: 0}
+  - data: {fileID: 11400000, guid: cdaf2c17fa0b6f843b462c16e052aa4a, type: 2}
     root: {fileID: 1312898454}
     icon: {fileID: 0}
 --- !u!1 &292327571
