@@ -27,6 +27,9 @@ public class DialogueBox : MonoBehaviour
     private Coroutine _typing;
     private bool _isTyping;
 
+    /// <summary>박스 루트의 RectTransform (튜토리얼이 위치 이동용으로 참조).</summary>
+    public RectTransform RootRect => (root != null ? root : gameObject).transform as RectTransform;
+
     private void Awake()
     {
         if (root == null) root = gameObject;
@@ -65,6 +68,7 @@ public class DialogueBox : MonoBehaviour
     {
         if (_typing != null) { StopCoroutine(_typing); _typing = null; }
         _isTyping = false;
+        if (nextButton != null) nextButton.gameObject.SetActive(false);  // 전영역 탭 버튼이 살아남아 터치 막는 것 방지
         if (root != null) root.SetActive(false);
     }
 

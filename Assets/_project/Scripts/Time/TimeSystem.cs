@@ -15,7 +15,7 @@ public class TimeSystem : MonoBehaviour
     private int _hour = 8;
     private int _month = 1;
     private int _year = 0;
-    private bool _ticking = true;
+    private bool _ticking = false;   // 시작 시엔 멈춤. 튜토리얼/로드 후 BeginDay()로 영업 개시
     private Coroutine _rollRoutine;
 
     public int Hour => _hour;

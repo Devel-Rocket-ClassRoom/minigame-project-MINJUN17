@@ -32,6 +32,9 @@ public class UnlockShopPanel : MonoBehaviour
     /// <summary>튜토리얼: 값이 있으면 가구 탭에서 이 가구(그릴 등)만 노출 (null=전체).</summary>
     public static FurnitureData TutorialOnlyFurniture;
 
+    /// <summary>튜토리얼: 값이 있으면 음식 탭에서 이 메뉴(계란후라이)만 노출 (null=전체).</summary>
+    public static MenuData TutorialOnlyMenu;
+
     public UnlockCategory CurrentCategory => currentCategory;
 
     /// <summary>탭 버튼 OnClick — int 로 PoolCategory 값 전달.</summary>
@@ -170,6 +173,7 @@ public class UnlockShopPanel : MonoBehaviour
                 {
                     if (m == null) continue;
                     if (m.satisfactionUnlock <= 0) continue;       // 시작 해금
+                    if (TutorialOnlyMenu != null && m != TutorialOnlyMenu) continue;   // 튜토리얼: 계란후라이만
                     yield return new FoodUnlockEntry(m);
                 }
                 yield break;

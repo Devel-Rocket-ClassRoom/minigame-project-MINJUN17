@@ -47,9 +47,9 @@ public class TutorialManager : MonoBehaviour
     [SerializeField] private Vector2 arrowOffset = new Vector2(0f, 60f);
 
     [Header("대화창 내림 (그릴 설치 등 주방 가릴 때)")]
-    [SerializeField] private RectTransform dialogueBoxRect;     // 움직일 대화창 박스
-    [SerializeField] private Vector2 dialogueLoweredPos;        // 내렸을 때 anchoredPosition
-    private Vector2 _dialogueNormalPos;
+    [SerializeField] private RectTransform dialogueBoxRect;     // 움직일 대화창 박스 (비우면 dialogueBox 루트 자동 사용)
+    [SerializeField] private RectTransform dialogueLoweredAnchor; // 내렸을 때 이동할 위치(빈 RectTransform을 원하는 곳에 배치)
+    private Vector3 _dialogueNormalPos;                         // 원위치(월드 좌표)
     private bool _dialoguePosCaptured;
 
     [Header("창 닫기 버튼 (선택 — 각 창의 닫기/취소 버튼)")]
@@ -117,19 +117,17 @@ public class TutorialManager : MonoBehaviour
             if (mask != null) mask.Hide();
             if (dialogueBox != null) dialogueBox.Hide();
             if (arrow != null) arrow.gameObject.SetActive(false);
-            gameObject.SetActive(false);
+            enabled = false;   // ⚠ 이 컴포넌트만 끈다. gameObject는 TimeSystem/DayCycleController와 공유 → SetActive(false) 금지
             return;
         }
 
-        if (dialogueBoxRect != null && !_dialoguePosCaptured)
-        {
-            _dialogueNormalPos = dialogueBoxRect.anchoredPosition;
-            _dialoguePosCaptured = true;
-        }
+        if (dialogueBoxRect == null && dialogueBox != null)
+            dialogueBoxRect = dialogueBox.RootRect;   // 미연결 시 대화창 루트 자동 사용
 
         SatisfactionSystem.Instance?.SetSatisfaction(satisfactionGrant);
         UnlockShopPanel.TutorialOnlyTier = tutorialRecruitTier;   // 모집은 일반 등급만 노출
         UnlockShopPanel.TutorialOnlyFurniture = grillData;        // 가구 해금은 그릴만 노출
+        UnlockShopPanel.TutorialOnlyMenu = eggData;               // 음식 해금은 계란후라이만 노출
 
         if (StaffManager.Instance != null) StaffManager.Instance.OnRosterChanged += OnRosterChanged;
         if (StaffCandidatePool.Instance != null) StaffCandidatePool.Instance.OnPendingTicketsChanged += OnRecruited;
@@ -195,9 +193,21 @@ public class TutorialManager : MonoBehaviour
             placementCancelButton.interactable = !placeStep;
         }
 
-        // 대화창 위치 (주방 가리는 단계만 아래로)
-        if (dialogueBoxRect != null && _dialoguePosCaptured)
-            dialogueBoxRect.anchoredPosition = step.lowerDialogue ? dialogueLoweredPos : _dialogueNormalPos;
+        // 대화창 위치 (주방 가리는 단계만 지정 앵커 위치로 내림 — 월드 좌표라 부모/앵커 무관)
+        if (dialogueBoxRect != null)
+        {
+            bool lower = step.lowerDialogue && dialogueLoweredAnchor != null;
+            if (lower)
+            {
+                // 첫 내림 직전, 현재(원래) 위치를 캡처 — 이 시점엔 박스가 이미 표시돼 레이아웃이 잡혀있음
+                if (!_dialoguePosCaptured) { _dialogueNormalPos = dialogueBoxRect.position; _dialoguePosCaptured = true; }
+                dialogueBoxRect.position = dialogueLoweredAnchor.position;
+            }
+            else if (_dialoguePosCaptured)
+            {
+                dialogueBoxRect.position = _dialogueNormalPos;   // 원위치 복귀
+            }
+        }
 
         RunEnterAction(step.onEnter);
 
@@ -348,6 +358,7 @@ public class TutorialManager : MonoBehaviour
         IsActive = false;
         UnlockShopPanel.TutorialOnlyTier = null;        // 모집 등급 필터 해제
         UnlockShopPanel.TutorialOnlyFurniture = null;   // 가구 필터 해제
+        UnlockShopPanel.TutorialOnlyMenu = null;        // 음식 필터 해제
         if (closeRecruitWindowButton != null) closeRecruitWindowButton.interactable = true;   // 닫기 잠금 해제
         if (placementCancelButton != null) placementCancelButton.interactable = true;         // 취소 잠금 해제
 
@@ -359,6 +370,6 @@ public class TutorialManager : MonoBehaviour
         if (dayCycle != null) dayCycle.StartBusiness();     // 영업 시작 (첫 손님 등장)
         SaveLoadManager.Instance?.Save();                   // 다음 실행부턴 튜토리얼 스킵
 
-        gameObject.SetActive(false);
+        enabled = false;   // ⚠ 이 컴포넌트만 끈다. gameObject는 TimeSystem/DayCycleController와 공유 → SetActive(false) 하면 시간/손님이 멈춤
     }
 }
