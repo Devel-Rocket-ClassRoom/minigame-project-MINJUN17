@@ -28,6 +28,15 @@ public class MarketingManager : MonoBehaviour
     public IReadOnlyList<MarketingData> PendingCampaigns => _pending;
     public int ActiveCount => _active.Count;
 
+    /// <summary>해당 마케팅이 현재 활성(_active) 중인지.</summary>
+    public bool IsActive(MarketingData data)
+    {
+        if (data == null) return false;
+        foreach (var c in _active)
+            if (c != null && c.Data == data) return true;
+        return false;
+    }
+
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }

@@ -31,7 +31,7 @@ MonoBehaviour:
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
-  icon: {fileID: 0}
+  icon: {fileID: 3497151259811845428, guid: 8104e774ce5b9674396af1a99c5dcd86, type: 3}
   satisfactionCost: 200
   spawnBoost: 0.5
   durationMonths: 3

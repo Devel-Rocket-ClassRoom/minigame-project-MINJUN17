@@ -2283,8 +2283,9 @@ GameObject:
   - component: {fileID: 65927635}
   - component: {fileID: 65927637}
   - component: {fileID: 65927636}
+  - component: {fileID: 65927638}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Paper
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2347,6 +2348,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 65927634}
   m_CullTransparentMesh: 1
+--- !u!114 &65927638
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 65927634}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86710e43de46f6f4bac7c8e50813a599, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.AspectRatioFitter
+  m_AspectMode: 2
+  m_AspectRatio: 1
 --- !u!1 &74334744
 GameObject:
   m_ObjectHideFlags: 0
@@ -5768,8 +5783,9 @@ GameObject:
   m_Component:
   - component: {fileID: 286613860}
   - component: {fileID: 286613861}
+  - component: {fileID: 286613862}
   m_Layer: 5
-  m_Name: GameObject
+  m_Name: Marketing
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5823,6 +5839,29 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &286613862
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 286613859}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfea88adc36a0494b90b080fc364296d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MarketingIndicatorView
+  manager: {fileID: 0}
+  slots:
+  - data: {fileID: 0}
+    root: {fileID: 65927634}
+    icon: {fileID: 0}
+  - data: {fileID: 0}
+    root: {fileID: 479260060}
+    icon: {fileID: 0}
+  - data: {fileID: 0}
+    root: {fileID: 1312898454}
+    icon: {fileID: 0}
 --- !u!1 &292327571
 GameObject:
   m_ObjectHideFlags: 0
@@ -9826,8 +9865,9 @@ GameObject:
   - component: {fileID: 479260061}
   - component: {fileID: 479260063}
   - component: {fileID: 479260062}
+  - component: {fileID: 479260064}
   m_Layer: 5
-  m_Name: Image (1)
+  m_Name: SNS
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9890,6 +9930,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 479260060}
   m_CullTransparentMesh: 1
+--- !u!114 &479260064
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 479260060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86710e43de46f6f4bac7c8e50813a599, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.AspectRatioFitter
+  m_AspectMode: 2
+  m_AspectRatio: 1
 --- !u!1 &480818352
 GameObject:
   m_ObjectHideFlags: 0
@@ -30534,8 +30588,9 @@ GameObject:
   - component: {fileID: 1312898455}
   - component: {fileID: 1312898457}
   - component: {fileID: 1312898456}
+  - component: {fileID: 1312898458}
   m_Layer: 5
-  m_Name: Image (2)
+  m_Name: TV
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30598,6 +30653,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1312898454}
   m_CullTransparentMesh: 1
+--- !u!114 &1312898458
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1312898454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86710e43de46f6f4bac7c8e50813a599, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.AspectRatioFitter
+  m_AspectMode: 2
+  m_AspectRatio: 1
 --- !u!1 &1314844446
 GameObject:
   m_ObjectHideFlags: 0
