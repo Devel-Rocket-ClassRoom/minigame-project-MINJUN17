@@ -6,6 +6,7 @@ public class GridVisualizer : MonoBehaviour
     public GridManager gridManager;
     public Color hallColor = new Color(0f, 1f, 0f, 0.2f);
     public Color kitchenColor = new Color(1f, 0.92f, 0f, 0.2f);
+    public Color counterColor = new Color(1f, 0.5f, 0f, 0.2f);
     public Color floor2HallColor = new Color(0f, 0.7f, 1f, 0.2f);
     public Color floor2ToiletColor = new Color(1f, 0.5f, 0.8f, 0.2f);
     public Color occupiedColor = new Color(0f, 0f, 1f, 0.3f);
@@ -60,6 +61,7 @@ public class GridVisualizer : MonoBehaviour
         {
             case CellZone.Kitchen: return kitchenColor;
             case CellZone.Hall: return hallColor;
+            case CellZone.Counter: return counterColor;
             case CellZone.Floor2_Hall: return floor2HallColor;
             case CellZone.Floor2_Toilet: return floor2ToiletColor;
             default: return hallColor;

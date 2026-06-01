@@ -18,6 +18,8 @@ public class GridManager : MonoBehaviour
     [SerializeField] private int floor2Height = 12;
     [Tooltip("1층 주방 / 2층 화장실 세로 (공통). 기본 4")]
     [SerializeField] private int kitchenAndToiletRows = 4;
+    [Tooltip("1층 홀 중 주방 바로 아래 N줄을 카운터 구역으로. 기본 4 (y4~7)")]
+    [SerializeField] private int counterRows = 4;
 
     [Header("Floor Tilemap")]
     [SerializeField] private Tilemap floorTilemap;
@@ -114,7 +116,10 @@ public class GridManager : MonoBehaviour
             {
                 // Floor 1: 시작부터 전체 활성
                 isActive = true;
-                zone = (y >= kitchen1YStart) ? CellZone.Kitchen : CellZone.Hall;
+                // 위에서부터 주방(y8~11) → 카운터(y4~7) → 홀(y0~3)
+                if (y >= kitchen1YStart)                       zone = CellZone.Kitchen;
+                else if (y >= kitchen1YStart - counterRows)    zone = CellZone.Counter;
+                else                                           zone = CellZone.Hall;
             }
             else if (hasFloor2 && y >= f2start)
             {
@@ -148,6 +153,17 @@ public class GridManager : MonoBehaviour
         return cell.zone;
     }
 
+    /// <summary>가구의 PlacementZone → 실제 셀 CellZone 매핑 (두 enum의 번호가 달라 명시 변환 필요).</summary>
+    public static CellZone ToCellZone(PlacementZone z) => z switch
+    {
+        PlacementZone.kitchen   => CellZone.Kitchen,
+        PlacementZone.Hall      => CellZone.Hall,
+        PlacementZone.RiderRoom => CellZone.RiderRoom,
+        PlacementZone.Toilet    => CellZone.Floor2_Toilet,
+        PlacementZone.Counter   => CellZone.Counter,
+        _ => CellZone.Hall
+    };
+
     public bool IsInBounds(Vector2Int pos)
     {
         return pos.x >= 0 && pos.x < _gridWidth && pos.y >= 0 && pos.y < GridHeight;
@@ -167,11 +183,12 @@ public class GridManager : MonoBehaviour
         {
             case PathRole.Customer:
                 return c.zone == CellZone.Hall
+                    || c.zone == CellZone.Counter
                     || c.zone == CellZone.Floor2_Hall
                     || c.zone == CellZone.Floor2_Toilet;
             case PathRole.Cook:     return c.zone == CellZone.Kitchen;
             case PathRole.Server:   return true; // 모든 zone 통과
-            case PathRole.Rider:    return c.zone == CellZone.Hall;
+            case PathRole.Rider:    return c.zone == CellZone.Hall || c.zone == CellZone.Counter;
             case PathRole.Commute:  return true; // 통근: 존 무시 (단 벽/가구/비활성은 위에서 이미 차단)
             default: return true;
         }

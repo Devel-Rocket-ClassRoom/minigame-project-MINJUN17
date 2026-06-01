@@ -14,6 +14,7 @@ public class PlacementSystem : MonoBehaviour
 
     [SerializeField] private Camera cam;
     [SerializeField] private GridManager gridManager;
+    [SerializeField] private PlacementZoneHighlighter zoneHighlighter;   // 설치 가능 구역 땅 표시 (선택)
     [SerializeField] private Color validColor = new Color(0f, 1f, 0f, 0.5f);
     [SerializeField] private Color invalidColor = new Color(1f, 0f, 0f, 0.5f);
     [SerializeField] private Color removeColor = new Color(1f, 0f, 0f, 0.5f);
@@ -31,8 +32,8 @@ public class PlacementSystem : MonoBehaviour
 
     // Remove 전용: 선택된 삭제 후보
     private PlacedObject _removeTarget;
-    private SpriteRenderer _removeTargetRenderer;
-    private Color _removeTargetOriginalColor;
+    private SpriteRenderer[] _removeTargetRenderers;   // 부모 + 자식 전부 (스프라이트가 자식에만 있는 케이스 지원)
+    private Color[] _removeTargetOriginalColors;
 
     // 회전을 반영한 preview footprint / anchor (PlacedObject의 계산과 동일)
     private int PreviewWidth  => _previewRotationStep % 2 == 0 ? _previewData.width  : _previewData.height;
@@ -117,7 +118,7 @@ public class PlacementSystem : MonoBehaviour
         if (Mode != Mode.None) return false;
         if (IsAlreadyPlaced(data)) { Debug.Log("[PlacementSystem] 이미 설치됨"); return false; }
 
-        var zone = gridManager.GetZone(data.fixedCell);
+        var zone = GridManager.ToCellZone(data.zone);
         if (!gridManager.CanPlace(data.fixedCell, data.width, data.height, zone))
         {
             Debug.LogWarning($"[PlacementSystem] InstantPlace 실패 — 셀 {data.fixedCell} 점유/비활성/존 불일치");
@@ -223,6 +224,7 @@ public class PlacementSystem : MonoBehaviour
         GameObject preview = Instantiate(target.Data.prefab);
         StripLogicComponents(preview);
         BeginDragging(target.Data, preview, target.Origin, target.RotationStep);
+        OnSelectionStarted?.Invoke();
     }
 
     private void TrySelectForRemove()
@@ -230,13 +232,17 @@ public class PlacementSystem : MonoBehaviour
         if (!TryGetTappedObject(out PlacedObject target)) return;
         if (target.Data != null && (target.Data.fixedSingle || target.Data.fixedPlacement)) return;   // 고정 가구(카운터/화장실 등)는 삭제 불가
 
-        if (_removeTarget != null)
-            _removeTargetRenderer.color = _removeTargetOriginalColor;
+        if (_removeTarget != null) RestoreRemoveTargetColors();
 
         _removeTarget = target;
-        _removeTargetRenderer = target.Instance.GetComponent<SpriteRenderer>();
-        _removeTargetOriginalColor = _removeTargetRenderer.color;
-        _removeTargetRenderer.color = removeColor;
+        _removeTargetRenderers = target.Instance.GetComponentsInChildren<SpriteRenderer>(true);
+        _removeTargetOriginalColors = new Color[_removeTargetRenderers.Length];
+        for (int i = 0; i < _removeTargetRenderers.Length; i++)
+        {
+            _removeTargetOriginalColors[i] = _removeTargetRenderers[i].color;
+            _removeTargetRenderers[i].color = removeColor;
+        }
+        OnSelectionStarted?.Invoke();
     }
 
     // ========== UI: 통합 확정 ==========
@@ -281,19 +287,25 @@ public class PlacementSystem : MonoBehaviour
                 if (_previewInstance != null) Destroy(_previewInstance);
                 break;
             case Mode.Remove:
-                if (_removeTarget != null)
-                    _removeTargetRenderer.color = _removeTargetOriginalColor;
+                if (_removeTarget != null) RestoreRemoveTargetColors();
                 break;
             default: return;
         }
         ResetState();
     }
 
+    private void RestoreRemoveTargetColors()
+    {
+        if (_removeTargetRenderers == null) return;
+        for (int i = 0; i < _removeTargetRenderers.Length; i++)
+            if (_removeTargetRenderers[i] != null) _removeTargetRenderers[i].color = _removeTargetOriginalColors[i];
+    }
+
     // ========== 내부 적용 로직 (성공 시 true, 실패 시 false) ==========
     private bool ApplyPlace()
     {
         if (_previewData != null && _previewData.fixedSingle) return false;   // 고정 가구는 신규 설치 불가 (이동만)
-        if (!gridManager.CanPlace(_currentOrigin, PreviewWidth, PreviewHeight, gridManager.GetZone(_currentOrigin))) return false;
+        if (!gridManager.CanPlace(_currentOrigin, PreviewWidth, PreviewHeight, GridManager.ToCellZone(_previewData.zone))) return false;
 
         // 설치 비용 차감 (0이면 무료, 무료가 아니고 잔액 부족이면 배치 실패)
         long cost = _previewData.purchaseCost;
@@ -322,7 +334,7 @@ public class PlacementSystem : MonoBehaviour
     private bool ApplyMove()
     {
         // 못 놓는 위치면 아무것도 하지 않고 false (사용자가 계속 드래그하거나 Cancel)
-        if (!gridManager.CanPlace(_currentOrigin, PreviewWidth, PreviewHeight, gridManager.GetZone(_currentOrigin))) return false;
+        if (!gridManager.CanPlace(_currentOrigin, PreviewWidth, PreviewHeight, GridManager.ToCellZone(_previewData.zone))) return false;
 
         _movingOriginal.Origin = _currentOrigin;
         _movingOriginal.RotationStep = _previewRotationStep;
@@ -353,6 +365,16 @@ public class PlacementSystem : MonoBehaviour
 
         _previewInstance.transform.rotation = Quaternion.Euler(0, 0, -90 * rotationStep);
         UpdatePreviewVisuals();
+        ShowZoneHighlight(data);
+    }
+
+    private void ShowZoneHighlight(FurnitureData data)
+    {
+        if (zoneHighlighter == null || data == null) return;
+        FloorIndex floor = CameraController.Instance != null
+            ? CameraController.Instance.CurrentFloor
+            : FloorIndex.Floor1;
+        zoneHighlighter.Show(GridManager.ToCellZone(data.zone), floor);
     }
 
     private void DragMove()
@@ -369,13 +391,15 @@ public class PlacementSystem : MonoBehaviour
     {
         _previewInstance.transform.position =
             gridManager.CellToWorld(_currentOrigin, PreviewWidth, PreviewHeight) + (Vector3)_previewData.fixedWorldOffset;
-        Color color = gridManager.CanPlace(_currentOrigin, PreviewWidth, PreviewHeight, gridManager.GetZone(_currentOrigin))
+        Color color = gridManager.CanPlace(_currentOrigin, PreviewWidth, PreviewHeight, GridManager.ToCellZone(_previewData.zone))
             ? validColor : invalidColor;
         if (_previewRenderers != null)
         {
             foreach (var sr in _previewRenderers)
                 if (sr != null) sr.color = color;
         }
+        if (zoneHighlighter != null)
+            zoneHighlighter.UpdatePreview(_currentOrigin, PreviewWidth, PreviewHeight);
     }
 
     // ========== 유틸 ==========
@@ -436,8 +460,10 @@ public class PlacementSystem : MonoBehaviour
         _previewRotationStep = 0;
         _movingOriginal = null;
         _removeTarget = null;
-        _removeTargetRenderer = null;
+        _removeTargetRenderers = null;
+        _removeTargetOriginalColors = null;
         Mode = Mode.None;
+        if (zoneHighlighter != null) zoneHighlighter.Hide();
     }
 
     // ─── Save / Load ───
@@ -450,6 +476,9 @@ public class PlacementSystem : MonoBehaviour
 
     /// <summary>설치(드래그) 모드로 진입했을 때. 튜토리얼 단계 진행용.</summary>
     public event System.Action OnEnterPlaceMode;
+
+    /// <summary>이동/삭제 모드에서 대상 가구를 탭으로 선택한 순간. (안내 텍스트 숨김 등)</summary>
+    public event System.Action OnSelectionStarted;
 
     public PlacementData[] ToData()
     {

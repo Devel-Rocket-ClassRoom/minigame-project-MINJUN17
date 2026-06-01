@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureData
   saveId: 6f302f2e3bf2
   prefab: {fileID: 7330242645600655272, guid: 9e8acbc75acb9d0478040baf4edc80db, type: 3}
-  zone: 1
+  zone: 4
   width: 3
   height: 2
   anchorX: 0
