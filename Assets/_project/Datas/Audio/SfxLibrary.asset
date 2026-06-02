@@ -33,3 +33,15 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 5fc374d3d545cda4b874f10dc8b8289c, type: 3}
     volume: 1
     startTrim: 0
+  - id: 7
+    clip: {fileID: 8300000, guid: f4288b3503d9f3846a13429e03a15310, type: 3}
+    volume: 1
+    startTrim: 0
+  - id: 8
+    clip: {fileID: 8300000, guid: 608c46ec4fb92124c9f35ac78057c59c, type: 3}
+    volume: 1
+    startTrim: 0
+  - id: 9
+    clip: {fileID: 8300000, guid: f4288b3503d9f3846a13429e03a15310, type: 3}
+    volume: 1
+    startTrim: 0

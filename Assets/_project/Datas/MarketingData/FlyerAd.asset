@@ -32,9 +32,9 @@ MonoBehaviour:
     m_WaitForCompletion: 0
     m_LocalVariables: []
   icon: {fileID: -2476458675151800057, guid: 90113fcedf0a8e247834d8ccfa1a04d8, type: 3}
-  satisfactionCost: 50
-  spawnBoost: 0.1
-  durationMonths: 1
+  satisfactionCost: 200
+  spawnBoost: 0.2
+  durationMonths: 2
   prerequisiteZone: 0
   references:
     version: 2

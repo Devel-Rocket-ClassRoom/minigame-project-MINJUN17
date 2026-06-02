@@ -44,6 +44,7 @@ public class ExpansionManager : MonoBehaviour
         _currentStage++;
         OnExpanded?.Invoke(stage);   // UnlockOnly여도 발화 → CatalogManager가 unlockOnExpansion 가구 자동 해금
         ExpansionRevealable.RevealForStage(stage);   // 자동 노출 가구(화장실/세면대 등) 활성화
+        ExpansionStageSwitcher.UnlockForStage(stage, animate: true);   // 어둡/망가진 → 깨끗 페이드 전환
         return true;
     }
 
@@ -63,6 +64,7 @@ public class ExpansionManager : MonoBehaviour
             if (stages[i].stageType == ExpansionStageData.StageType.CellExpansion)
                 gridManager.ActivateCells(stages[i]);
             ExpansionRevealable.RevealForStage(stages[i]);
+            ExpansionStageSwitcher.UnlockForStage(stages[i], animate: false);   // 로드는 즉시 (페이드 X)
         }
         _currentStage = data.currentStage;
         // 이벤트 발화 X — 이미 적용된 상태 복원
