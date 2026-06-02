@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CustomerData
   saveId: e41a2509fded
   unlockedFromStart: 1
-  preferredMenu: {fileID: 0}
+  preferredMenu: {fileID: 11400000, guid: 0a16036f7b197d040914a8f28a7124e7, type: 2}
   customerPrefab: {fileID: 7120179047670830194, guid: a16883624c4c4a241851943f5d64614c, type: 3}
   customerName:
     m_TableReference:

@@ -24,6 +24,12 @@ public class UnlockShopPanel : MonoBehaviour
     [Header("참조")]
     [SerializeField] private PlacementSystem placementSystem;
 
+    [Tooltip("맵확장 해금 시 이걸로 닫음(딤막도 함께 꺼짐). 비우면 같은 오브젝트에서 자동 탐색.")]
+    [SerializeField] private PopupPanel popupPanel;
+
+    [Tooltip("PopupPanel이 없을 때 대신 끌 패널 루트. 비우면 새로고침만.")]
+    [SerializeField] private GameObject panelRoot;
+
     private readonly List<UnlockSlot> _spawned = new();
 
     /// <summary>튜토리얼: 값이 있으면 모집 탭에서 이 등급만 노출 (null=전체).</summary>
@@ -118,7 +124,15 @@ public class UnlockShopPanel : MonoBehaviour
     private void OnFurnitureUnlocked(FurnitureData _) => Refresh();
     private void OnMenuUnlocked(MenuData _)            => Refresh();
     private void OnMarketingPurchased(MarketingData _) => Refresh();
-    private void OnExpanded(ExpansionStageData _)      => Refresh();
+    private void OnExpanded(ExpansionStageData _)
+    {
+        // 맵확장 해금되면 해금패널을 닫는다.
+        // PopupPanel.Close()로 닫아야 딤막(dimBackdrop)도 같이 꺼짐 → SetActive(false) 직접 끄면 막만 남음.
+        if (popupPanel == null) popupPanel = GetComponent<PopupPanel>();
+        if (popupPanel != null) { popupPanel.Close(); return; }
+        if (panelRoot != null)  { panelRoot.SetActive(false); return; }
+        Refresh();
+    }
     private void OnSatisfactionChanged(int _)          => RefreshCanAffordOnly();
     private void OnMoneyChanged(long _)                => RefreshCanAffordOnly();
     /// <summary>월 1회 제한 토글 — 설명 텍스트가 바뀌므로 슬롯 재생성 필요.</summary>

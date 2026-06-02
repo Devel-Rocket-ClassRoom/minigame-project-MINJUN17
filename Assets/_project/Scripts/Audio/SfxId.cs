@@ -12,4 +12,8 @@ public enum SfxId
     SettlementItem,   // 월정산 내역 하나씩 뜰 때마다
 
     Upgrade,          // (기존) 업그레이드/해금
+
+    Floor2Unlock,     // 2층 해금 — 연기 펑
+    ToiletUnlock,     // 화장실 해금 — 따라란
+    DTUnlock,         // DT 해금
 }
