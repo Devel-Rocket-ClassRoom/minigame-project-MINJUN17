@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 1110660131291813226}
   - component: {fileID: 6474755102225511725}
   - component: {fileID: 3618867727315804974}
-  - component: {fileID: 3357476937756778274}
   m_Layer: 0
   m_Name: Cook
   m_TagString: Untagged
@@ -86,7 +85,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 2
   m_MaskInteraction: 0
   m_Sprite: {fileID: 3983453485446504721, guid: c85d78da1e95f2b41a79c04a23f3ca3b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -163,23 +162,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DirectionalCharacterAnimator
   moveSpeedThreshold: 0.05
   defaultDirection: 3
---- !u!114 &3357476937756778274
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2700806579746239112}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 65f0c05f3a54337498adac7c391f2432, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::YSorter
-  precision: 100
-  sortYOffset: 0
-  orderBias: 0
-  staticObject: 0
-  useSpriteBottom: 1
 --- !u!1 &3569031209179938873
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(PathMover))]
@@ -83,48 +84,80 @@ public abstract class Staff : MonoBehaviour
     // ─── 통근(출퇴근) ───
     protected enum CommuteState { NONE, ARRIVING, LEAVING }
     private CommuteState _commute = CommuteState.NONE;
-    private Vector3 _commuteTarget;
 
-    // 사이드워크 ↔ 가게 안 횡단 시 도어 (0,1) 경유 — 직선이동이 외벽 가로지르는 것 방지
-    private bool _commutePassedDoor;
+    // 통근 경유 웨이포인트(문) + 최종 목적지. from에서 가까운 문부터 순서대로.
+    private readonly List<Vector3> _commuteWaypoints = new();
+    private int _commuteWpIndex;
+
+    // 사이드워크 ↔ 가게 안 횡단 시 정문 (0,1) 경유
     private static readonly Vector3 DoorWorld = new Vector3(0.5f, 1.5f, 0f);
 
+    // 출퇴근(통근) 시 이동 속도 배수 — 근무 중보다 빠르게 출퇴근
+    private const float kCommuteSpeedMult = 2f;
+
     public bool IsCommuting => _commute != CommuteState.NONE;
+    /// <summary>퇴근(출구로 이동) 중인지. 새 영업일 오픈 시 되돌려 재출근시키는 판정에 사용.</summary>
+    public bool IsLeaving => _commute == CommuteState.LEAVING;
 
     // 서브클래스가 자기 근무지 좌표 / 도착 시 IDLE 진입을 구현
     protected abstract Vector3 GetWorkPosition();
     protected abstract void OnArrivedAtWork();
 
-    // 출발/도착이 도어를 가로지르는지 (안↔밖 횡단인지) 판단. 같은 쪽이면 도어 경유 불필요.
+    // 가게 안↔밖 횡단인지 (x 기준). 같은 쪽이면 정문 경유 불필요.
     private static bool DoorCrossingNeeded(Vector3 from, Vector3 to)
+        => (from.x >= 0f) != (to.x >= 0f);
+
+    // 주방↔홀 경계를 넘는지 (1층 주방 y범위 기준). 출퇴근만 주방문으로 다니게 하기 위함.
+    private static bool KitchenCrossingNeeded(Vector3 from, Vector3 to)
     {
-        bool fromInside = from.x >= 0f;
-        bool toInside   = to.x   >= 0f;
-        return fromInside != toInside;
+        var gm = GridManager.Instance;
+        if (gm == null) return false;
+        int b = gm.KitchenBoundaryY, top = gm.Floor1Height;
+        bool fromK = from.y >= b && from.y < top;
+        bool toK   = to.y   >= b && to.y   < top;
+        return fromK != toK;
     }
 
-    /// <summary>영업 시작: 입구에서 등장 → 근무지로 이동.</summary>
+    private static Vector3 KitchenDoorWorld()
+    {
+        var gm = GridManager.Instance;
+        return gm != null ? gm.CellToWorld(gm.KitchenDoorCell) : new Vector3(1.5f, 8.5f, 0f);
+    }
+
+    // from→to 경로에 필요한 문 웨이포인트를 from에서 가까운 순으로 구성 + 최종 목적지.
+    private void BuildCommuteWaypoints(Vector3 from, Vector3 to)
+    {
+        _commuteWaypoints.Clear();
+        _commuteWpIndex = 0;
+
+        if (DoorCrossingNeeded(from, to))    _commuteWaypoints.Add(DoorWorld);
+        if (KitchenCrossingNeeded(from, to)) _commuteWaypoints.Add(KitchenDoorWorld());
+
+        // from에서 가까운 문부터 경유 (출근/퇴근 방향 자동 처리)
+        _commuteWaypoints.Sort((a, c) =>
+            Vector3.Distance(from, a).CompareTo(Vector3.Distance(from, c)));
+
+        _commuteWaypoints.Add(to);
+    }
+
+    /// <summary>영업 시작: 입구에서 등장 → (정문/주방문 경유) → 근무지로 이동.</summary>
     public void BeginArriving(Vector3 entryPos)
     {
         gameObject.SetActive(true);
         transform.position = entryPos;
-        _commuteTarget = GetWorkPosition();
         _mover.Role = PathRole.Commute;
         _mover.Clear();
-        // 입구(밖) → 근무지가 가게 안이면 도어 경유, 라이더처럼 밖→밖이면 바로 직진
-        _commutePassedDoor = !DoorCrossingNeeded(entryPos, _commuteTarget);
+        BuildCommuteWaypoints(entryPos, GetWorkPosition());
         _commute = CommuteState.ARRIVING;
     }
 
-    /// <summary>영업 종료: 입구로 이동 → 도착하면 숨김(다음날 재입장).</summary>
+    /// <summary>영업 종료: (주방문/정문 경유) → 입구로 이동 → 도착하면 숨김(다음날 재입장).</summary>
     public void BeginLeaving(Vector3 exitPos)
     {
         if (!gameObject.activeSelf) return;
-        _commuteTarget = exitPos;
         _mover.Role = PathRole.Commute;
         _mover.Clear();
-        // 현재 위치(근무지)가 안이고 출구가 밖이면 도어 경유, 같은 쪽이면 바로
-        _commutePassedDoor = !DoorCrossingNeeded(transform.position, _commuteTarget);
+        BuildCommuteWaypoints(transform.position, exitPos);
         _commute = CommuteState.LEAVING;
     }
 
@@ -132,28 +165,35 @@ public abstract class Staff : MonoBehaviour
     protected bool TickCommute()
     {
         if (_commute == CommuteState.NONE) return false;
+        if (_commuteWaypoints.Count == 0) { FinishCommute(); return true; }
 
-        // 1단계: 도어 경유 필요하면 도어로. 2단계: 진짜 목적지로.
-        Vector3 dest = _commutePassedDoor ? _commuteTarget : DoorWorld;
-        MoveTo(dest);
+        Vector3 dest = _commuteWaypoints[Mathf.Min(_commuteWpIndex, _commuteWaypoints.Count - 1)];
+        // 출퇴근은 근무 이동보다 빠르게 (kCommuteSpeedMult 배)
+        _mover.SetDestination(dest);
+        _mover.Step(EffectiveMoveSpeed * kCommuteSpeedMult);
+
         if (HasArrived())
         {
-            if (!_commutePassedDoor) { _commutePassedDoor = true; return true; }
-
-            if (_commute == CommuteState.ARRIVING)
-            {
-                _commute = CommuteState.NONE;
-                _mover.Role = GetPathRole();   // 근무 역할 복원
-                _mover.Clear();
-                OnArrivedAtWork();             // 서브클래스 IDLE 진입
-            }
-            else // LEAVING
-            {
-                _commute = CommuteState.NONE;
-                gameObject.SetActive(false);   // 퇴장 → 숨김
-            }
+            _commuteWpIndex++;
+            if (_commuteWpIndex >= _commuteWaypoints.Count) FinishCommute();
         }
         return true;
+    }
+
+    private void FinishCommute()
+    {
+        if (_commute == CommuteState.ARRIVING)
+        {
+            _commute = CommuteState.NONE;
+            _mover.Role = GetPathRole();   // 근무 역할 복원
+            _mover.Clear();
+            OnArrivedAtWork();             // 서브클래스 IDLE 진입
+        }
+        else // LEAVING
+        {
+            _commute = CommuteState.NONE;
+            gameObject.SetActive(false);   // 퇴장 → 숨김
+        }
     }
 
     public bool CanUpgrade
@@ -163,8 +203,8 @@ public abstract class Staff : MonoBehaviour
             if (_data.grade == StaffType.Manager) return false;
             var next = StaffManager.Instance.GetNextGrade(_data);
             if (next == null) return false;
-            if (next.grade == StaffType.Senior) return _tenureMonths >= 6;
-            if (next.grade == StaffType.Manager) return _tenureMonths >= 12;
+            if (next.grade == StaffType.Senior) return _tenureMonths >= 12;
+            if (next.grade == StaffType.Manager) return _tenureMonths >= 24;
             return false;
         }
     }

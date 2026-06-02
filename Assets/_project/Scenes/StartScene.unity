@@ -150,6 +150,7 @@ RectTransform:
   m_Children:
   - {fileID: 2091719265}
   - {fileID: 1436931463}
+  - {fileID: 1428982907}
   - {fileID: 626283814}
   - {fileID: 1793861141}
   m_Father: {fileID: 1516997805}
@@ -1995,7 +1996,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1516997805}
+  m_Father: {fileID: 201034306}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -2259,7 +2260,6 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1428982907}
   - {fileID: 201034306}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3023,7 +3023,7 @@ MonoBehaviour:
   newGameConfirmDialog: {fileID: 626283813}
   confirmYesButton: {fileID: 1693101369}
   confirmNoButton: {fileID: 304984339}
-  gameSceneName: TestScene
+  gameSceneName: GameScene
 --- !u!4 &1911226122
 Transform:
   m_ObjectHideFlags: 0

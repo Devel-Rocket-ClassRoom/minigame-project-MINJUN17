@@ -20,7 +20,11 @@ MonoBehaviour:
   anchorX: 0
   anchorY: 0
   fixedSingle: 1
-  deliveryBonus: 0
+  lockMove: 1
+  passThrough: 1
+  fixedPlacement: 0
+  fixedCell: {x: 0, y: 0}
+  fixedWorldOffset: {x: 0, y: 0.2}
   displayName:
     m_TableReference:
       m_TableCollectionName: GUID:e8a326a4f684cfd4f828350fbb7606b2

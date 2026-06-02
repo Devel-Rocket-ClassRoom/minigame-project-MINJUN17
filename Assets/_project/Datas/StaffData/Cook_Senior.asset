@@ -20,6 +20,6 @@ MonoBehaviour:
   moveSpeed: 1.5
   kindness: 4
   deliveryTime: 0
-  speedMultiplier: 1.3
+  speedMultiplier: 1.5
   hireCost: 8000
   salary: 2500

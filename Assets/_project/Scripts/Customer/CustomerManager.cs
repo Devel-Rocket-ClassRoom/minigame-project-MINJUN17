@@ -139,16 +139,20 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
 
     public void StopSpawning() => _spawning = false;
 
-    // 영업 종료 시 호출 - 자리 대기 + 카운터 큐 손님 전원 강제 퇴장
-    // (주문/식사 중인 손님은 정상 흐름 유지)
+    /// <summary>즉시 손님 1명 스폰 (영업 첫 오픈 등). 스폰 타이머와 무관하게 1명만.</summary>
+    public void SpawnOneNow() => Spawn();
+
+    // 영업 종료 시 호출 - 아직 주문하지 못한 손님 전원 즉시 퇴장.
+    // (자리 대기·큐·카운터 주문대기 손님 모두 포함. 이미 주문한 손님은 음식 받고
+    //  식사 마칠 때까지 정상 흐름 유지 → 정산은 그들이 다 나간 뒤에 진행됨)
     public void ForceLeaveWaitingCustomers()
     {
-        // _waitingForSeat 복사 후 순회 (ForceLeave에서 리스트 변경됨)
-        var snapshot = new List<Customer>(_waitingForSeat);
+        // _active 복사 후 순회 (ForceLeave에서 컬렉션 변경됨)
+        var snapshot = new List<Customer>(_active);
         foreach (var c in snapshot)
-            if (c != null) c.ForceLeave();
+            if (c != null && !c.HasOrdered) c.ForceLeave();
 
-        // 사이드워크 큐 손님도 전원 퇴장
+        // 사이드워크 큐 정리 (위 ForceLeave가 대부분 처리하지만 안전망)
         if (queueManager != null) queueManager.ForceLeaveAll();
     }
 

@@ -22,6 +22,9 @@ public class PlacementModeUI : MonoBehaviour
     [Header("설치 중 숨길 HUD (CanvasGroup — GameObject 끄지 않아 이벤트 구독 유지)")]
     [SerializeField] private CanvasGroup hudGroup;
 
+    [Header("설치 중에도 유지할 층전환 토글 (hudGroup 바깥에 배치해야 함)")]
+    [SerializeField] private GameObject floorToggle;
+
     [Header("모드 안내 텍스트 (이동/제거 시 대상 선택 안내)")]
     [SerializeField] private GameObject hintRoot;          // 안내 텍스트 루트 (없으면 미사용)
     [SerializeField] private TextMeshProUGUI hintLabel;
@@ -58,6 +61,15 @@ public class PlacementModeUI : MonoBehaviour
         hudGroup.blocksRaycasts = visible;
     }
 
+    /// <summary>층전환 토글은 설치 중에도 유지 (2층 해금 시에만 표시). hudGroup 바깥에 있어야 가려지지 않음.</summary>
+    private void RefreshFloorToggle()
+    {
+        if (floorToggle == null) return;
+        bool unlocked = GridManager.Instance != null
+            && GridManager.Instance.GetActiveBoundsForFloor(FloorIndex.Floor2).HasValue;
+        floorToggle.SetActive(unlocked);
+    }
+
     /// <summary>PlacedShopPanel.ConfirmSlot에서 호출 — Place/이동 모드 진입 직후 UI 전환 (설치/취소 버튼).</summary>
     public void ShowPlace()
     {
@@ -65,6 +77,7 @@ public class PlacementModeUI : MonoBehaviour
         if (placeButtons  != null) placeButtons.SetActive(true);
         if (removeButtons != null) removeButtons.SetActive(false);
         SetHud(false);
+        RefreshFloorToggle();
     }
 
     /// <summary>제거 모드 진입 직후 UI 전환 (제거/취소 버튼).</summary>
@@ -74,6 +87,7 @@ public class PlacementModeUI : MonoBehaviour
         if (placeButtons  != null) placeButtons.SetActive(false);
         if (removeButtons != null) removeButtons.SetActive(true);
         SetHud(false);
+        RefreshFloorToggle();
     }
 
     public void ShowNormal()

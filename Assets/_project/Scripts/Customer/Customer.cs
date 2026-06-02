@@ -22,6 +22,10 @@ public class Customer : MonoBehaviour
     private Seat _targetSeat;
     public Seat AssignedSeat => _targetSeat;
 
+    // 카운터에서 주문(결제)을 마쳤는가. 영업 마감 시 "주문한 손님만 대기" 판정에 사용.
+    private bool _hasOrdered;
+    public bool HasOrdered => _hasOrdered;
+
     private float _stateTimer;
     private float _waitStartTime;
     private float _spawnTime;
@@ -46,6 +50,10 @@ public class Customer : MonoBehaviour
     // 총 대기가 patience의 이 배수를 넘으면 포기하고 퇴장 (무한대기 안전망).
     // patience 자체는 "만족도 차감 시작점"이라, 그 N배를 "완전 포기" 임계로 재활용.
     private const float kGiveUpPatienceMult = 2.5f;
+
+    // 착석/식사 중 좌석이 플레이어에 의해 옮겨졌을 때, 이 거리 이상 벌어지면
+    // 손님이 새 좌석 위치로 다시 따라가도록 재동기화 (좌석 이동 1칸 = 월드 1단위 이상).
+    private const float kSeatMoveResyncDist = 0.3f;
 
     // 화장실 사이클
     public enum ToiletPhase { None, Stall, Sink }
@@ -166,6 +174,13 @@ public class Customer : MonoBehaviour
             case CustomerState.WALK_TO_SEAT:     WalkToSeatState(); break;
             case CustomerState.WALK_TO_STAIR:    WalkToStairState(); break;
             case CustomerState.WAIT_AT_SEAT:
+                // 앉아 기다리는 중 플레이어가 좌석을 옮겼으면 새 위치로 다시 걸어감
+                if (_targetSeat != null
+                    && Vector3.Distance(transform.position, GetSitTarget()) > kSeatMoveResyncDist)
+                {
+                    ChangeState(CustomerState.WALK_TO_SEAT);
+                    break;
+                }
                 if (_servedFood != null) { ChangeState(CustomerState.EAT); break; }
                 // 음식이 참을성 한계(patience×배수)를 넘게 안 나오면 포기하고 퇴장 (무한대기 안전망)
                 if (GaveUpWaiting())
@@ -294,6 +309,7 @@ public class Customer : MonoBehaviour
             }
             _targetCounter.OnCustomerPaid(totalPrice);
             _targetCounter = null;
+            _hasOrdered = true;
             orderBubble?.Hide();
             ChangeState(CustomerState.WALK_TO_SEAT);
         }
@@ -359,22 +375,24 @@ public class Customer : MonoBehaviour
             return;
         }
 
-        // 앉을 위치 결정:
-        //  - Seat에 sitPoint가 지정돼 있으면 그 위치로 정확히 이동 (2인용 등 자리별 지정용)
-        //  - 없으면 좌석이 속한 셀 중앙으로 이동 (기존 동작 — 의자 sprite 정렬 오프셋 보정)
-        Vector3 target;
-        if (_targetSeat.SitPoint != null)
-        {
-            target = _targetSeat.SitPoint.position;
-        }
-        else
-        {
-            Vector2Int seatCell = GridManager.Instance.WorldToCell(_targetSeat.transform.position);
-            target = GridManager.Instance.CellToWorld(seatCell);
-        }
-        MoveTo(target);
+        // 앉을 위치로 이동 (좌석이 옮겨지면 GetSitTarget이 라이브로 새 위치 반환 → 자동 추적)
+        MoveTo(GetSitTarget());
         if (HasArrived())
             ChangeState(CustomerState.WAIT_AT_SEAT);
+    }
+
+    /// <summary>
+    /// 현재 _targetSeat 기준 손님이 앉아야 할 월드 위치. 좌석 이동 시 매 호출마다 라이브로 재계산.
+    ///  - Seat에 sitPoint가 지정돼 있으면 그 위치 (2인용 등 자리별 지정용)
+    ///  - 없으면 좌석이 속한 셀 중앙 (기존 동작 — 의자 sprite 정렬 오프셋 보정)
+    /// 호출 측에서 _targetSeat != null 보장 필요.
+    /// </summary>
+    private Vector3 GetSitTarget()
+    {
+        if (_targetSeat.SitPoint != null)
+            return _targetSeat.SitPoint.position;
+        Vector2Int seatCell = GridManager.Instance.WorldToCell(_targetSeat.transform.position);
+        return GridManager.Instance.CellToWorld(seatCell);
     }
 
     private void WalkToStairState()
@@ -422,7 +440,12 @@ public class Customer : MonoBehaviour
 
     private void EatState()
     {
-        if (_targetSeat != null) FaceToward(_targetSeat.FoodDropOff.position);   // 먹는 동안 테이블 바라보기
+        // 식사 중 좌석이 옮겨졌으면 따라 이동 (음식은 테이블 dropOff에 부착돼 좌석과 함께 이동).
+        // 진행도/만족도는 그대로 유지 — EAT 상태를 벗어나지 않으므로 대기 패널티 재적용 없음.
+        if (_targetSeat != null && Vector3.Distance(transform.position, GetSitTarget()) > kSeatMoveResyncDist)
+            MoveTo(GetSitTarget());
+        else if (_targetSeat != null)
+            FaceToward(_targetSeat.FoodDropOff.position);   // 먹는 동안 테이블 바라보기
         _satisfaction += Mathf.FloorToInt(Time.deltaTime * _data.eatGainRate);
 
         // 식사 시간은 주문 개수에 비례 (eatSpeed = 메뉴 1개 기준 시간)

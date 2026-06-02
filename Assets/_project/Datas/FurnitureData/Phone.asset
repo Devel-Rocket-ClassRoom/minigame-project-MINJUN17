@@ -20,6 +20,7 @@ MonoBehaviour:
   anchorX: 0
   anchorY: 0
   fixedSingle: 0
+  lockMove: 0
   fixedPlacement: 0
   fixedCell: {x: 0, y: 0}
   fixedWorldOffset: {x: 0, y: 0}
@@ -41,7 +42,7 @@ MonoBehaviour:
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
-  icon: {fileID: 0}
+  icon: {fileID: -3886678911037831004, guid: 47acbf423ee47d64ba45065d51be09d6, type: 3}
   satisfactionUnlock: 1500
   purchaseCost: 70000
   unlockOnExpansion: {fileID: 0}

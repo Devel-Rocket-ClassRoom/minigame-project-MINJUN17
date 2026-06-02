@@ -43,6 +43,12 @@ public class FurnitureData : ScriptableObject, ISaveIdentifiable
     [Tooltip("이동만 가능 — 추가 설치/삭제 불가. 시작 배치로 1개만 존재하는 고정 가구 (예: 카운터).")]
     public bool fixedSingle;
 
+    [Tooltip("이동 금지 — 한 번 자리잡으면 옮길 수 없음 (카운터·픽업대 등). fixedSingle과 함께 쓰면 추가/삭제/이동 모두 불가.")]
+    public bool lockMove;
+
+    [Tooltip("체크 시 이 가구는 길찾기를 막지 않음 — 직원/손님이 통과 가능 (설치 시 가구끼리 겹침은 그대로 방지).")]
+    public bool passThrough;
+
     [Header("고정 위치 즉시 설치 (드래그 X)")]
     [Tooltip("체크 시 카탈로그 클릭하면 fixedCell 위치에 즉시 spawn. 이동/삭제/회전 불가, 1회만 설치 가능.")]
     public bool fixedPlacement;

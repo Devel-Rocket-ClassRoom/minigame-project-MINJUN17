@@ -17,7 +17,7 @@ MonoBehaviour:
   grade: 2
   sprite: {fileID: 6019279233290180414, guid: e754830489ba91141a59c36c64dfeb07, type: 3}
   animController: {fileID: 22100000, guid: 5bf77390045f1af4992ac02da0e446cc, type: 2}
-  moveSpeed: 3
+  moveSpeed: 2
   kindness: 3
   deliveryTime: 0
   speedMultiplier: 1.6

@@ -32,8 +32,8 @@ MonoBehaviour:
     m_WaitForCompletion: 0
     m_LocalVariables: []
   foodSprite: {fileID: -4719407065779388043, guid: da9dfe71af41e99409df13c9b00d3995, type: 3}
-  price: 6000
-  cost: 1500
+  price: 5000
+  cost: 1375
   tool: {fileID: 11400000, guid: d19e3da870805a242a72292d0739cb8f, type: 2}
   satisfactionUnlock: 1000
   spawnWeight: 0.5

@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 6474755102225511725}
   - component: {fileID: 3618867727315804974}
   - component: {fileID: 5173087036599316640}
-  - component: {fileID: 1609390875156823712}
   m_Layer: 0
   m_Name: Serve
   m_TagString: Untagged
@@ -85,7 +84,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 2
   m_MaskInteraction: 0
   m_Sprite: {fileID: 3453626864198620198, guid: 33ae65c5b969e0946825b8fbbe93d344, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -162,23 +161,6 @@ MonoBehaviour:
   carryPoint: {fileID: 6003501904766411195}
   takingOrderDuration: 1
   takingDeliveryOrderDuration: 1
---- !u!114 &1609390875156823712
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2700806579746239112}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 65f0c05f3a54337498adac7c391f2432, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::YSorter
-  precision: 100
-  sortYOffset: 0
-  orderBias: 0
-  staticObject: 0
-  useSpriteBottom: 1
 --- !u!1 &3569031209179938873
 GameObject:
   m_ObjectHideFlags: 0

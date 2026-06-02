@@ -30,4 +30,5 @@ public class RecruitmentTicket
 {
     public RecruitmentTier tier;
     public int monthsRemaining;
+    public int seed;            // 후보 생성용 고정 시드 (재시작 리롤 방지)
 }

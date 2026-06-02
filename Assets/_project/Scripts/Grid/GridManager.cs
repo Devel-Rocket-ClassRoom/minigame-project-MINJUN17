@@ -27,6 +27,8 @@ public class GridManager : MonoBehaviour
     public int GridWidth => _gridWidth;
     public int GridHeight => floor1Height + gapHeight + floor2Height;
     public int Floor2YStart => floor1Height + gapHeight;
+    public int KitchenBoundaryY => floor1Height - kitchenAndToiletRows; // 1층 주방 시작 y (보통 8)
+    public int Floor1Height => floor1Height;                            // 1층 주방 상단(배타) y
     public int ActiveCellCount
     {
         get
@@ -54,6 +56,10 @@ public class GridManager : MonoBehaviour
 
     [Header("진입 금지 셀 (길찾기 X, 가구 설치 O — 화장실 칸막이 등)")]
     [SerializeField] private List<Vector2Int> blockedCells;
+
+    [Header("배치 금지 셀 (길찾기 O, 가구 설치 X — 입구·픽업대 옆 통로 등)")]
+    [Tooltip("지나다닐 순 있지만 가구는 못 놓는 셀. 인스펙터에서 좌표 직접 추가.")]
+    [SerializeField] private List<Vector2Int> reservedCells;
 
     private void Awake()
     {
@@ -140,6 +146,10 @@ public class GridManager : MonoBehaviour
         if (blockedCells != null)
             foreach (var pos in blockedCells)
                 SetWall(pos, true);
+
+        if (reservedCells != null)
+            foreach (var pos in reservedCells)
+                SetReserved(pos, true);   // 통과 O, 배치 X
     }
 
     public GridCell GetCell(Vector2Int pos)
@@ -175,8 +185,10 @@ public class GridManager : MonoBehaviour
         var c = GetCell(pos);
         if (c == null) return false;
         if (!c.isActive) return false;
-        if (c.isWall) return false;     // 벽은 누구도 못 지남
-        if (c.isOccupied) return false; // 가구는 못 지남 (isReserved는 OK)
+        if (c.isWall) return false;     // 벽은 누구도 못 지남 (화장실 칸막이 등 blockedCells)
+        // 가구는 못 지남. 단 reserved 셀(문·픽업대 등 통과 의도) / passThrough 가구는 예외.
+        bool walkableFurniture = c.placedObject != null && c.placedObject.Data != null && c.placedObject.Data.passThrough;
+        if (c.isOccupied && !c.isReserved && !walkableFurniture) return false;
 
         // 역할별 zone 제한
         switch (role)
@@ -208,37 +220,15 @@ public class GridManager : MonoBehaviour
         if (c != null) c.isReserved = value;
     }
 
-    // PassWindow 영역 세팅: 4셀 reserved 처리 + 주방 측 셀만 벽 opening으로
+    // PassWindow 영역 세팅: 픽업대 셀 + 주방문 reserved 처리 (통과 O, 가구 배치 X)
     public void SetupPassWindow(IEnumerable<Vector2Int> passWindowCells)
     {
-        var openings = new List<Vector2Int>();
         foreach (var pos in passWindowCells)
-        {
             SetReserved(pos, true);
-            var c = GetCell(pos);
-            if (c != null && c.zone == CellZone.Kitchen)
-                openings.Add(pos);
-        }
 
-        // 직원 통근용 주방 전용 문: 벽 제외 + 가구 배치 금지(reserved)
-        openings.Add(kitchenDoorCell);
         SetReserved(kitchenDoorCell, true);
-
-        BuildKitchenLWalls(openings);
-    }
-
-    // 1층 주방을 가로로 막는 벽 (y=8 한 줄, 전체 폭)
-    // openings에 포함된 셀은 벽 X (PassWindow 위치 + 직원 통근 문)
-    public void BuildKitchenLWalls(IEnumerable<Vector2Int> openings)
-    {
-        var openSet = new HashSet<Vector2Int>(openings);
-        int kitchenYStart = floor1Height - kitchenAndToiletRows; // 기본 8 (1층 주방 바닥)
-
-        for (int x = 0; x < _gridWidth; x++)
-        {
-            var pos = new Vector2Int(x, kitchenYStart);
-            if (!openSet.Contains(pos)) SetWall(pos);
-        }
+        // 주방 경계벽(y=8 가로벽) 미생성 — 직원 통근/길찾기 방해 제거.
+        // (손님=Hall 전용, 요리사=Kitchen 전용이라 벽 없이도 영역 유지됨)
     }
 
     // 특정 floor의 활성 셀 cell-coord bbox. 활성 셀 없으면 false.
@@ -408,6 +398,14 @@ public class GridManager : MonoBehaviour
         return list;
     }
 
+    /// <summary>가구가 요구하는 존이 해당 셀 존에 놓일 수 있는지. 홀 가구는 1·2층 홀 모두 허용.</summary>
+    public static bool ZoneAccepts(CellZone furnitureZone, CellZone cellZone)
+    {
+        if (furnitureZone == cellZone) return true;
+        if (furnitureZone == CellZone.Hall && cellZone == CellZone.Floor2_Hall) return true;
+        return false;
+    }
+
     public bool CanPlace(Vector2Int origin, int width, int height, CellZone zone)
     {
         for(int dx = 0; dx < width; dx++)
@@ -415,7 +413,8 @@ public class GridManager : MonoBehaviour
             for (int dy = 0; dy < height; dy++)
             {
                 GridCell cell = GetCell(origin + new Vector2Int(dx, dy));
-                if (cell == null || cell.isOccupied || !cell.isActive || cell.isReserved || cell.zone != zone) return false;
+                if (cell == null || cell.isOccupied || !cell.isActive || cell.isReserved
+                    || !ZoneAccepts(zone, cell.zone)) return false;
             }
         }
         return true;

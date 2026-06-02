@@ -34,7 +34,7 @@ MonoBehaviour:
   waitPenaltyRate: 3
   moveSpeed: 1
   eatSpeed: 7
-  patience: 30
+  patience: 50
   spawnWeight: 1
   toiletUrgeProbability: 0.3
   toiletUseDuration: 5

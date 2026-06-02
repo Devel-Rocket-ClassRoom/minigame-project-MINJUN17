@@ -20,6 +20,8 @@ MonoBehaviour:
   anchorX: 0
   anchorY: 0
   fixedSingle: 0
+  lockMove: 0
+  passThrough: 1
   fixedPlacement: 0
   fixedCell: {x: 0, y: 0}
   fixedWorldOffset: {x: 0.02, y: 0.35}
@@ -46,7 +48,7 @@ MonoBehaviour:
   purchaseCost: 30000
   unlockOnExpansion: {fileID: 0}
   toolType: 4
-  usingDuration: 2
+  usingDuration: 5
   references:
     version: 2
     RefIds: []
