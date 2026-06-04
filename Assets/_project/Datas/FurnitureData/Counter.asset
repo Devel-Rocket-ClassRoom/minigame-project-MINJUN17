@@ -20,6 +20,7 @@ MonoBehaviour:
   anchorX: 0
   anchorY: 0
   fixedSingle: 1
+  lockMove: 1
   fixedPlacement: 0
   fixedCell: {x: 0, y: 0}
   fixedWorldOffset: {x: 0, y: 0}

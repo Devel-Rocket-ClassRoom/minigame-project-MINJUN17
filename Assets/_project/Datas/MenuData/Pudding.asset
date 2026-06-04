@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88ad3a3536494ba42ac37b1a58e4863e, type: 3}
   m_Name: Pudding
   m_EditorClassIdentifier: Assembly-CSharp::MenuData
-  saveId: 020460757e0d
+  saveId: 7a1c0d2e9f05
   menuName:
     m_TableReference:
       m_TableCollectionName: GUID:e8a326a4f684cfd4f828350fbb7606b2
@@ -32,8 +32,8 @@ MonoBehaviour:
     m_WaitForCompletion: 0
     m_LocalVariables: []
   foodSprite: {fileID: 8722072848766645262, guid: 44b2ba61663c41b4c8c09a135d1e4c13, type: 3}
-  price: 6000
-  cost: 1000
+  price: 5000
+  cost: 1375
   tool: {fileID: 11400000, guid: 50587e369e1240e4db514839ef7613ec, type: 2}
   satisfactionUnlock: 1100
   spawnWeight: 0.5

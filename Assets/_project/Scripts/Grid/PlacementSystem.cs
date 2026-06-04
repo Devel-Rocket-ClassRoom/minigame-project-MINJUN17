@@ -71,6 +71,29 @@ public class PlacementSystem : MonoBehaviour
 #endif
     }
 
+    private void Start()
+    {
+        if (CameraController.Instance != null)
+            CameraController.Instance.OnFloorChanged += HandleFloorChanged;
+    }
+
+    private void OnDestroy()
+    {
+        if (CameraController.Instance != null)
+            CameraController.Instance.OnFloorChanged -= HandleFloorChanged;
+    }
+
+    // 설치/이동 중 층 전환 시: 홀로그램을 새 층 활성 영역 중앙으로 옮기고 존 하이라이트 갱신
+    private void HandleFloorChanged(FloorIndex floor)
+    {
+        if (Mode != Mode.Place && Mode != Mode.Move) return;
+        if (_previewInstance == null) return;   // Move 모드에서 아직 대상 미선택 상태 방어
+
+        _currentOrigin = gridManager.GetActiveAreaCenter(PreviewWidth, PreviewHeight);
+        UpdatePreviewVisuals();
+        ShowZoneHighlight(_previewData);
+    }
+
     // ========== Update ==========
     private void Update()
     {
@@ -213,7 +236,7 @@ public class PlacementSystem : MonoBehaviour
     private void TrySelectForMove()
     {
         if (!TryGetTappedObject(out PlacedObject target)) return;
-        if (target.Data != null && target.Data.fixedPlacement) return;   // 고정 위치 가구는 이동 불가 (fixedSingle은 이동 OK)
+        if (target.Data != null && (target.Data.fixedPlacement || target.Data.lockMove)) return;   // 고정 위치 / 이동잠금 가구는 이동 불가
 
         _movingOriginal = target;
         _originalOrigin = target.Origin;

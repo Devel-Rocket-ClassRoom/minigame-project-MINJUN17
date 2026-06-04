@@ -20,6 +20,8 @@ MonoBehaviour:
   anchorX: 0
   anchorY: 0
   fixedSingle: 0
+  lockMove: 0
+  passThrough: 0
   fixedPlacement: 0
   fixedCell: {x: 0, y: 0}
   fixedWorldOffset: {x: 0, y: 0}
@@ -34,16 +36,16 @@ MonoBehaviour:
     m_LocalVariables: []
   description:
     m_TableReference:
-      m_TableCollectionName: 
+      m_TableCollectionName: GUID:e8a326a4f684cfd4f828350fbb7606b2
     m_TableEntryReference:
-      m_KeyId: 0
+      m_KeyId: 1500000000000778
       m_Key: 
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
-  icon: {fileID: 0}
-  satisfactionUnlock: 1500
-  purchaseCost: 70000
+  icon: {fileID: -3886678911037831004, guid: 47acbf423ee47d64ba45065d51be09d6, type: 3}
+  satisfactionUnlock: 3000
+  purchaseCost: 100000
   unlockOnExpansion: {fileID: 0}
   references:
     version: 2

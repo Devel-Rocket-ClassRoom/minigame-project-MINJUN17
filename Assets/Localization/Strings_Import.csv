@@ -14,6 +14,7 @@ furniture.fishCuttingTable,,생선 손질대,Fish Cutting Table
 unlock.cookingtool,,구매하면 이 도구로 만드는 메뉴가 해금 목록에 등장합니다.,Purchase to unlock menus made with this tool.
 unlock.food,,새로운 손님이 등장할지도 모릅니다.,A new customer might appear.
 furniture.phone,,전화기,Phone
+furniture.phone.desc,,해금하고 설치시 배달직원 고용이 가능합니다,Unlock and install to enable hiring delivery staff
 furniture.dtOrderWindow,,DT 주문창구,DT Order Window
 furniture.dtPickupWindow,,DT 픽업창구,DT Pickup Window
 furniture.toilet1,,변기 1,Toilet 1
@@ -156,6 +157,7 @@ customer.officeWorker,,회사원,Office Worker
 customer.college,,대학생,College Student
 customer.police,,경찰,Police Officer
 customer.rapper,,래퍼,Rapper
+customer.rich,,부자,Rich Man
 staff.role.cook,,요리사,Cook
 staff.role.server,,서버,Server
 staff.role.rider,,라이더,Rider
@@ -189,3 +191,9 @@ ui.shop.empty.unlock,,가능한 해금이 없습니다,No available unlocks
 ui.placement.confirmAction,,확정,Confirm
 ui.marketing.applyAction,,마케팅 적용,Apply Marketing
 ui.zone.delivery,,배달존,Delivery Zone
+ui.startscene.texttmp,,새 게임,New Game
+ui.startscene.texttmp2,,이어하기,Continue
+ui.startscene.texttmp3,,설정,Settings
+ui.startscene.texttmp4,,경고,Warning
+ui.startscene.texttmp5,,확인,Confirm
+ui.startscene.texttmp1,,새 게임 시작시 기존에 저장된 게임은 삭제됩니다 그래도 하시겠습니까?,Starting a new game will delete your existing save. Continue anyway?

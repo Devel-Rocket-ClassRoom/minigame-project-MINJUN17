@@ -17,10 +17,10 @@ public class StaffManager : MonoBehaviour
     [SerializeField] private List<StaffData> serverGrades;
     [SerializeField] private List<StaffData> riderGrades;
 
-    [Header("직원 상한 (카운터 수와 무관 — 각 3명 고정)")]
-    [SerializeField] private int maxCookCount = 3;
-    [SerializeField] private int maxServerCount = 3;
-    [SerializeField] private int maxRiderCount = 3;
+    [Header("직원 상한 (카운터 수와 무관 — 각 4명 고정)")]
+    [SerializeField] private int maxCookCount = 4;
+    [SerializeField] private int maxServerCount = 4;
+    [SerializeField] private int maxRiderCount = 4;
 
     [Header("시작 직원 수")]
     [SerializeField] private int starterCookCount = 1;
@@ -67,6 +67,15 @@ public class StaffManager : MonoBehaviour
     public int MaxCookCount => maxCookCount;
     public int MaxRiderCount => maxRiderCount;
 
+    /// <summary>해당 직군에 고용 여유가 있는지 (현재 인원 &lt; 상한).</summary>
+    public bool HasRoomFor(StaffRole role) => role switch
+    {
+        StaffRole.Cook   => cookStaffs.Count   < maxCookCount,
+        StaffRole.Server => serverStaffs.Count < maxServerCount,
+        StaffRole.Rider  => riderStaffs.Count  < maxRiderCount,
+        _ => false,
+    };
+
     // 라이더 고용 가능 = 전화기가 카탈로그에서 해금되었을 때
     public bool IsRiderHiringUnlocked =>
         PhoneManager.Instance != null && PhoneManager.Instance.IsUnlocked;
@@ -95,12 +104,21 @@ public class StaffManager : MonoBehaviour
         OnRosterChanged?.Invoke();
     }
 
-    /// <summary>영업 시작 — 전 직원 입구에서 등장해 근무지로.</summary>
+    /// <summary>영업 시작 — 미출근(숨겨진) 직원만 입구에서 등장해 근무지로.</summary>
     public void OnBusinessOpen()
     {
         if (CustomerManager.Instance == null) return;
         Vector3 entry = CustomerManager.Instance.EntryPosition;
-        foreach (var s in GetAllStaffs()) s.BeginArriving(entry);
+        foreach (var s in GetAllStaffs())
+        {
+            if (s == null) continue;
+            // 이미 출근해 근무/입장 중인 직원은 자리 유지 — 입구에서 재입장 안 시킴.
+            // (튜토리얼 중 고용해 이미 들어온 직원이 튜토리얼 종료 시 또 출근하던 문제 방지)
+            // 단, 아직 퇴근(LEAVING) 중이면 되돌려 재출근시킴 — 정산 직후 바로 다음날을 열면
+            // 출구로 걸어가던 직원이 그대로 숨겨져 그날 내내 미복귀하던 버그 방지.
+            bool workingOrArriving = s.gameObject.activeSelf && !s.IsLeaving;
+            if (!workingOrArriving) s.BeginArriving(entry);
+        }
     }
 
     /// <summary>영업 종료 — 전 직원 입구로 퇴장(도착 시 숨김).</summary>

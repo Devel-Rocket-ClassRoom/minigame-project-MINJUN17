@@ -17,9 +17,9 @@ MonoBehaviour:
   grade: 0
   sprite: {fileID: 3983453485446504721, guid: c85d78da1e95f2b41a79c04a23f3ca3b, type: 3}
   animController: {fileID: 22100000, guid: 624569400f2ea984288356a69253e79d, type: 2}
-  moveSpeed: 5
+  moveSpeed: 1
   kindness: 2
   deliveryTime: 0
-  speedMultiplier: 10
-  hireCost: 3000
+  speedMultiplier: 1
+  hireCost: 8000
   salary: 1000

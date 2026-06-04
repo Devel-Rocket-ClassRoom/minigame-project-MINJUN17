@@ -15,7 +15,22 @@ using UnityEngine;
 [DefaultExecutionOrder(-100)]
 public class CatalogManager : MonoBehaviour
 {
-    public static CatalogManager Instance;
+    private static CatalogManager _instance;
+    /// <summary>
+    /// 단일 인스턴스 접근자. 백킹 참조가 null이거나 파괴된(Unity fake-null) 경우
+    /// 씬에서 살아있는 CatalogManager를 자동으로 다시 찾는다.
+    /// (씬 리로드/중복 배치로 Instance가 죽은 오브젝트를 가리켜 상점 슬롯이 전부 사라지던 버그 방지)
+    /// </summary>
+    public static CatalogManager Instance
+    {
+        get
+        {
+            if (_instance == null)   // Unity의 == 오버로드로 파괴된 객체도 null로 잡힘
+                _instance = FindFirstObjectByType<CatalogManager>();
+            return _instance;
+        }
+        private set => _instance = value;
+    }
 
     [Header("전체 카탈로그")]
     [SerializeField] private List<FurnitureData> allFurniture;

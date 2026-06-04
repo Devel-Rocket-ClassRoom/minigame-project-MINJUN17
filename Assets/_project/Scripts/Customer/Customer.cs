@@ -22,6 +22,10 @@ public class Customer : MonoBehaviour
     private Seat _targetSeat;
     public Seat AssignedSeat => _targetSeat;
 
+    // 카운터에서 주문(결제)을 마쳤는가. 영업 마감 시 "주문한 손님만 대기" 판정에 사용.
+    private bool _hasOrdered;
+    public bool HasOrdered => _hasOrdered;
+
     private float _stateTimer;
     private float _waitStartTime;
     private float _spawnTime;
@@ -33,6 +37,9 @@ public class Customer : MonoBehaviour
     // 사이드워크 ↔ 가게 안 횡단 시 도어 셀 (0,1)을 경유 — 직선이동이 외벽 가로지르는 것 방지
     private bool _passedDoor;
     private static readonly Vector3 DoorWorld = new Vector3(0.5f, 1.5f, 0f);
+
+    // 카운터 접근 경로(end→mid→start) 순회용 인덱스. WALK_TO_COUNTER 진입 시 세팅.
+    private int _approachIdx;
 
     // Stair 경유 보조 필드
     private Stair _pendingStair;
@@ -46,6 +53,10 @@ public class Customer : MonoBehaviour
     // 총 대기가 patience의 이 배수를 넘으면 포기하고 퇴장 (무한대기 안전망).
     // patience 자체는 "만족도 차감 시작점"이라, 그 N배를 "완전 포기" 임계로 재활용.
     private const float kGiveUpPatienceMult = 2.5f;
+
+    // 착석/식사 중 좌석이 플레이어에 의해 옮겨졌을 때, 이 거리 이상 벌어지면
+    // 손님이 새 좌석 위치로 다시 따라가도록 재동기화 (좌석 이동 1칸 = 월드 1단위 이상).
+    private const float kSeatMoveResyncDist = 0.3f;
 
     // 화장실 사이클
     public enum ToiletPhase { None, Stall, Sink }
@@ -166,6 +177,13 @@ public class Customer : MonoBehaviour
             case CustomerState.WALK_TO_SEAT:     WalkToSeatState(); break;
             case CustomerState.WALK_TO_STAIR:    WalkToStairState(); break;
             case CustomerState.WAIT_AT_SEAT:
+                // 앉아 기다리는 중 플레이어가 좌석을 옮겼으면 새 위치로 다시 걸어감
+                if (_targetSeat != null
+                    && Vector3.Distance(transform.position, GetSitTarget()) > kSeatMoveResyncDist)
+                {
+                    ChangeState(CustomerState.WALK_TO_SEAT);
+                    break;
+                }
                 if (_servedFood != null) { ChangeState(CustomerState.EAT); break; }
                 // 음식이 참을성 한계(patience×배수)를 넘게 안 나오면 포기하고 퇴장 (무한대기 안전망)
                 if (GaveUpWaiting())
@@ -232,8 +250,18 @@ public class Customer : MonoBehaviour
 
         switch (s)
         {
+            case CustomerState.Enter:
+                _approachIdx = 0;   // 줄 합류: 도어(end)부터 순서대로 접근
+                break;
             case CustomerState.WALK_TO_COUNTER:
-                _passedDoor = false;   // 사이드워크 → 도어 → 카운터
+                // end(도어) → mid(코너) → start(맨앞) → 카운터 순서로 접근.
+                // 단, 이미 지나친 웨이포인트는 건너뛴다(줄 앞에서 대기하던 손님이 도어로 되돌아가지 않게).
+                _passedDoor = false;
+                var approach = _queueManager != null ? _queueManager.GetApproachPath() : null;
+                _approachIdx = ComputeApproachStartIndex(approach);
+                // 도어(인덱스 0)를 건너뛰고 시작 = 이미 가게 안 → 이 시점에 진입 처리(신규 손님 소개 포함)
+                if (approach != null && approach.Count > 0 && _approachIdx > 0)
+                    EnterStoreOnce();
                 break;
             case CustomerState.WAIT_AT_COUNTER:
                 // 주문할 게 없는 손님은 서버를 부르지 않음(OnCustomerArrived 생략) → Update에서 곧 퇴장
@@ -294,6 +322,7 @@ public class Customer : MonoBehaviour
             }
             _targetCounter.OnCustomerPaid(totalPrice);
             _targetCounter = null;
+            _hasOrdered = true;
             orderBubble?.Hide();
             ChangeState(CustomerState.WALK_TO_SEAT);
         }
@@ -301,9 +330,25 @@ public class Customer : MonoBehaviour
 
     private void EnterState()
     {
-        MoveTo(_queueManager.GetSlotPosition(this));
+        // 줄 슬롯까지 도어(end)→코너(mid)→슬롯 순서로 따라 이동 (직선 대각선 방지)
+        var walk = _queueManager != null ? _queueManager.GetWalkPathToSlot(this) : null;
+        bool atSlot;
+        if (walk == null || walk.Count == 0)
+        {
+            MoveTo(_queueManager.GetSlotPosition(this));   // 폴백: 경로 미설정 시 직행
+            atSlot = HasArrived();
+        }
+        else
+        {
+            atSlot = WalkApproach(walk);
+        }
 
-        if (!_queueManager.IsFront(this)) return;
+        // 슬롯에 서 있고, 카운터 다리(mid~start)에 있는 손님만 카운터를 바라봄
+        if (atSlot && _queueManager.IsOnCounterLeg(this))
+            FaceToward(CounterFacingPoint());
+
+        // 아직 슬롯에 도착 안 했거나 맨 앞이 아니면 대기
+        if (!atSlot || !_queueManager.IsFront(this)) return;
 
         var ready = _counterManager.GetReadyCounter();
         if (ready == null) return;
@@ -314,22 +359,102 @@ public class Customer : MonoBehaviour
         ChangeState(CustomerState.WALK_TO_COUNTER);
     }
 
-    private void WalkToCounterState()
+    /// <summary>
+    /// 웨이포인트 리스트(맨 끝 = 최종 목적지)를 _approachIdx 따라 순차 이동.
+    /// 첫 점(도어) 도착 시 가게 진입 처리. 최종 목적지에 도착하면 true.
+    /// </summary>
+    private bool WalkApproach(List<Vector3> pts)
     {
-        // 1단계: 사이드워크 → 도어. 2단계: 도어 → 카운터 (그리드 안에서 정상 길찾기)
-        Vector3 dest = _passedDoor ? _targetCounter.ServicePos.position : DoorWorld;
-        MoveTo(dest);
+        if (pts == null || pts.Count == 0) return true;
+        if (_approachIdx >= pts.Count) _approachIdx = pts.Count - 1;
+
+        bool last = _approachIdx >= pts.Count - 1;
+        MoveTo(pts[_approachIdx]);
         if (HasArrived())
         {
-            if (!_passedDoor)
-            {
-                _passedDoor = true;
-                // 문 통과 = 가게 진입. 새로 해금된 손님이면 이 시점에 "새 손님 등장!" 팝업.
-                CustomerManager.Instance?.TryIntroduceNewCustomer(_data);
-                return;
-            }
-            ChangeState(CustomerState.WAIT_AT_COUNTER);
+            if (_approachIdx == 0) EnterStoreOnce();   // 첫 웨이포인트(도어) 통과 = 가게 진입
+            if (!last) { _approachIdx++; return false; }
+            return true;
         }
+        return false;
+    }
+
+    private void WalkToCounterState()
+    {
+        var path = _queueManager != null ? _queueManager.GetApproachPath() : null;
+
+        // 경로(start/mid/end) 미설정 시 폴백: 기존 도어 경유 2단계 이동
+        if (path == null || path.Count == 0)
+        {
+            Vector3 dest = _passedDoor ? _targetCounter.ServicePos.position : DoorWorld;
+            MoveTo(dest);
+            if (HasArrived())
+            {
+                if (!_passedDoor) { EnterStoreOnce(); return; }
+                ChangeState(CustomerState.WAIT_AT_COUNTER);
+            }
+            return;
+        }
+
+        // 접근 웨이포인트(end→mid→start)를 순서대로 통과 — 손님 유무와 무관하게 항상 경로를 따른다.
+        if (_approachIdx < path.Count)
+        {
+            MoveTo(path[_approachIdx]);
+            if (HasArrived())
+            {
+                if (_approachIdx == 0) EnterStoreOnce();   // 첫 웨이포인트(도어) 통과 = 가게 진입
+                _approachIdx++;
+            }
+            return;
+        }
+
+        // 모든 웨이포인트 통과 → 카운터로
+        MoveTo(_targetCounter.ServicePos.position);
+        if (HasArrived())
+            ChangeState(CustomerState.WAIT_AT_COUNTER);
+    }
+
+    /// <summary>가게 진입 1회 처리 — 도어 통과 시점에 신규 손님 소개 팝업 발화.</summary>
+    private void EnterStoreOnce()
+    {
+        if (_passedDoor) return;
+        _passedDoor = true;
+        CustomerManager.Instance?.TryIntroduceNewCustomer(_data);
+    }
+
+    /// <summary>
+    /// 접근 경로(end→mid→start)에서 손님이 시작할 웨이포인트 인덱스.
+    /// 이미 지나친(다음 점이 더 가까운) 앞쪽 웨이포인트는 건너뛴다 —
+    /// 줄 앞에서 대기하던 손님이 도어 쪽으로 되돌아가는 것을 방지.
+    /// </summary>
+    private int ComputeApproachStartIndex(List<Vector3> path)
+    {
+        if (path == null || path.Count == 0) return 0;
+        Vector3 pos = transform.position;
+        int idx = 0;
+        while (idx < path.Count - 1
+            && (pos - path[idx]).sqrMagnitude > (pos - path[idx + 1]).sqrMagnitude)
+            idx++;
+        return idx;
+    }
+
+    /// <summary>대기 중 바라볼 카운터 방향 — 가장 가까운 카운터의 서비스 위치(없으면 줄 맨앞).</summary>
+    private Vector3 CounterFacingPoint()
+    {
+        var cm = CounterManager.Instance;
+        if (cm != null)
+        {
+            Counter nearest = null;
+            float best = float.MaxValue;
+            foreach (var c in cm.Counters)
+            {
+                if (c == null || c.ServicePos == null) continue;
+                float d = (c.ServicePos.position - transform.position).sqrMagnitude;
+                if (d < best) { best = d; nearest = c; }
+            }
+            if (nearest != null) return nearest.ServicePos.position;
+        }
+        return _queueManager != null ? _queueManager.FrontPoint : transform.position + Vector3.right;
     }
     private void WalkToSeatState()
     {
@@ -359,22 +484,24 @@ public class Customer : MonoBehaviour
             return;
         }
 
-        // 앉을 위치 결정:
-        //  - Seat에 sitPoint가 지정돼 있으면 그 위치로 정확히 이동 (2인용 등 자리별 지정용)
-        //  - 없으면 좌석이 속한 셀 중앙으로 이동 (기존 동작 — 의자 sprite 정렬 오프셋 보정)
-        Vector3 target;
-        if (_targetSeat.SitPoint != null)
-        {
-            target = _targetSeat.SitPoint.position;
-        }
-        else
-        {
-            Vector2Int seatCell = GridManager.Instance.WorldToCell(_targetSeat.transform.position);
-            target = GridManager.Instance.CellToWorld(seatCell);
-        }
-        MoveTo(target);
+        // 앉을 위치로 이동 (좌석이 옮겨지면 GetSitTarget이 라이브로 새 위치 반환 → 자동 추적)
+        MoveTo(GetSitTarget());
         if (HasArrived())
             ChangeState(CustomerState.WAIT_AT_SEAT);
+    }
+
+    /// <summary>
+    /// 현재 _targetSeat 기준 손님이 앉아야 할 월드 위치. 좌석 이동 시 매 호출마다 라이브로 재계산.
+    ///  - Seat에 sitPoint가 지정돼 있으면 그 위치 (2인용 등 자리별 지정용)
+    ///  - 없으면 좌석이 속한 셀 중앙 (기존 동작 — 의자 sprite 정렬 오프셋 보정)
+    /// 호출 측에서 _targetSeat != null 보장 필요.
+    /// </summary>
+    private Vector3 GetSitTarget()
+    {
+        if (_targetSeat.SitPoint != null)
+            return _targetSeat.SitPoint.position;
+        Vector2Int seatCell = GridManager.Instance.WorldToCell(_targetSeat.transform.position);
+        return GridManager.Instance.CellToWorld(seatCell);
     }
 
     private void WalkToStairState()
@@ -422,7 +549,12 @@ public class Customer : MonoBehaviour
 
     private void EatState()
     {
-        if (_targetSeat != null) FaceToward(_targetSeat.FoodDropOff.position);   // 먹는 동안 테이블 바라보기
+        // 식사 중 좌석이 옮겨졌으면 따라 이동 (음식은 테이블 dropOff에 부착돼 좌석과 함께 이동).
+        // 진행도/만족도는 그대로 유지 — EAT 상태를 벗어나지 않으므로 대기 패널티 재적용 없음.
+        if (_targetSeat != null && Vector3.Distance(transform.position, GetSitTarget()) > kSeatMoveResyncDist)
+            MoveTo(GetSitTarget());
+        else if (_targetSeat != null)
+            FaceToward(_targetSeat.FoodDropOff.position);   // 먹는 동안 테이블 바라보기
         _satisfaction += Mathf.FloorToInt(Time.deltaTime * _data.eatGainRate);
 
         // 식사 시간은 주문 개수에 비례 (eatSpeed = 메뉴 1개 기준 시간)
@@ -447,6 +579,13 @@ public class Customer : MonoBehaviour
     {
         if (_toiletDecided) { ChangeState(CustomerState.LEAVE); return; }
         _toiletDecided = true;
+
+        // 영업 마감 대기 중이면 화장실 안 가고 바로 퇴장 (마감 시간 끌지 않게)
+        if (CustomerManager.Instance != null && CustomerManager.Instance.IsClosing)
+        {
+            ChangeState(CustomerState.LEAVE);
+            return;
+        }
 
         // 의지 없으면 그냥 떠남
         if (Random.value > _data.toiletUrgeProbability)

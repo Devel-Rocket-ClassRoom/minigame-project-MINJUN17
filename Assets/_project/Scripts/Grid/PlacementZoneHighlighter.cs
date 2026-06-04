@@ -73,7 +73,7 @@ public class PlacementZoneHighlighter : MonoBehaviour
             if (!grid.IsCellOnFloor(y, _floor)) continue;
 
             // 존이 맞아도 점유/예약/벽이면 못 놓음 → 빨강
-            bool placeable = cell.zone == _allowed && !cell.isOccupied && !cell.isReserved && !cell.isWall;
+            bool placeable = GridManager.ZoneAccepts(_allowed, cell.zone) && !cell.isOccupied && !cell.isReserved && !cell.isWall;
 
             // 설치중인 가구가 덮는 셀이면 파란색
             bool underPreview = hasPreview

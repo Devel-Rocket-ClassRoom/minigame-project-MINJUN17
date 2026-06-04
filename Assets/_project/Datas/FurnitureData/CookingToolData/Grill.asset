@@ -20,6 +20,8 @@ MonoBehaviour:
   anchorX: 0
   anchorY: 0
   fixedSingle: 0
+  lockMove: 0
+  passThrough: 1
   fixedPlacement: 0
   fixedCell: {x: 0, y: 0}
   fixedWorldOffset: {x: 0, y: 0.3}
@@ -43,10 +45,10 @@ MonoBehaviour:
     m_LocalVariables: []
   icon: {fileID: 1989365053788644909, guid: 42b3767372e8b434fbdc37c5196fc2dc, type: 3}
   satisfactionUnlock: 50
-  purchaseCost: 30000
+  purchaseCost: 10000
   unlockOnExpansion: {fileID: 0}
   toolType: 0
-  usingDuration: 2
+  usingDuration: 5
   references:
     version: 2
     RefIds: []

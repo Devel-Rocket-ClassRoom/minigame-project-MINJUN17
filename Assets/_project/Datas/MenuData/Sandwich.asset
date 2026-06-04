@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88ad3a3536494ba42ac37b1a58e4863e, type: 3}
   m_Name: Sandwich
   m_EditorClassIdentifier: Assembly-CSharp::MenuData
-  saveId: 020460757e0d
+  saveId: 7a1c0d2e9f07
   menuName:
     m_TableReference:
       m_TableCollectionName: GUID:e8a326a4f684cfd4f828350fbb7606b2
@@ -33,7 +33,7 @@ MonoBehaviour:
     m_LocalVariables: []
   foodSprite: {fileID: -7135540818809487110, guid: 2acc2401c89570d459db7b2c1099bb23, type: 3}
   price: 3500
-  cost: 800
+  cost: 963
   tool: {fileID: 11400000, guid: 50587e369e1240e4db514839ef7613ec, type: 2}
   satisfactionUnlock: 800
   spawnWeight: 0.5

@@ -220,7 +220,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b67a047ae3a037b45a2407259e5b06d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CookingToolInstance
-  data: {fileID: 0}
+  data: {fileID: 11400000, guid: a851002380cf5144ab8f4ae4a2e0b40a, type: 2}
   usePoint: {fileID: 4885739441207566012}
   animator: {fileID: 6830052142363823994}
 --- !u!1 &3808231748317151591

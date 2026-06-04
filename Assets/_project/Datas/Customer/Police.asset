@@ -32,9 +32,9 @@ MonoBehaviour:
   baseSatisfaction: 55
   eatGainRate: 5
   waitPenaltyRate: 3
-  moveSpeed: 1
+  moveSpeed: 1.5
   eatSpeed: 5
-  patience: 35
+  patience: 50
   spawnWeight: 1
   toiletUrgeProbability: 0.3
   toiletUseDuration: 5

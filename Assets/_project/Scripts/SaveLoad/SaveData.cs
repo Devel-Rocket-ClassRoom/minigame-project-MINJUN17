@@ -175,6 +175,7 @@ public class TicketEntry
 {
     public int tier;             // RecruitmentTier 캐스팅
     public int monthsRemaining;
+    public int seed;             // 후보 생성용 고정 시드
 }
 
 // ─────────────────────────────────────── Phase 6

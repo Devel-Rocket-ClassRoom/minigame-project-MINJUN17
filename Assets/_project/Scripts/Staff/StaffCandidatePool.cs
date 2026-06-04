@@ -52,7 +52,12 @@ public class StaffCandidatePool : MonoBehaviour
         if (cfg == null) return false;
         if (!SatisfactionSystem.Instance.Spend(cfg.satisfactionCost)) return false;
 
-        _pendingTickets.Add(new RecruitmentTicket { tier = tier, monthsRemaining = ticketDelayMonths });
+        _pendingTickets.Add(new RecruitmentTicket
+        {
+            tier = tier,
+            monthsRemaining = ticketDelayMonths,
+            seed = Random.Range(int.MinValue, int.MaxValue),   // 후보 고정 (재시작 리롤 방지)
+        });
         _purchasedThisMonth = true;
         OnPendingTicketsChanged?.Invoke();
         OnPurchaseStateChanged?.Invoke();
@@ -70,15 +75,23 @@ public class StaffCandidatePool : MonoBehaviour
 
         for (int i = _pendingTickets.Count - 1; i >= 0; i--)
         {
-            _pendingTickets[i].monthsRemaining--;
+            if (_pendingTickets[i].monthsRemaining > 0)
+                _pendingTickets[i].monthsRemaining--;
+
             if (_pendingTickets[i].monthsRemaining <= 0)
             {
-                var tier = _pendingTickets[i].tier;
+                // 전 직군 만원이면 티켓 보류 — 자리 나면(해고 등) 다음 달에 재시도
+                if (!HasAnyHiringRoom()) continue;
+
+                var ticket = _pendingTickets[i];
+                var prevState = Random.state;        // 전역 난수 상태 보존
+                Random.InitState(ticket.seed);       // 티켓 고정 시드 → 재시작해도 동일 후보
                 for (int n = 0; n < applicantsPerTicket; n++)
                 {
-                    var c = MakeApplicant(tier);
+                    var c = MakeApplicant(ticket.tier);
                     if (c != null) { AddApplicant(c); applicantsChanged = true; }
                 }
+                Random.state = prevState;            // 다른 난수 시스템 영향 없게 복원
                 _pendingTickets.RemoveAt(i);
                 ticketsChanged = true;
             }
@@ -122,8 +135,9 @@ public class StaffCandidatePool : MonoBehaviour
         if (cfg == null) return null;
 
         var role = PickRole();
+        if (role == null) return null;              // 뽑을 직군 없음 (전 직군 만원)
         var grade = PickGrade(cfg);
-        var baseData = StaffManager.Instance.GetGrade(role, grade);
+        var baseData = StaffManager.Instance.GetGrade(role.Value, grade);
         if (baseData == null) return null;
 
         return new StaffCandidate
@@ -134,20 +148,33 @@ public class StaffCandidatePool : MonoBehaviour
         };
     }
 
-    private StaffRole PickRole()
+    private StaffRole? PickRole()
     {
-        bool riderUnlocked = isDeliveryUnlocked
-            || (StaffManager.Instance != null && StaffManager.Instance.IsRiderHiringUnlocked);
-        if (!riderUnlocked)
-            return Random.value < 0.5f ? StaffRole.Cook : StaffRole.Server;
+        var sm = StaffManager.Instance;
+        if (sm == null) return null;
 
-        int r = Random.Range(0, 3);
-        return r switch
-        {
-            0 => StaffRole.Cook,
-            1 => StaffRole.Server,
-            _ => StaffRole.Rider,
-        };
+        bool riderUnlocked = isDeliveryUnlocked || sm.IsRiderHiringUnlocked;
+
+        // 여유 있는 직군만 후보 대상 (만원 직군 제외 → 해고 시 다시 등장)
+        var available = new List<StaffRole>();
+        if (sm.HasRoomFor(StaffRole.Cook))   available.Add(StaffRole.Cook);
+        if (sm.HasRoomFor(StaffRole.Server)) available.Add(StaffRole.Server);
+        if (riderUnlocked && sm.HasRoomFor(StaffRole.Rider)) available.Add(StaffRole.Rider);
+
+        if (available.Count == 0) return null;
+        return available[Random.Range(0, available.Count)];
+    }
+
+    /// <summary>현재 고용 가능한(여유 있는) 직군이 하나라도 있는지.</summary>
+    private bool HasAnyHiringRoom()
+    {
+        var sm = StaffManager.Instance;
+        if (sm == null) return false;
+        bool riderUnlocked = isDeliveryUnlocked || sm.IsRiderHiringUnlocked;
+        if (sm.HasRoomFor(StaffRole.Cook))   return true;
+        if (sm.HasRoomFor(StaffRole.Server)) return true;
+        if (riderUnlocked && sm.HasRoomFor(StaffRole.Rider)) return true;
+        return false;
     }
 
     private StaffType PickGrade(RecruitmentTierConfig cfg)
@@ -217,7 +244,7 @@ public class StaffCandidatePool : MonoBehaviour
         foreach (var t in _pendingTickets)
         {
             if (t == null) continue;
-            tickets.Add(new TicketEntry { tier = (int)t.tier, monthsRemaining = t.monthsRemaining });
+            tickets.Add(new TicketEntry { tier = (int)t.tier, monthsRemaining = t.monthsRemaining, seed = t.seed });
         }
 
         return new CandidatePoolData
@@ -264,6 +291,7 @@ public class StaffCandidatePool : MonoBehaviour
                     {
                         tier            = (RecruitmentTier)t.tier,
                         monthsRemaining = t.monthsRemaining,
+                        seed            = t.seed,
                     });
                 }
             }

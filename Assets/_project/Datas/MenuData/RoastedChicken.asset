@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88ad3a3536494ba42ac37b1a58e4863e, type: 3}
   m_Name: RoastedChicken
   m_EditorClassIdentifier: Assembly-CSharp::MenuData
-  saveId: 020460757e0d
+  saveId: 7a1c0d2e9f06
   menuName:
     m_TableReference:
       m_TableCollectionName: GUID:e8a326a4f684cfd4f828350fbb7606b2
@@ -33,7 +33,7 @@ MonoBehaviour:
     m_LocalVariables: []
   foodSprite: {fileID: 3586752976274997106, guid: 95fde4d268332a649af2f321cfa710e9, type: 3}
   price: 10000
-  cost: 4500
+  cost: 2750
   tool: {fileID: 11400000, guid: d19e3da870805a242a72292d0739cb8f, type: 2}
   satisfactionUnlock: 1100
   spawnWeight: 0.5

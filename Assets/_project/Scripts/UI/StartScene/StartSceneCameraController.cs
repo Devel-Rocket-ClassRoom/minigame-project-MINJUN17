@@ -58,7 +58,7 @@ public class StartSceneCameraController : MonoBehaviour
 
     [Header("씬 전환")]
     [Tooltip("새 게임 / 이어하기 시 로드할 게임씬 이름. Build Settings에 등록 필요.")]
-    [SerializeField] private string gameSceneName = "TestScene";
+    [SerializeField] private string gameSceneName = "GameScene";
 
     private bool isSequenceRunning;
     private bool isSkipped;

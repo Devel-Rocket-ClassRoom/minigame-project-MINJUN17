@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -30,6 +31,9 @@ public class CameraController : MonoBehaviour
     private int _baseRefX, _baseRefY, _baseAssetsPPU;
 
     public FloorIndex CurrentFloor => _currentFloor;
+
+    /// <summary>층 전환 시 발화 (UI 버튼/디버그/DT 해금 등 모든 SetFloor 경로).</summary>
+    public event Action<FloorIndex> OnFloorChanged;
 
     private void Awake()
     {
@@ -78,6 +82,7 @@ public class CameraController : MonoBehaviour
     {
         _currentFloor = floor;
         ApplyVisibility(floor);
+        OnFloorChanged?.Invoke(floor);
 
         if (GridManager.Instance == null || mainCamera == null)
         {
