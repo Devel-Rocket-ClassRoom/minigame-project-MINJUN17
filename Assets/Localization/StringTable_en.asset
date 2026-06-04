@@ -786,6 +786,333 @@ MonoBehaviour:
     m_Localized: A new customer might appear.
     m_Metadata:
       m_Items: []
+  - m_Id: 3945678702706688
+    m_Localized: 1F
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678832730112
+    m_Localized: Customers
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678832730113
+    m_Localized: 'Info
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678832730114
+    m_Localized: Menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678832730115
+    m_Localized: 'Settings
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678832730116
+    m_Localized: Place
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118720
+    m_Localized: Staff
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118721
+    m_Localized: Hire
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118722
+    m_Localized: 'Unlock
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118723
+    m_Localized: 'Menu
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118724
+    m_Localized: Save
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118725
+    m_Localized: Cancel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118726
+    m_Localized: 'Place
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118727
+    m_Localized: Remove
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118728
+    m_Localized: Cancel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118729
+    m_Localized: Favorite Food
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118730
+    m_Localized: Menu 1/5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118731
+    m_Localized: Select furniture to move
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118732
+    m_Localized: Confirm
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118733
+    m_Localized: A new customer has appeared!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118734
+    m_Localized: Move
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118735
+    m_Localized: Remove
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118736
+    m_Localized: Counter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118737
+    m_Localized: Hall
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678853701632
+    m_Localized: Kitchen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678853701633
+    m_Localized: Restroom
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678853701634
+    m_Localized: Confirm
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678853701635
+    m_Localized: 56th
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678853701636
+    m_Localized: Rank
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678853701637
+    m_Localized: 3220 pts
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678857895936
+    m_Localized: Reputation
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678857895937
+    m_Localized: 133,335,469
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678857895938
+    m_Localized: Annual Revenue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678857895939
+    m_Localized: Monthly Revenue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678857895940
+    m_Localized: Info
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678857895941
+    m_Localized: Total Customers
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678857895942
+    m_Localized: Best Rank
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678857895943
+    m_Localized: Total Store Revenue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678857895944
+    m_Localized: Home
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678857895945
+    m_Localized: English
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678857895946
+    m_Localized: "\uD55C\uAD6D\uC5B4"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678866284544
+    m_Localized: Language
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678866284545
+    m_Localized: 'Sound
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678866284546
+    m_Localized: Settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678870478848
+    m_Localized: Confirm
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678870478849
+    m_Localized: Rent
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678870478850
+    m_Localized: Staff Salary
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678870478851
+    m_Localized: 'Total
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678870478852
+    m_Localized: Settlement
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678870478853
+    m_Localized: Please recruit staff!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678874673152
+    m_Localized: Recruit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678874673153
+    m_Localized: You can hire staff 1 month after recruiting!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678874673154
+    m_Localized: Recruit Staff
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678874673155
+    m_Localized: 'Salary: 200,000
+
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678878867456
+    m_Localized: Fire
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678878867457
+    m_Localized: 'Promote
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678878867458
+    m_Localized: 'Map Expansion
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678878867459
+    m_Localized: Furniture
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678878867460
+    m_Localized: 'Marketing
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678878867461
+    m_Localized: Food
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678878867462
+    m_Localized: Recruit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678878867463
+    m_Localized: No unlocks available
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500000000000777
+    m_Localized: Rich Man
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1500000000000778
+    m_Localized: Unlock and install to enable hiring delivery staff
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014115135225856
+    m_Localized: Confirm
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014115311386624
+    m_Localized: Warning
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014115311386625
+    m_Localized: Starting a new game will delete your existing save. Continue anyway?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014115311386626
+    m_Localized: Continue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014115319775232
+    m_Localized: New Game
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014115319775233
+    m_Localized: Settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014115319775234
+    m_Localized: 
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014115323969536
+    m_Localized: 
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014115323969537
+    m_Localized: 
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014115323969538
+    m_Localized: 
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014115323969539
+    m_Localized: 
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014115323969540
+    m_Localized: 
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

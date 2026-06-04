@@ -66,6 +66,9 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
     private float _spawnTimer;
     private bool _spawning;
     private float _marketingMultiplier = 1f;
+    private float _menuSpawnMultiplier = 1f;   // 해금된 메뉴 수에 따른 스폰 가속 (로그 감쇠)
+    // 메뉴 25종 전부 해금 시 약 1.66배 → 마케팅 최대 3배와 곱해 약 5배.
+    private const float kMenuSpawnCoeff = 0.037f;
     public Vector3 EntryPosition => entryPoint.position;
     public Vector3 ExitPosition => exitPoint.position;
 
@@ -73,10 +76,19 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
 
     public void SetMarketingMultiplier(float m) => _marketingMultiplier = Mathf.Max(0.01f, m);
 
+    /// <summary>해금된 메뉴 수에 따라 스폰 가속 배수 갱신 (로그 감쇠). 마케팅 배수와 곱해진다.</summary>
+    private void RecomputeMenuMultiplier()
+    {
+        int count = 0;
+        if (CatalogManager.Instance != null && CatalogManager.Instance.UnlockedMenus != null)
+            foreach (var _ in CatalogManager.Instance.UnlockedMenus) count++;
+        _menuSpawnMultiplier = 1f + Mathf.Log(1f + count * kMenuSpawnCoeff);
+    }
+
     private float RollSpawnInterval()
     {
         float baseInterval = Random.Range(_minSpawnInterval, _maxSpawnInterval);
-        return baseInterval / _marketingMultiplier;
+        return baseInterval / (_marketingMultiplier * _menuSpawnMultiplier);
     }
 
     private void Awake()
@@ -97,6 +109,7 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
             foreach (var m in CatalogManager.Instance.UnlockedMenus)
                 HandleMenuUnlocked(m);
         }
+        RecomputeMenuMultiplier();   // 로드/시작 직후 현재 해금 메뉴 수 반영 (메뉴 0개여도 1배 보장)
     }
 
     private void OnDestroy()
@@ -118,6 +131,7 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
     /// <summary>음식이 해금되면 그 음식을 preferredMenu로 가진 손님을 해금.</summary>
     private void HandleMenuUnlocked(MenuData menu)
     {
+        RecomputeMenuMultiplier();   // 메뉴 해금 수 변동 → 스폰 가속 배수 갱신
         if (menu == null || pool == null) return;
         foreach (var d in pool)
         {
@@ -130,14 +144,22 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
         }
     }
 
+    /// <summary>영업 마감 진행 중인가. 마감 후 대기 시간엔 다 먹은 손님이 화장실에 가지 않고 바로 퇴장.</summary>
+    public bool IsClosing { get; private set; }
+
     public void StartSpawning()
     {
         _spawning = true;
+        IsClosing = false;
         _spawnInterval = RollSpawnInterval();
         _spawnTimer = 0f;
     }
 
-    public void StopSpawning() => _spawning = false;
+    public void StopSpawning()
+    {
+        _spawning = false;
+        IsClosing = true;
+    }
 
     /// <summary>즉시 손님 1명 스폰 (영업 첫 오픈 등). 스폰 타이머와 무관하게 1명만.</summary>
     public void SpawnOneNow() => Spawn();
@@ -189,6 +211,11 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
         if (data == null) return;
         if (!_introduced.Add(data)) return;   // 손님별 최초 1회만
         OnNewCustomerIntroduced?.Invoke(data);
+
+        // 소개 기록을 즉시 저장 — 안 그러면 다음 정산(저장 시점) 전에 게임을 끌 경우
+        // 기록이 유실돼, 이미 본 손님(예: Rich)이 다시 "새 손님"으로 뜬다. 소개는
+        // 손님당 평생 1회뿐이라 저장 빈도 부담 없음.
+        SaveLoadManager.Instance?.Save();
     }
 
     private void HandleDespawn(Customer c)

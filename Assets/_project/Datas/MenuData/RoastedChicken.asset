@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88ad3a3536494ba42ac37b1a58e4863e, type: 3}
   m_Name: RoastedChicken
   m_EditorClassIdentifier: Assembly-CSharp::MenuData
-  saveId: 020460757e0d
+  saveId: 7a1c0d2e9f06
   menuName:
     m_TableReference:
       m_TableCollectionName: GUID:e8a326a4f684cfd4f828350fbb7606b2

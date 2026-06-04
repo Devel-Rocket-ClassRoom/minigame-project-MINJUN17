@@ -17,10 +17,10 @@ public class StaffManager : MonoBehaviour
     [SerializeField] private List<StaffData> serverGrades;
     [SerializeField] private List<StaffData> riderGrades;
 
-    [Header("직원 상한 (카운터 수와 무관 — 각 3명 고정)")]
-    [SerializeField] private int maxCookCount = 3;
-    [SerializeField] private int maxServerCount = 3;
-    [SerializeField] private int maxRiderCount = 3;
+    [Header("직원 상한 (카운터 수와 무관 — 각 4명 고정)")]
+    [SerializeField] private int maxCookCount = 4;
+    [SerializeField] private int maxServerCount = 4;
+    [SerializeField] private int maxRiderCount = 4;
 
     [Header("시작 직원 수")]
     [SerializeField] private int starterCookCount = 1;

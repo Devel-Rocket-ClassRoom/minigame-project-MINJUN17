@@ -171,7 +171,7 @@ GameObject:
   - component: {fileID: 5459527353958466323}
   - component: {fileID: 5590692155511984823}
   m_Layer: 5
-  m_Name: PlacedText
+  m_Name: SizeText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -413,6 +413,7 @@ MonoBehaviour:
   iconImage: {fileID: 763127514506785082}
   nameText: {fileID: 5566726865519573216}
   priceText: {fileID: 748883671372778697}
+  sizeText: {fileID: 5459527353958466323}
   slotButton: {fileID: 5653778094390164926}
   checkOverlay: {fileID: 5845914625488381798}
   confirmButton: {fileID: 2682187132595750389}

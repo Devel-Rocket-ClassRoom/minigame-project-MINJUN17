@@ -75,6 +75,10 @@ MonoBehaviour:
     m_Key: furniture.phone
     m_Metadata:
       m_Items: []
+  - m_Id: 1500000000000778
+    m_Key: furniture.phone.desc
+    m_Metadata:
+      m_Items: []
   - m_Id: 1715406962689
     m_Key: furniture.dtOrderWindow
     m_Metadata:
@@ -643,6 +647,10 @@ MonoBehaviour:
     m_Key: customer.rapper
     m_Metadata:
       m_Items: []
+  - m_Id: 1500000000000777
+    m_Key: customer.rich
+    m_Metadata:
+      m_Items: []
   - m_Id: 2880882409484
     m_Key: staff.role.cook
     m_Metadata:
@@ -775,12 +783,308 @@ MonoBehaviour:
     m_Key: ui.zone.delivery
     m_Metadata:
       m_Items: []
+  - m_Id: 4014115319775232
+    m_Key: ui.startscene.texttmp
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014115311386626
+    m_Key: ui.startscene.texttmp2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014115319775233
+    m_Key: ui.startscene.texttmp3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014115311386624
+    m_Key: ui.startscene.texttmp4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014115135225856
+    m_Key: ui.startscene.texttmp5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014115311386625
+    m_Key: ui.startscene.texttmp1
+    m_Metadata:
+      m_Items: []
   - m_Id: 1910565768855552
     m_Key: furniture.cookingtool.desc
     m_Metadata:
       m_Items: []
   - m_Id: 1926785658322944
     m_Key: furniture.kitchenSink
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678702706688
+    m_Key: ui.gamescene.texttmp2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678832730112
+    m_Key: ui.gamescene.texttmp7
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678832730113
+    m_Key: ui.gamescene.texttmp5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678832730114
+    m_Key: ui.gamescene.texttmp8
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678832730115
+    m_Key: ui.gamescene.texttmp4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678832730116
+    m_Key: ui.gamescene.texttmp11
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118720
+    m_Key: ui.gamescene.texttmp9
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118721
+    m_Key: ui.gamescene.texttmp10
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118722
+    m_Key: ui.gamescene.texttmp6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118723
+    m_Key: ui.gamescene.texttmp3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118724
+    m_Key: ui.gamescene.texttmp12
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118725
+    m_Key: ui.gamescene.texttmp13
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118726
+    m_Key: ui.gamescene.texttmp14
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118727
+    m_Key: ui.gamescene.texttmp16
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118728
+    m_Key: ui.gamescene.texttmp15
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118729
+    m_Key: ui.gamescene.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118730
+    m_Key: ui.gamescene.infotext3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118731
+    m_Key: ui.gamescene.movehinttext
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118732
+    m_Key: ui.gamescene.texttmp62
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118733
+    m_Key: ui.gamescene.texttmp61
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118734
+    m_Key: ui.gamescene.texttmp47
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118735
+    m_Key: ui.gamescene.texttmp48
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118736
+    m_Key: ui.gamescene.texttmp45
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678841118737
+    m_Key: ui.gamescene.texttmp1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678853701632
+    m_Key: ui.gamescene.texttmp210
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678853701633
+    m_Key: ui.gamescene.texttmp46
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678853701634
+    m_Key: ui.gamescene.texttmp60
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678853701635
+    m_Key: ui.gamescene.rankingtext
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678853701636
+    m_Key: ui.gamescene.texttmp59
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678853701637
+    m_Key: ui.gamescene.reputationtext
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678857895936
+    m_Key: ui.gamescene.texttmp58
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678857895937
+    m_Key: ui.gamescene.revenuetext
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678857895938
+    m_Key: ui.gamescene.texttmp57
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678857895939
+    m_Key: ui.gamescene.title5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678857895940
+    m_Key: ui.gamescene.title4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678857895941
+    m_Key: ui.gamescene.title6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678857895942
+    m_Key: ui.gamescene.title8
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678857895943
+    m_Key: ui.gamescene.title7
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678857895944
+    m_Key: ui.gamescene.texttmp65
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678857895945
+    m_Key: ui.gamescene.label2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678857895946
+    m_Key: ui.gamescene.label
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678866284544
+    m_Key: ui.gamescene.texttmp64
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678866284545
+    m_Key: ui.gamescene.title3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678866284546
+    m_Key: ui.gamescene.texttmp63
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678870478848
+    m_Key: ui.gamescene.texttmp56
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678870478849
+    m_Key: ui.gamescene.rent
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678870478850
+    m_Key: ui.gamescene.salary
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678870478851
+    m_Key: ui.gamescene.total
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678870478852
+    m_Key: ui.gamescene.texttmp55
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678870478853
+    m_Key: ui.gamescene.emptytext2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678874673152
+    m_Key: ui.gamescene.texttmp54
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678874673153
+    m_Key: ui.gamescene.desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678874673154
+    m_Key: ui.gamescene.texttmp53
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678874673155
+    m_Key: ui.gamescene.salaytext
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678878867456
+    m_Key: ui.gamescene.texttmp111
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678878867457
+    m_Key: ui.gamescene.texttmp52
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678878867458
+    m_Key: ui.gamescene.texttmp49
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678878867459
+    m_Key: ui.gamescene.texttmp50
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678878867460
+    m_Key: ui.gamescene.texttmp110
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678878867461
+    m_Key: ui.gamescene.texttmp211
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678878867462
+    m_Key: ui.gamescene.texttmp51
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3945678878867463
+    m_Key: ui.gamescene.emptytext
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014115319775234
+    m_Key: ui.startscene.texttmp8
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014115323969536
+    m_Key: ui.startscene.label2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014115323969537
+    m_Key: ui.startscene.label
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014115323969538
+    m_Key: ui.startscene.texttmp7
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014115323969539
+    m_Key: ui.startscene.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014115323969540
+    m_Key: ui.startscene.texttmp6
     m_Metadata:
       m_Items: []
   m_Metadata:

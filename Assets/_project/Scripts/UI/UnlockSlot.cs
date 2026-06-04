@@ -20,6 +20,7 @@ public class UnlockSlot : MonoBehaviour
     [SerializeField] private TextMeshProUGUI buyButtonText;
     [SerializeField] private string buyLabel = "구매";
     [SerializeField] private string purchasedThisMonthLabel = "구매완료";
+    [SerializeField] private string activeLabel = "적용 중";   // 마케팅 효과 지속 중
 
     [Header("잔액 부족 색")]
     [SerializeField] private Color affordColor   = Color.white;
@@ -76,14 +77,19 @@ public class UnlockSlot : MonoBehaviour
 
         // 구매 버튼
         bool blockedByMonthly = entry is RecruitmentUnlockEntry r && !r.IsPurchasableThisMonth;
+        var marketing = entry as MarketingUnlockEntry;
+        bool blockedByActive = marketing != null && marketing.IsRunning;   // 마케팅 효과 지속 중엔 재구매 불가
+        bool blocked = blockedByMonthly || blockedByActive;
         if (buyButton != null)
         {
             buyButton.onClick.RemoveAllListeners();
             buyButton.onClick.AddListener(OnBuyClicked);
-            buyButton.interactable = !blockedByMonthly;
+            buyButton.interactable = !blocked;
         }
         if (buyButtonText != null)
-            buyButtonText.text = blockedByMonthly ? purchasedThisMonthLabel : buyLabel;
+            buyButtonText.text = blockedByMonthly ? purchasedThisMonthLabel
+                               : blockedByActive  ? $"{activeLabel} ({marketing.RemainingMonths}개월)"
+                               : buyLabel;
     }
 
     /// <summary>잔액이 바뀌었을 때 비용 색만 갱신.</summary>

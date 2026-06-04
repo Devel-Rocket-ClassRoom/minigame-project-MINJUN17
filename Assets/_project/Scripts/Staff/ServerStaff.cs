@@ -201,17 +201,16 @@ public class ServerStaff : Staff
             }
         }
 
-        var occupiers = new List<Vector3>();
-        foreach (var s in StaffManager.Instance.ServerStaffs)
-        {
-            if (s == this) continue;
-            occupiers.Add(s.transform.position);
-            if (s.CurrentRestTarget.HasValue) occupiers.Add(s.CurrentRestTarget.Value);   // 찜한 자리도 점유로
-        }
+        if (candidates.Count == 0) return Vector3.zero;
 
-        // 우선순위(restPositions 배열 순서)대로 빈 자리 채우기
-        return RestSpotPicker.PickByPriority(
-            transform.position, candidates, occupiers, kRestBlockRadius);
+        // 서버마다 로스터 순번(고정)으로 자리를 1:1 배정 → 두 명이 같은 자리에서 쉬는 문제 방지.
+        // (근접도 추첨은 동시 배치 시 둘 다 1순위를 골라 겹치는 버그가 있었음)
+        // 자리보다 서버가 많으면 순환(wrap)하여 공유.
+        var servers = StaffManager.Instance.ServerStaffs;
+        int rank = 0;
+        for (int i = 0; i < servers.Count; i++)
+            if (servers[i] == this) { rank = i; break; }
+        return candidates[rank % candidates.Count];
     }
 
     private void TakingOrderState()

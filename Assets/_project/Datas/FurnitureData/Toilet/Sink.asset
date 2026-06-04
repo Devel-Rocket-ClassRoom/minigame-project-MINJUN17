@@ -43,7 +43,7 @@ MonoBehaviour:
     m_LocalVariables: []
   icon: {fileID: 2527633585281699998, guid: d4612248f36978649b90cf9f7d82b40f, type: 3}
   satisfactionUnlock: 0
-  purchaseCost: 30000
+  purchaseCost: 50000
   unlockOnExpansion: {fileID: 11400000, guid: b99bcd2314cd45e4dbe8328e694d8836, type: 2}
   references:
     version: 2

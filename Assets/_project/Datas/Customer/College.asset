@@ -32,7 +32,7 @@ MonoBehaviour:
   baseSatisfaction: 50
   eatGainRate: 5
   waitPenaltyRate: 3
-  moveSpeed: 1
+  moveSpeed: 1.5
   eatSpeed: 5
   patience: 50
   spawnWeight: 1

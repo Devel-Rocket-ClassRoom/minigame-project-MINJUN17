@@ -66,4 +66,7 @@ public class FurnitureData : ScriptableObject, ISaveIdentifiable
     public int satisfactionUnlock;                // 0이면 시작 해금 가능 (좌석 등 기본 가구) — 카탈로그 1회 해금 비용
     public long purchaseCost;                     // 설치 1회당 돈 비용 (0이면 무료)
     public ExpansionStageData unlockOnExpansion;  // 이 확장 단계 활성화 시 자동 해금
+
+    /// <summary>상점 슬롯에 표시할 크기 라벨. 고정 위치 가구(화장실 등)는 "고정형", 그 외엔 "W X H".</summary>
+    public string SizeLabel => fixedPlacement ? "고정형" : $"{width} X {height}";
 }

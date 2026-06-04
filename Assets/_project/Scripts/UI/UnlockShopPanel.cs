@@ -73,6 +73,7 @@ public class UnlockShopPanel : MonoBehaviour
         if (MarketingManager.Instance != null)
         {
             MarketingManager.Instance.OnMarketingPurchased += OnMarketingPurchased;
+            MarketingManager.Instance.OnActiveChanged       += OnMarketingActiveChanged;
         }
         if (ExpansionManager.Instance != null)
         {
@@ -102,6 +103,7 @@ public class UnlockShopPanel : MonoBehaviour
         if (MarketingManager.Instance != null)
         {
             MarketingManager.Instance.OnMarketingPurchased -= OnMarketingPurchased;
+            MarketingManager.Instance.OnActiveChanged       -= OnMarketingActiveChanged;
         }
         if (ExpansionManager.Instance != null)
         {
@@ -124,6 +126,8 @@ public class UnlockShopPanel : MonoBehaviour
     private void OnFurnitureUnlocked(FurnitureData _) => Refresh();
     private void OnMenuUnlocked(MenuData _)            => Refresh();
     private void OnMarketingPurchased(MarketingData _) => Refresh();
+    /// <summary>마케팅 활성 목록 변동(매일 시작 시 만료/적용) — 재구매 가능 상태가 바뀌므로 슬롯 갱신.</summary>
+    private void OnMarketingActiveChanged()            => Refresh();
     private void OnExpanded(ExpansionStageData _)
     {
         // 맵확장 해금되면 해금패널을 닫는다.

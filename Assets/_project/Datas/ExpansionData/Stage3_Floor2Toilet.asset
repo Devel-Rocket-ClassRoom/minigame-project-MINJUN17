@@ -37,7 +37,7 @@ MonoBehaviour:
   width: 9
   height: 4
   newZone: 4
-  unlockCost: 250000
+  unlockCost: 400000
   order: 0
   references:
     version: 2

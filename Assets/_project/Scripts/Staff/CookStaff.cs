@@ -99,14 +99,14 @@ public class CookStaff : Staff
 
             if (spots.Count > 0)
             {
-                var occ = new List<Vector3>();
-                foreach (var c in StaffManager.Instance.CookStaffs)
-                {
-                    if (c == this) continue;
-                    occ.Add(c.transform.position);
-                    if (c.CurrentRestTarget.HasValue) occ.Add(c.CurrentRestTarget.Value);   // 찜한 자리도 점유로
-                }
-                return RestSpotPicker.PickByPriority(transform.position, spots, occ, kRestBlockRadius);
+                // 요리사마다 로스터 순번(고정)으로 자리를 1:1 배정 → 두 명이 같은 자리에서 쉬는 문제 방지.
+                // (근접도 추첨은 동시 출근 시 둘 다 1순위를 골라 겹치는 버그가 있었음)
+                // 자리보다 요리사가 많으면 순환(wrap)하여 공유.
+                var cooks = StaffManager.Instance.CookStaffs;
+                int rank = 0;
+                for (int i = 0; i < cooks.Count; i++)
+                    if (cooks[i] == this) { rank = i; break; }
+                return spots[rank % spots.Count];
             }
         }
 

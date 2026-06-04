@@ -37,6 +37,27 @@ public class MarketingManager : MonoBehaviour
         return false;
     }
 
+    /// <summary>해당 마케팅이 활성(_active) 또는 당일 구매 대기(_pending) 중인지. (중복 구매 차단/UI 비활성화용)</summary>
+    public bool IsActiveOrPending(MarketingData data)
+    {
+        if (data == null) return false;
+        if (IsActive(data)) return true;
+        foreach (var p in _pending)
+            if (p == data) return true;
+        return false;
+    }
+
+    /// <summary>활성/대기 중인 마케팅의 남은 개월 수. 대기 중이면 전체 기간, 없으면 0.</summary>
+    public int GetRemainingMonths(MarketingData data)
+    {
+        if (data == null) return 0;
+        foreach (var c in _active)
+            if (c != null && c.Data == data) return c.RemainingMonths;
+        foreach (var p in _pending)
+            if (p == data) return data.durationMonths;
+        return 0;
+    }
+
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
@@ -56,6 +77,7 @@ public class MarketingManager : MonoBehaviour
     public bool Apply(MarketingData data)
     {
         if (data == null) return false;
+        if (IsActiveOrPending(data)) return false;   // 중복 구매 방지 — 효과 끝날 때까지 재구매 불가
         if (!SatisfactionSystem.Instance.Spend(data.satisfactionCost)) return false;
 
         _pending.Add(data);

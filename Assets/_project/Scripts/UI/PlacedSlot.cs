@@ -16,6 +16,8 @@ public class PlacedSlot : MonoBehaviour
     [SerializeField] private Image iconImage;
     [SerializeField] private TextMeshProUGUI nameText;
     [SerializeField] private TextMeshProUGUI priceText;   // 옵션 — 비워두면 표시 안함
+    [Tooltip("가구 크기 표시 (좌하단). 고정 위치 가구면 '고정형'. 옵션 — 비워두면 표시 안함")]
+    [SerializeField] private TextMeshProUGUI sizeText;
 
     [Header("선택/확정")]
     [Tooltip("슬롯 전체에 깔린 1차 클릭 버튼")]
@@ -63,6 +65,9 @@ public class PlacedSlot : MonoBehaviour
 
         if (priceText != null)
             priceText.text = data.purchaseCost > 0 ? $"{data.purchaseCost:N0}원" : "무료";
+
+        if (sizeText != null)
+            sizeText.text = data.SizeLabel;   // "W X H" 또는 고정 위치 가구면 "고정형"
 
         if (slotButton != null)
         {

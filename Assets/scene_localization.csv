@@ -1,0 +1,145 @@
+Key,Korean (ko-KR),English (en)
+ui.gamescene.texttmp66,안녕하세요 사장님! 본사에서 매장운영을 도와드릴려고 나왔습니다.,"Hello, boss! I'm here from headquarters to help you run your store."
+ui.gamescene.texttmp2,1층,1F
+ui.gamescene.texttmp7,손님,Customers
+ui.gamescene.texttmp5,"정보
+","Info
+"
+ui.gamescene.texttmp8,메뉴,Menu
+ui.gamescene.texttmp4,"설정
+","Settings
+"
+ui.gamescene.texttmp11,설치,Place
+ui.gamescene.texttmp9,직원,Staff
+ui.gamescene.texttmp10,고용,Hire
+ui.gamescene.texttmp6,"해금
+","Unlock
+"
+ui.gamescene.texttmp3,"메뉴
+","Menu
+"
+ui.gamescene.texttmp12,저장,Save
+ui.gamescene.texttmp13,취소,Cancel
+ui.gamescene.texttmp14,"설치
+","Place
+"
+ui.gamescene.texttmp16,제거,Remove
+ui.gamescene.texttmp15,취소,Cancel
+ui.gamescene.title,최애 음식,Favorite Food
+ui.gamescene.wallet,"지갑: 20,000원","Wallet: 20,000"
+ui.gamescene.infotext2,손님 1/5,Customers 1/5
+ui.gamescene.date,1년 05월,Year 1 / May
+ui.gamescene.infotext3,메뉴 1/5,Menu 1/5
+ui.gamescene.movehinttext,이동할 가구를 선택해주세요,Select furniture to move
+ui.gamescene.texttmp62,확인,Confirm
+ui.gamescene.texttmp61,새로운 손님 등장!,A new customer has appeared!
+ui.gamescene.texttmp47,이동,Move
+ui.gamescene.texttmp48,제거,Remove
+ui.gamescene.texttmp45,카운터,Counter
+ui.gamescene.texttmp1,홀,Hall
+ui.gamescene.texttmp210,주방,Kitchen
+ui.gamescene.texttmp46,화장실,Restroom
+ui.gamescene.texttmp60,확인,Confirm
+ui.gamescene.rankingtext,56등,56th
+ui.gamescene.texttmp59,순위,Rank
+ui.gamescene.reputationtext,3220점,3220 pts
+ui.gamescene.texttmp58,손님평판,Reputation
+ui.gamescene.revenuetext,133335469원,"133,335,469"
+ui.gamescene.texttmp57,연매출,Annual Revenue
+ui.gamescene.title2,1년차 결산,Year 1 Settlement
+ui.gamescene.maxsales,"1,900,000원","1,900,000"
+ui.gamescene.title5,월매출,Monthly Revenue
+ui.gamescene.title4,정보,Info
+ui.gamescene.title6,누적 손님 수,Total Customers
+ui.gamescene.title8,최대 순위,Best Rank
+ui.gamescene.title7,매장 총 매출,Total Store Revenue
+ui.gamescene.texttmp65,홈으로,Home
+ui.gamescene.label2,English,English
+ui.gamescene.label,한국어,한국어
+ui.gamescene.texttmp64,언어,Language
+ui.gamescene.title3,"소리
+","Sound
+"
+ui.gamescene.texttmp63,설정,Settings
+ui.gamescene.texttmp56,확인,Confirm
+ui.gamescene.rent,임대료,Rent
+ui.gamescene.salary,직원월급,Staff Salary
+ui.gamescene.total,"총합
+","Total
+"
+ui.gamescene.texttmp55,정산,Settlement
+ui.gamescene.emptytext2,직원 모집을 해주세요!,Please recruit staff!
+ui.gamescene.texttmp54,모집,Recruit
+ui.gamescene.desc,모집 시 1달후에 직원 고용이 가능합니다!,You can hire staff 1 month after recruiting!
+ui.gamescene.texttmp53,직원모집하기,Recruit Staff
+ui.gamescene.month,근속 : 3개월,Tenure: 3 months
+ui.gamescene.staffgrade,초보 요리사,Beginner Cook
+ui.gamescene.salaytext,"월급 : 200,000원
+
+","Salary: 200,000
+
+"
+ui.gamescene.infotext,직원 선택 1/5,Staff Select 1/5
+ui.gamescene.texttmp111,해고,Fire
+ui.gamescene.texttmp52,"승급
+","Promote
+"
+ui.gamescene.texttmp18,시간원복,Restore Time
+ui.gamescene.texttmp36,"손님1명 스폰
+","Spawn 1 Customer
+"
+ui.gamescene.texttmp37,게임 상태 보기,View Game State
+ui.gamescene.texttmp38,만족도 +1000,Satisfaction +1000
+ui.gamescene.texttmp39,스폰 간격 보기,View Spawn Interval
+ui.gamescene.texttmp40,"설치
+","Place
+"
+ui.gamescene.texttmp41,"이동
+","Move
+"
+ui.gamescene.texttmp42,"삭제
+","Delete
+"
+ui.gamescene.texttmp43,확정,Confirm
+ui.gamescene.texttmp44,"취소
+","Cancel
+"
+ui.gamescene.texttmp25,돈 +10000,Money +10000
+ui.gamescene.texttmp19,1달스킵,Skip 1 Month
+ui.gamescene.texttmp26,라이더 고용,Hire Rider
+ui.gamescene.texttmp27,맵 확장,Expand Map
+ui.gamescene.texttmp28,DT강제해금,Force Unlock DT
+ui.gamescene.texttmp29,DT스폰ON,DT Spawn ON
+ui.gamescene.texttmp30,DT스폰OFF,DT Spawn OFF
+ui.gamescene.texttmp31,"차 1대 스폰
+","Spawn 1 Car
+"
+ui.gamescene.texttmp32,"DT로그
+","DT Log
+"
+ui.gamescene.texttmp33,"RESTART
+","RESTART
+"
+ui.gamescene.texttmp20,"3달스킵
+","Skip 3 Months
+"
+ui.gamescene.texttmp21,1년스킵,Skip 1 Year
+ui.gamescene.texttmp22,직원 +1개월,Staff +1 Month
+ui.gamescene.texttmp23,직원 상태 보기,View Staff State
+ui.gamescene.texttmp24,마케팅 적용,Apply Marketing
+ui.gamescene.texttmp34,손님 스폰 시작,Start Customer Spawn
+ui.gamescene.texttmp35,손님 스폰 중지,Stop Customer Spawn
+ui.gamescene.texttmp17,빠른시간ON,Fast Time ON
+ui.gamescene.texttmp,"디버그패널
+","Debug Panel
+"
+ui.gamescene.texttmp49,"맵확장
+","Map Expansion
+"
+ui.gamescene.texttmp50,가구,Furniture
+ui.gamescene.texttmp110,"마케팅
+","Marketing
+"
+ui.gamescene.texttmp211,음식,Food
+ui.gamescene.texttmp51,모집,Recruit
+ui.gamescene.emptytext,가능한 해금이 없습니다,No unlocks available

@@ -19,7 +19,7 @@ MonoBehaviour:
   animController: {fileID: 22100000, guid: 789be276bd05ef14d818fb67487df032, type: 2}
   moveSpeed: 1
   kindness: 1
-  deliveryTime: 20
+  deliveryTime: 30
   speedMultiplier: 1
-  hireCost: 2000
+  hireCost: 8000
   salary: 800

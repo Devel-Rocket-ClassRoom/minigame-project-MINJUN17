@@ -45,7 +45,7 @@ MonoBehaviour:
     m_LocalVariables: []
   icon: {fileID: -8471269896924323902, guid: 48dd659bd40f2aa4a9c850436d8aa154, type: 3}
   satisfactionUnlock: 1000
-  purchaseCost: 30000
+  purchaseCost: 50000
   unlockOnExpansion: {fileID: 0}
   toolType: 6
   usingDuration: 10

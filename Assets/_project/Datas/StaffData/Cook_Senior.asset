@@ -21,5 +21,5 @@ MonoBehaviour:
   kindness: 4
   deliveryTime: 0
   speedMultiplier: 1.5
-  hireCost: 8000
+  hireCost: 12000
   salary: 2500
