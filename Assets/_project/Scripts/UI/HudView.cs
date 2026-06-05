@@ -27,12 +27,24 @@ public class HudView : MonoBehaviour
     private Tween _satisfactionTween;
     private Tween _reputationTween;
 
+    [Header("잔액 부족 흔들림")]
+    [SerializeField] private RectTransform moneyShakeTarget;        // 비우면 moneyText 사용
+    [SerializeField] private RectTransform satisfactionShakeTarget; // 비우면 satisfactionText 사용
+    [SerializeField] private float shakeDuration = 0.4f;
+    [SerializeField] private float shakeStrength = 12f;
+    [SerializeField] private int   shakeVibrato = 18;
+
+    private Tween _moneyShakeTween;
+    private Tween _satisfactionShakeTween;
+
     private void Start()
     {
         MoneySystem.Instance.OnMoneyChanged += UpdateMoney;
         SatisfactionSystem.Instance.OnSatisfactionChanged += UpdateSatisfaction;
         ReputationSystem.Instance.OnReputationChanged += UpdateReputation;
         timeSystem.OnHourChanged += UpdateTime;
+        MoneySystem.Instance.OnInsufficientFunds += ShakeMoney;
+        SatisfactionSystem.Instance.OnInsufficientSatisfaction += ShakeSatisfaction;
 
         // 첫 갱신은 카운트업 없이 즉시 표시 (게임 시작 시 0에서 굴러올라가지 않게)
         _displayedMoney = MoneySystem.Instance.Money;
@@ -98,6 +110,22 @@ public class HudView : MonoBehaviour
         if (timeText != null) timeText.text = $"{timeSystem.Hour:D2}:00";
     }
 
+    private void ShakeMoney()
+    {
+        var t = moneyShakeTarget != null ? moneyShakeTarget : (moneyText != null ? moneyText.rectTransform : null);
+        if (t == null) return;
+        _moneyShakeTween?.Kill(true);
+        _moneyShakeTween = t.DOShakeAnchorPos(shakeDuration, shakeStrength, shakeVibrato, 90, false, true);
+    }
+
+    private void ShakeSatisfaction()
+    {
+        var t = satisfactionShakeTarget != null ? satisfactionShakeTarget : (satisfactionText != null ? satisfactionText.rectTransform : null);
+        if (t == null) return;
+        _satisfactionShakeTween?.Kill(true);
+        _satisfactionShakeTween = t.DOShakeAnchorPos(shakeDuration, shakeStrength, shakeVibrato, 90, false, true);
+    }
+
     private void OnDisable()
     {
         if (MoneySystem.Instance != null)
@@ -116,9 +144,13 @@ public class HudView : MonoBehaviour
         {
             timeSystem.OnHourChanged -= UpdateTime;
         }
+        if (MoneySystem.Instance != null) MoneySystem.Instance.OnInsufficientFunds -= ShakeMoney;
+        if (SatisfactionSystem.Instance != null) SatisfactionSystem.Instance.OnInsufficientSatisfaction -= ShakeSatisfaction;
 
         _moneyTween?.Kill();
         _satisfactionTween?.Kill();
         _reputationTween?.Kill();
+        _moneyShakeTween?.Kill();
+        _satisfactionShakeTween?.Kill();
     }
 }

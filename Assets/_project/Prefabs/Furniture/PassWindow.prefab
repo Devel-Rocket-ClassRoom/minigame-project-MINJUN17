@@ -113,7 +113,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 4
+  m_SortingOrder: 2
   m_MaskInteraction: 0
   m_Sprite: {fileID: 9010453533175355055, guid: bfb2bbec5fd28da46bd5e472d8024e54, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -140,6 +140,8 @@ MonoBehaviour:
   readyFoods: []
   firstSlotOffset: {x: -0.1, y: 0.5, z: 0}
   slotSpacing: 0.1
+  foodBaseOrder: 2
+  foodOnWindowOrder: 3
   cookUsePoint: {fileID: 3254291298793987737}
   serverUsePoint: {fileID: 5156495820784023739}
 --- !u!1 &5407030246536276681

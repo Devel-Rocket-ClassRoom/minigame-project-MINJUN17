@@ -167,6 +167,7 @@ public class PlacementSystem : MonoBehaviour
     public void StartPlace(FurnitureData data)
     {
         if (Mode != Mode.None) return;
+        if (data.singleInstance && IsAlreadyPlaced(data)) { Debug.Log("[PlacementSystem] 이미 설치됨 (1개 제한)"); return; }
 
         // 현재 floor 활성 영역의 중앙에 spawn (놓을 수 있는지와 무관하게 일단 가운데)
         Vector2Int startOrigin = gridManager.GetActiveAreaCenter(data.width, data.height);

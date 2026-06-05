@@ -11,6 +11,7 @@ public enum ServerState
 {
     IDLE_AT_COUNTER,
     TAKING_ORDER,
+    WAIT_FOR_NEXT_ORDER,   // 줄 남아있을 때 다음 주문 손님을 카운터에서 대기
     WALK_TO_PASS_WINDOW,
     WALK_TO_SEAT,
     WALK_TO_STAIR,

@@ -45,3 +45,11 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: f4288b3503d9f3846a13429e03a15310, type: 3}
     volume: 1
     startTrim: 0
+  - id: 10
+    clip: {fileID: 8300000, guid: 032f09ac6d879a943b43fedeceeb8841, type: 3}
+    volume: 0.8
+    startTrim: 0
+  - id: 11
+    clip: {fileID: 8300000, guid: 0bd1cd8a1a0379b4a80686e754b2e3b6, type: 3}
+    volume: 0.8
+    startTrim: 0

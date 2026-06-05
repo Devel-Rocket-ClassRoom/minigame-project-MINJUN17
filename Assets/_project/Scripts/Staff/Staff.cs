@@ -161,6 +161,19 @@ public abstract class Staff : MonoBehaviour
         _commute = CommuteState.LEAVING;
     }
 
+    /// <summary>로드 직후: 출퇴근 연출 없이 근무지에 바로 배치 + IDLE 진입.
+    /// (세이브 로드 시 직원들이 입구에서 우르르 등장→복귀하는 현상 방지)</summary>
+    public void SnapToWorkPosition()
+    {
+        gameObject.SetActive(true);
+        _commute = CommuteState.NONE;
+        _mover.Role = GetPathRole();
+        _mover.Clear();
+        Vector3 wp = GetWorkPosition();
+        if (wp != Vector3.zero) transform.position = wp;
+        OnArrivedAtWork();   // 서브클래스 IDLE 진입
+    }
+
     /// <summary>각 서브클래스 Update 맨 위에서 호출. true면 통근 중이라 기존 FSM 정지.</summary>
     protected bool TickCommute()
     {

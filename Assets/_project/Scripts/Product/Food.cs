@@ -1,6 +1,5 @@
 using UnityEngine;
 
-[RequireComponent(typeof(SpriteRenderer))]
 public class Food : MonoBehaviour
 {
     public Order order;
@@ -9,12 +8,19 @@ public class Food : MonoBehaviour
 
     private void Awake()
     {
-        sr = GetComponent<SpriteRenderer>();
+        // 정렬은 루트 위치 기준, 그림은 자식 Visual(위로 올림)에서 — 루트/자식 어디 있든 OK
+        sr = GetComponentInChildren<SpriteRenderer>();
     }
 
     public void SetUp(Order order)
     {
         this.order = order;
         sr.sprite = order.menus[0].foodSprite;
+    }
+
+    /// <summary>정렬 순서 설정 (패스윈도우 위=올림, 들고가면=0 복귀).</summary>
+    public void SetSortingOrder(int order)
+    {
+        if (sr != null) sr.sortingOrder = order;
     }
 }

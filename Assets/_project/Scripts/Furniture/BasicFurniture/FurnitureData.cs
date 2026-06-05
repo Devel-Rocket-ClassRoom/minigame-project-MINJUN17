@@ -46,6 +46,9 @@ public class FurnitureData : ScriptableObject, ISaveIdentifiable
     [Tooltip("이동 금지 — 한 번 자리잡으면 옮길 수 없음 (카운터·픽업대 등). fixedSingle과 함께 쓰면 추가/삭제/이동 모두 불가.")]
     public bool lockMove;
 
+    [Tooltip("드래그 설치는 일반과 동일하되 최대 1개만 — 설치 후 상점 슬롯에서 숨기고 추가 설치 차단 (예: 전화기).")]
+    public bool singleInstance;
+
     [Tooltip("체크 시 이 가구는 길찾기를 막지 않음 — 직원/손님이 통과 가능 (설치 시 가구끼리 겹침은 그대로 방지).")]
     public bool passThrough;
 

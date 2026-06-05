@@ -21,6 +21,7 @@ MonoBehaviour:
   anchorY: 0
   fixedSingle: 0
   lockMove: 0
+  singleInstance: 1
   passThrough: 0
   fixedPlacement: 0
   fixedCell: {x: 0, y: 0}

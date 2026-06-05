@@ -16,4 +16,7 @@ public enum SfxId
     Floor2Unlock,     // 2층 해금 — 연기 펑
     ToiletUnlock,     // 화장실 해금 — 따라란
     DTUnlock,         // DT 해금
+
+    Purchase,         // 결제(돈 차감) 성공 — 설치/고용/업그레이드 등 플레이어 결제
+    PurchaseFail,     // 잔액 부족 — 설치 진입 실패
 }

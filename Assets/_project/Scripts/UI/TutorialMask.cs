@@ -17,7 +17,7 @@ public class TutorialMask : MonoBehaviour
 
     private Canvas _canvas;
     private RectTransform _target;
-    private float _pad = 8f;
+    private float _pad = 2f;
 
     private void Awake()
     {
@@ -34,7 +34,7 @@ public class TutorialMask : MonoBehaviour
     }
 
     /// <summary>target 영역만 뚫고 클릭 허용. 매 프레임 추적.</summary>
-    public void HighlightUI(RectTransform target, float padding = 8f)
+    public void HighlightUI(RectTransform target, float padding = 2f)
     {
         if (target == null) { CoverAll(); return; }
         gameObject.SetActive(true);

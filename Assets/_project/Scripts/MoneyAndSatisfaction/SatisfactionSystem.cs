@@ -4,6 +4,7 @@ using UnityEngine;
 public class SatisfactionSystem : MonoBehaviour
 {
     public event Action<int> OnSatisfactionChanged;
+    public event Action OnInsufficientSatisfaction;   // 만족도 부족 시 (HUD 흔들림용)
     /// <summary>평생 누적 만족도가 바뀔 때(= Earn 발생 시). 손님 해금 임계점 감시용.</summary>
     public event Action<long> OnLifetimeSatisfactionChanged;
     public static SatisfactionSystem Instance;
@@ -26,7 +27,7 @@ public class SatisfactionSystem : MonoBehaviour
     public bool CanAfford(int amount) => _satisfaction >= amount;
     public bool Spend(int amount)
     {
-        if (!CanAfford(amount)) return false;
+        if (!CanAfford(amount)) { OnInsufficientSatisfaction?.Invoke(); return false; }
         _satisfaction -= amount;
         OnSatisfactionChanged?.Invoke(_satisfaction);
         return true;

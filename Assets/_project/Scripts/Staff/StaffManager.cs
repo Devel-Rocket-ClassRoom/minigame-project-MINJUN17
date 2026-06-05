@@ -152,7 +152,7 @@ public class StaffManager : MonoBehaviour
     {
         if (data == null || cookStaffPrefab == null) return null;
         if (cookStaffs.Count >= MaxCookCount) return null;
-        if (!CanAfford(data.hireCost)) return null;
+        if (!CanAfford(data.hireCost)) { MoneySystem.Instance?.NotifyInsufficientFunds(); return null; }
 
         MoneySystem.Instance.Spend(data.hireCost);
         var staff = Instantiate(cookStaffPrefab);
@@ -169,7 +169,7 @@ public class StaffManager : MonoBehaviour
     {
         if (data == null || serverStaffPrefab == null) return null;
         if (serverStaffs.Count >= MaxServerCount) return null;
-        if (!CanAfford(data.hireCost)) return null;
+        if (!CanAfford(data.hireCost)) { MoneySystem.Instance?.NotifyInsufficientFunds(); return null; }
 
         MoneySystem.Instance.Spend(data.hireCost);
         var staff = Instantiate(serverStaffPrefab);
@@ -187,7 +187,7 @@ public class StaffManager : MonoBehaviour
         if (data == null || riderStaffPrefab == null) return null;
         if (!IsRiderHiringUnlocked) return null;   // 라이더룸 가구 설치 필요
         if (riderStaffs.Count >= MaxRiderCount) return null;
-        if (!CanAfford(data.hireCost)) return null;
+        if (!CanAfford(data.hireCost)) { MoneySystem.Instance?.NotifyInsufficientFunds(); return null; }
 
         MoneySystem.Instance.Spend(data.hireCost);
         var staff = Instantiate(riderStaffPrefab);
@@ -209,7 +209,7 @@ public class StaffManager : MonoBehaviour
     {
         if (staff == null || !cookStaffs.Contains(staff)) return false;
         long severance = staff.EffectiveSalary;
-        if (!CanAfford(severance)) return false;
+        if (!CanAfford(severance)) { MoneySystem.Instance?.NotifyInsufficientFunds(); return false; }
 
         MoneySystem.Instance.Spend(severance);
         cookStaffs.Remove(staff);
@@ -222,7 +222,7 @@ public class StaffManager : MonoBehaviour
     {
         if (staff == null || !serverStaffs.Contains(staff)) return false;
         long severance = staff.EffectiveSalary;
-        if (!CanAfford(severance)) return false;
+        if (!CanAfford(severance)) { MoneySystem.Instance?.NotifyInsufficientFunds(); return false; }
 
         MoneySystem.Instance.Spend(severance);
         serverStaffs.Remove(staff);
@@ -235,7 +235,7 @@ public class StaffManager : MonoBehaviour
     {
         if (staff == null || !riderStaffs.Contains(staff)) return false;
         long severance = staff.EffectiveSalary;
-        if (!CanAfford(severance)) return false;
+        if (!CanAfford(severance)) { MoneySystem.Instance?.NotifyInsufficientFunds(); return false; }
 
         MoneySystem.Instance.Spend(severance);
         riderStaffs.Remove(staff);
@@ -301,7 +301,7 @@ public class StaffManager : MonoBehaviour
         if (next == null) return false;
 
         long cost = next.hireCost / 2;
-        if (!CanAfford(cost)) return false;
+        if (!CanAfford(cost)) { MoneySystem.Instance?.NotifyInsufficientFunds(); return false; }
 
         MoneySystem.Instance.Spend(cost);
         staff.SetData(next);
@@ -316,7 +316,7 @@ public class StaffManager : MonoBehaviour
         if (next == null) return false;
 
         long cost = next.hireCost / 2;
-        if (!CanAfford(cost)) return false;
+        if (!CanAfford(cost)) { MoneySystem.Instance?.NotifyInsufficientFunds(); return false; }
 
         MoneySystem.Instance.Spend(cost);
         staff.SetData(next);
@@ -331,7 +331,7 @@ public class StaffManager : MonoBehaviour
         if (next == null) return false;
 
         long cost = next.hireCost / 2;
-        if (!CanAfford(cost)) return false;
+        if (!CanAfford(cost)) { MoneySystem.Instance?.NotifyInsufficientFunds(); return false; }
 
         MoneySystem.Instance.Spend(cost);
         staff.SetData(next);
@@ -388,9 +388,8 @@ public class StaffManager : MonoBehaviour
         }
         nextId = maxId + 1;
 
-        // 영업 시간이 아니면 직원 숨김(다음 영업에 입장). 영업 중이면 저장 위치에서 근무.
-        if (timeSystem == null || !timeSystem.IsOpen)
-            foreach (var s in GetAllStaffs()) s.gameObject.SetActive(false);
+        // 로드 시: 출퇴근 연출 없이 각자 근무지에 바로 배치 (입구에서 다같이 등장→복귀 방지)
+        foreach (var s in GetAllStaffs()) s.SnapToWorkPosition();
 
         OnRosterChanged?.Invoke();
     }

@@ -15,6 +15,9 @@ public class QueueManager : MonoBehaviour
     private const float FallbackSlotY  = 1.5f;
     private const float FallbackFirstX = -0.5f;
 
+    public static QueueManager Instance { get; private set; }
+    private void Awake() { Instance = this; }
+
     private readonly List<Customer> queue = new();
 
     public int Count => queue.Count;

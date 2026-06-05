@@ -73,6 +73,7 @@ public class PlacedShopPanel : MonoBehaviour
         {
             if (data.fixedSingle) continue;   // 고정 가구(카운터 등)는 추가 설치 불가 — 상점에 노출 X
             if (data.fixedPlacement && placementSystem != null && placementSystem.IsAlreadyPlaced(data)) continue; // 고정 위치 가구는 설치 후 슬롯 숨김
+            if (data.singleInstance && placementSystem != null && placementSystem.IsAlreadyPlaced(data)) continue;  // 1개 제한 가구(전화기 등)는 설치 후 슬롯 숨김
             var slot = Instantiate(slotPrefab, content);
             slot.Setup(data, placementSystem, this);
             _spawned.Add(slot);
@@ -90,6 +91,15 @@ public class PlacedShopPanel : MonoBehaviour
     public void ConfirmSlot(PlacedSlot slot)
     {
         if (slot == null || slot.Data == null || placementSystem == null) return;
+
+        // 돈 부족하면 설치 모드 진입 자체를 막고 실패음 + HUD 흔들림 (실제 차감은 설치 확정 시 — 여기선 차감 X)
+        if (MoneySystem.Instance != null && !MoneySystem.Instance.CanAfford(slot.Data.purchaseCost))
+        {
+            SoundManager.Instance?.PlaySfx(SfxId.PurchaseFail);
+            MoneySystem.Instance.NotifyInsufficientFunds();
+            SelectSlot(null);
+            return;   // 설치모드 진입 X (패널은 열어둠)
+        }
 
         SelectSlot(null);
         CloseWindow();

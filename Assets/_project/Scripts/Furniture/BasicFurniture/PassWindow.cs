@@ -10,6 +10,11 @@ public class PassWindow : MonoBehaviour
     [SerializeField] private Vector3 firstSlotOffset = new Vector3(-0.3f, 0.2f, 0f);
     [SerializeField] private float slotSpacing = 0.3f;
 
+    [Tooltip("음식 기본 sortingOrder (내려오면 이 값)")]
+    [SerializeField] private int foodBaseOrder = 2;
+    [Tooltip("픽업대 위에 있을 때 sortingOrder (윈도우보다 위로)")]
+    [SerializeField] private int foodOnWindowOrder = 3;
+
     [Header("사용 위치 (비우면 자동 인접셀 계산)")]
     [Tooltip("요리사가 음식을 놓는 위치 (주방측)")]
     [SerializeField] private Transform cookUsePoint;
@@ -69,6 +74,7 @@ public class PassWindow : MonoBehaviour
         {
             ReflowSlots();
             food.claimedBy = null;   // 정리
+            food.SetSortingOrder(foodBaseOrder); // 내려오면 기본 order(2)로
             return food;
         }
         return null;
@@ -91,6 +97,7 @@ public class PassWindow : MonoBehaviour
         readyFoods.Add(food);
         food.transform.SetParent(transform, false);
         food.transform.localPosition = SlotPos(readyFoods.Count - 1);
+        food.SetSortingOrder(foodOnWindowOrder);   // 픽업대 위 = 3 (윈도우보다 위)
     }
 
     // FIFO를 유지하면서 isDelivery 매칭되는 가장 앞 음식 픽업
@@ -103,6 +110,7 @@ public class PassWindow : MonoBehaviour
                 Food f = readyFoods[i];
                 readyFoods.RemoveAt(i);
                 ReflowSlots();
+                f.SetSortingOrder(foodBaseOrder);   // 내려오면 기본 order(2)로
                 return f;
             }
         }
@@ -118,6 +126,7 @@ public class PassWindow : MonoBehaviour
                 Food f = readyFoods[i];
                 readyFoods.RemoveAt(i);
                 ReflowSlots();
+                f.SetSortingOrder(foodBaseOrder);   // 내려오면 기본 order(2)로
                 return f;
             }
         }

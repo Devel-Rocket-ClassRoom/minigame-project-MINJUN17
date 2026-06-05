@@ -8,6 +8,8 @@ public class ServerStaff : Staff
     [Header("동작 시간 (더미)")]
     [SerializeField] private float takingOrderDuration = 1f;
     [SerializeField] private float takingDeliveryOrderDuration = 1f;
+    [Tooltip("주문 연속 응대 중 다음 손님이 카운터에 안 오면 이 시간(초) 뒤 다른 일로 전환")]
+    [SerializeField] private float nextOrderWaitTimeout = 3f;
 
     private Food _carryingFood;
     private Food _claimedFood;   // 픽업대에 시각적으로 남아있으나 내가 가져갈 거라고 클레임만 한 음식
@@ -53,6 +55,7 @@ public class ServerStaff : Staff
         {
             case ServerState.IDLE_AT_COUNTER:        IdleAtCounterState(); break;
             case ServerState.TAKING_ORDER:           TakingOrderState(); break;
+            case ServerState.WAIT_FOR_NEXT_ORDER:    WaitForNextOrderState(); break;
             case ServerState.WALK_TO_PASS_WINDOW:    WalkToPassWindowState(); break;
             case ServerState.WALK_TO_SEAT:           WalkToSeatState(); break;
             case ServerState.WALK_TO_STAIR:          WalkToStairState(); break;
@@ -203,14 +206,16 @@ public class ServerStaff : Staff
 
         if (candidates.Count == 0) return Vector3.zero;
 
-        // 서버마다 로스터 순번(고정)으로 자리를 1:1 배정 → 두 명이 같은 자리에서 쉬는 문제 방지.
-        // (근접도 추첨은 동시 배치 시 둘 다 1순위를 골라 겹치는 버그가 있었음)
-        // 자리보다 서버가 많으면 순환(wrap)하여 공유.
-        var servers = StaffManager.Instance.ServerStaffs;
-        int rank = 0;
-        for (int i = 0; i < servers.Count; i++)
-            if (servers[i] == this) { rank = i; break; }
-        return candidates[rank % candidates.Count];
+        // 다른 서버가 이미 찜했거나(=CurrentRestTarget) 머무는 자리는 점유로 간주.
+        // 점유되지 않은 자리 중 내 위치에서 가장 가까운 곳에서 쉼. (자리가 다 차면 가까운 자리로 폴백)
+        var occupiers = new List<Vector3>();
+        foreach (var s in StaffManager.Instance.ServerStaffs)
+        {
+            if (s == this) continue;
+            occupiers.Add(s.CurrentRestTarget ?? s.transform.position);
+        }
+
+        return RestSpotPicker.PickClosestFree(transform.position, candidates, occupiers, kRestBlockRadius);
     }
 
     private void TakingOrderState()
@@ -245,7 +250,48 @@ public class ServerStaff : Staff
 
         _targetCounter.ReleaseClaim(this);
         _targetCounter = null;
+
+        // 한 번 주문 받으러 왔으면 줄이 빌 때까지 연달아 받음 (음식 운반은 그 다음)
+        var nextCounter = CounterManager.Instance.GetCounterWithUnservedCustomer();
+        if (nextCounter != null && nextCounter.TryClaim(this))
+        {
+            _targetCounter = nextCounter;
+            ChangeState(ServerState.TAKING_ORDER);
+            return;
+        }
+        // 줄에 손님이 카운터로 오는 중 → 잠깐 기다렸다 마저 받기
+        if (HasPendingHallCustomers())
+        {
+            ChangeState(ServerState.WAIT_FOR_NEXT_ORDER);
+            return;
+        }
         ChangeState(ServerState.IDLE_AT_COUNTER);
+    }
+
+    // 줄(큐) 또는 카운터에 아직 응대할 홀 손님이 남아있는지
+    private bool HasPendingHallCustomers()
+    {
+        if (QueueManager.Instance != null && QueueManager.Instance.Count > 0) return true;
+        return CounterManager.Instance.GetCounterWithUnservedCustomer() != null;
+    }
+
+    private void WaitForNextOrderState()
+    {
+        // 줄·카운터 모두 비면 일반 IDLE로 (음식 운반 등 다른 일)
+        if (!HasPendingHallCustomers()) { ChangeState(ServerState.IDLE_AT_COUNTER); return; }
+
+        // 카운터에 손님이 도착하면 바로 받기
+        var c = CounterManager.Instance.GetCounterWithUnservedCustomer();
+        if (c != null && c.TryClaim(this))
+        {
+            _targetCounter = c;
+            ChangeState(ServerState.TAKING_ORDER);
+            return;
+        }
+
+        // 손님이 카운터로 걸어오는 동안 대기(정면). 너무 오래 못 받으면 빠져서 다른 일.
+        _dirAnim?.FaceDirection(DirectionalCharacterAnimator.DIR_DOWN);
+        if (_stateTimer >= nextOrderWaitTimeout) ChangeState(ServerState.IDLE_AT_COUNTER);
     }
 
     private void WalkToPassWindowState()

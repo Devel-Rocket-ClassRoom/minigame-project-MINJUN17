@@ -62,8 +62,20 @@ public class DayCycleController : MonoBehaviour
         }
 
         // 튜토리얼 중엔 영업 시작 보류 → 튜토리얼 끝나면 TutorialManager가 StartBusiness() 호출
-        if (!TutorialManager.IsActive)
-            time.BeginDay();
+        if (TutorialManager.IsActive) return;
+
+        bool loaded = SaveLoadManager.Instance != null && SaveLoadManager.Instance.HasActiveSave;
+        if (!loaded)
+        {
+            time.BeginDay();                       // 신규 게임 — 첫 영업일 시작
+        }
+        else if (time.IsOpen)
+        {
+            // 영업 중 저장 로드 → 시간/월 롤 없이 그 시점부터 재개, 스포너만 시작
+            customerManager.StartSpawning();
+            DTSystem.Instance?.StartSpawning();
+        }
+        // else: 닫힌 상태 로드 → TimeSystem.FromData가 이미 다음 영업일(BeginDay)을 예약함
     }
 
     /// <summary>튜토리얼 완료 등 외부에서 영업(시간) 시작.</summary>

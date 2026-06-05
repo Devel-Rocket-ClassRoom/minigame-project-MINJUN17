@@ -114,7 +114,8 @@ public class PhoneManager : MonoBehaviour
         if (riderCount <= 0) return false;
         if (timeSystem != null && !timeSystem.IsOpen) return false;
         if (timeSystem != null && timeSystem.Hour >= newCallCutoffHour) return false;
-        if (_activeDeliveryCount >= riderCount * 2) return false;
+        // 진행 중 배달(ring+조리+배달)을 라이더 수만큼만 허용 → 라이더 1명이면 동시에 1건만, 완료돼야 다음 콜
+        if (_activeDeliveryCount >= riderCount) return false;
         return true;
     }
 
