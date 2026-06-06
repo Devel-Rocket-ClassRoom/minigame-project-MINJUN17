@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -52,9 +53,19 @@ public class UnlockShopPanel : MonoBehaviour
         Refresh();
     }
 
+    [Header("기본 탭")]
+    [SerializeField] private UnlockCategory defaultCategory = UnlockCategory.Marketing;
+
     private void OnEnable()
     {
+        currentCategory = defaultCategory;
         SubscribeAll();
+        StartCoroutine(RefreshNextFrame());
+    }
+
+    private IEnumerator RefreshNextFrame()
+    {
+        yield return null;
         Refresh();
     }
 

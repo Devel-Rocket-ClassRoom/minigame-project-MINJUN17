@@ -85,9 +85,11 @@ public abstract class Staff : MonoBehaviour
     protected enum CommuteState { NONE, ARRIVING, LEAVING }
     private CommuteState _commute = CommuteState.NONE;
 
-    // 통근 경유 웨이포인트(문) + 최종 목적지. from에서 가까운 문부터 순서대로.
+    // 통근 경유 웨이포인트(문/계단) + 최종 목적지. from에서 가까운 문부터 순서대로.
     private readonly List<Vector3> _commuteWaypoints = new();
     private int _commuteWpIndex;
+    // 계단 웨이포인트 도착 시 텔레포트할 착지 위치 (index → landing)
+    private readonly Dictionary<int, Vector3> _commuteTeleports = new();
 
     // 사이드워크 ↔ 가게 안 횡단 시 정문 (0,1) 경유
     private static readonly Vector3 DoorWorld = new Vector3(0.5f, 1.5f, 0f);
@@ -124,18 +126,35 @@ public abstract class Staff : MonoBehaviour
         return gm != null ? gm.CellToWorld(gm.KitchenDoorCell) : new Vector3(1.5f, 8.5f, 0f);
     }
 
-    // from→to 경로에 필요한 문 웨이포인트를 from에서 가까운 순으로 구성 + 최종 목적지.
+    // from→to 경로에 필요한 웨이포인트를 구성 + 최종 목적지.
+    // 2층 출발 시 계단 경유 후 텔레포트 → 이후 정문/주방문 경유 처리.
     private void BuildCommuteWaypoints(Vector3 from, Vector3 to)
     {
         _commuteWaypoints.Clear();
         _commuteWpIndex = 0;
+        _commuteTeleports.Clear();
 
-        if (DoorCrossingNeeded(from, to))    _commuteWaypoints.Add(DoorWorld);
-        if (KitchenCrossingNeeded(from, to)) _commuteWaypoints.Add(KitchenDoorWorld());
+        // 2층에서 출발하는 경우 계단 먼저 경유
+        var gm = GridManager.Instance;
+        if (gm != null && gm.GetFloorAt(from) == FloorIndex.Floor2)
+        {
+            var stair = StairManager.Instance?.FindNearestStairOnFloor(FloorIndex.Floor2, from);
+            if (stair != null && stair.HasPair)
+            {
+                Vector3 approachPos = stair.GetApproachPos(GetPathRole(), from);
+                Vector3 landingPos  = stair.GetTeleportLandingPos(GetPathRole(), from);
+                _commuteWaypoints.Add(approachPos);
+                _commuteTeleports[0] = landingPos;
+                from = landingPos; // 이후 경유지는 착지점 기준으로 계산
+            }
+        }
 
-        // from에서 가까운 문부터 경유 (출근/퇴근 방향 자동 처리)
-        _commuteWaypoints.Sort((a, c) =>
-            Vector3.Distance(from, a).CompareTo(Vector3.Distance(from, c)));
+        // 정문/주방문 경유지 추가 후 from(착지점) 기준 거리 정렬
+        var doors = new List<Vector3>();
+        if (DoorCrossingNeeded(from, to))    doors.Add(DoorWorld);
+        if (KitchenCrossingNeeded(from, to)) doors.Add(KitchenDoorWorld());
+        doors.Sort((a, c) => Vector3.Distance(from, a).CompareTo(Vector3.Distance(from, c)));
+        _commuteWaypoints.AddRange(doors);
 
         _commuteWaypoints.Add(to);
     }
@@ -187,6 +206,12 @@ public abstract class Staff : MonoBehaviour
 
         if (HasArrived())
         {
+            // 계단 웨이포인트 도착 시 텔레포트
+            if (_commuteTeleports.TryGetValue(_commuteWpIndex, out Vector3 landing))
+            {
+                transform.position = landing;
+                _mover.Clear();
+            }
             _commuteWpIndex++;
             if (_commuteWpIndex >= _commuteWaypoints.Count) FinishCommute();
         }

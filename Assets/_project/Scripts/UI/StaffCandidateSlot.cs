@@ -49,10 +49,15 @@ public class StaffCandidateSlot : MonoBehaviour
                 : (candidate?.candidateName ?? "");
         }
 
-        // 역할 + 등급
+        // 역할 + 등급 (매니저는 "요리사 매니저", 그 외는 "초보 요리사" 순)
         if (roleGradeText != null && candidate?.baseData != null)
-            roleGradeText.text = $"{Loc("staff.role." + candidate.baseData.role.ToString().ToLower())} " +
-                                 $"{Loc("staff.grade." + candidate.baseData.grade.ToString().ToLower())}";
+        {
+            string role  = Loc("staff.role."  + candidate.baseData.role.ToString().ToLower());
+            string grade = Loc("staff.grade." + candidate.baseData.grade.ToString().ToLower());
+            roleGradeText.text = candidate.baseData.grade == StaffType.Manager
+                ? $"{role} {grade}"
+                : $"{grade} {role}";
+        }
 
         // 비용
         long cost = candidate?.baseData != null ? candidate.baseData.hireCost : 0;

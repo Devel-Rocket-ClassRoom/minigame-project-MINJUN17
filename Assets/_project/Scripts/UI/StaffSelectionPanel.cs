@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -48,6 +49,12 @@ public class StaffSelectionPanel : MonoBehaviour
         if (promoteButton != null) promoteButton.onClick.AddListener(OnPromote);
         if (fireButton    != null) fireButton.onClick.AddListener(OnFire);
 
+        StartCoroutine(RefreshNextFrame());
+    }
+
+    private IEnumerator RefreshNextFrame()
+    {
+        yield return null;
         Refresh();
     }
 
@@ -93,7 +100,9 @@ public class StaffSelectionPanel : MonoBehaviour
         if (indexText  != null) indexText.text  = $"직원 선택 {_index + 1}/{_roster.Count}";
         if (nameText   != null) nameText.text   = $"이름 : {st.Name}";
         if (salaryText != null) salaryText.text = $"월급 : {st.EffectiveSalary:N0}원";
-        if (gradeText  != null) gradeText.text  = $"{GradeLabel(d.grade)} {RoleLabel(d.role)}";
+        if (gradeText  != null) gradeText.text  = d.grade == StaffType.Manager
+            ? $"{RoleLabel(d.role)} {GradeLabel(d.grade)}"
+            : $"{GradeLabel(d.grade)} {RoleLabel(d.role)}";
         if (tenureText != null) tenureText.text = $"근속 : {st.TenureMonths}개월";
 
         if (portrait != null)

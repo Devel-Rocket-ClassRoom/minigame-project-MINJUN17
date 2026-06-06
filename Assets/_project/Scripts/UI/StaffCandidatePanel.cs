@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -22,6 +23,12 @@ public class StaffCandidatePanel : MonoBehaviour
     private void OnEnable()
     {
         SubscribeAll();
+        StartCoroutine(RefreshNextFrame());
+    }
+
+    private IEnumerator RefreshNextFrame()
+    {
+        yield return null;
         Refresh();
     }
 

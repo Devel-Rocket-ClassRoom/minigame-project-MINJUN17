@@ -30,6 +30,7 @@ public class SatisfactionSystem : MonoBehaviour
         if (!CanAfford(amount)) { OnInsufficientSatisfaction?.Invoke(); return false; }
         _satisfaction -= amount;
         OnSatisfactionChanged?.Invoke(_satisfaction);
+        if (amount > 0) SoundManager.Instance?.PlaySfx(SfxId.Purchase);
         return true;
     }
 

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -37,13 +38,23 @@ public class PlacedShopPanel : MonoBehaviour
     /// <summary>탭 버튼 OnClick에서 int로 직접 연결할 때 (PlacementZone 값에 맞는 정수 사용).</summary>
     public void SetZone(int zoneInt) => SetZone((PlacementZone)zoneInt);
 
+    [Header("기본 탭")]
+    [SerializeField] private PlacementZone defaultZone;
+
     private void OnEnable()
     {
-        Refresh();
+        zone = defaultZone;
+
         if (CatalogManager.Instance != null)
-        {
             CatalogManager.Instance.OnFurnitureUnlocked += OnFurnitureUnlocked;
-        }
+
+        StartCoroutine(RefreshNextFrame());
+    }
+
+    private IEnumerator RefreshNextFrame()
+    {
+        yield return null;
+        Refresh();
     }
 
     private void OnDisable()

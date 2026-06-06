@@ -19,6 +19,7 @@ public class PhoneManager : MonoBehaviour
     [SerializeField] private int maxOrderCount = 3;
 
     [Header("영업시간 차단")]
+    [SerializeField] private int newCallStartHour = 8;     // 이 시각 이전 새 콜 차단
     [SerializeField] private int newCallCutoffHour = 22;   // 이 시각 이후 새 콜 차단
     [SerializeField] private TimeSystem timeSystem;
 
@@ -113,6 +114,7 @@ public class PhoneManager : MonoBehaviour
         int riderCount = StaffManager.Instance.RiderCount;
         if (riderCount <= 0) return false;
         if (timeSystem != null && !timeSystem.IsOpen) return false;
+        if (timeSystem != null && timeSystem.Hour < newCallStartHour) return false;
         if (timeSystem != null && timeSystem.Hour >= newCallCutoffHour) return false;
         // 진행 중 배달(ring+조리+배달)을 라이더 수만큼만 허용 → 라이더 1명이면 동시에 1건만, 완료돼야 다음 콜
         if (_activeDeliveryCount >= riderCount) return false;

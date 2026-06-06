@@ -119,6 +119,14 @@ MonoBehaviour:
     m_Key: furniture.sink.desc
     m_Metadata:
       m_Items: []
+  - m_Id: 4713575561625600
+    m_Key: furniture.aircon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4713575611957248
+    m_Key: furniture.aircon.desc
+    m_Metadata:
+      m_Items: []
   - m_Id: 1715406962691
     m_Key: menu.burger
     m_Metadata:

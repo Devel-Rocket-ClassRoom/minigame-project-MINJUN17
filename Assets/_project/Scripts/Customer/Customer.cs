@@ -300,9 +300,11 @@ public class Customer : MonoBehaviour
                     // 만들 수 있는 메뉴가 없어 그냥 돌아가는 손님은 만족도/평판에 반영하지 않음(중립)
                     if (!_noServeableMenu)
                     {
-                        SatisfactionSystem.Instance.Earn(_satisfaction);
-                        FloatingTextSystem.SpawnSatisfaction(transform.position, _satisfaction);
-                        ReputationSystem.Instance?.Report(_satisfaction);
+                        float mult = AirconManager.Instance != null ? AirconManager.Instance.SatisfactionMultiplier : 1f;
+                        int finalSatisfaction = Mathf.RoundToInt(_satisfaction * mult);
+                        SatisfactionSystem.Instance.Earn(finalSatisfaction);
+                        FloatingTextSystem.SpawnSatisfaction(transform.position, finalSatisfaction);
+                        ReputationSystem.Instance?.Report(finalSatisfaction);
                     }
                 }
                 break;
@@ -594,8 +596,11 @@ public class Customer : MonoBehaviour
             return;
         }
 
-        // 변기 시설 자체가 없으면 LEAVE (페널티 X)
-        if (ToiletManager.Instance == null || !ToiletManager.Instance.HasAny)
+        bool hasToilet = ToiletManager.Instance != null && ToiletManager.Instance.HasAny;
+        bool hasSink   = SinkManager.Instance   != null && SinkManager.Instance.HasAny;
+
+        // 변기도 세면대도 없으면 LEAVE
+        if (!hasToilet && !hasSink)
         {
             ChangeState(CustomerState.LEAVE);
             return;
@@ -605,7 +610,8 @@ public class Customer : MonoBehaviour
         _targetSeat?.Release();
         _targetSeat = null;
 
-        _toiletPhase = ToiletPhase.Stall;
+        // 변기 있으면 변기 → 세면대 순서, 없으면 세면대 바로
+        _toiletPhase = hasToilet ? ToiletPhase.Stall : ToiletPhase.Sink;
         ChangeState(CustomerState.WALK_TO_TOILET);
     }
 

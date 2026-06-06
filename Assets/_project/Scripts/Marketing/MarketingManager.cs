@@ -37,11 +37,13 @@ public class MarketingManager : MonoBehaviour
         return false;
     }
 
-    /// <summary>해당 마케팅이 활성(_active) 또는 당일 구매 대기(_pending) 중인지. (중복 구매 차단/UI 비활성화용)</summary>
+    /// <summary>해당 마케팅이 활성(_active) 또는 당일 구매 대기(_pending) 중인지. (중복 구매 차단/UI 비활성화용)
+    /// 단, 활성 중이라도 남은 기간이 1개월 이하이면 재구매 허용 (끊김 없이 연장 가능하도록).</summary>
     public bool IsActiveOrPending(MarketingData data)
     {
         if (data == null) return false;
-        if (IsActive(data)) return true;
+        foreach (var c in _active)
+            if (c != null && c.Data == data && c.RemainingMonths > 1) return true;
         foreach (var p in _pending)
             if (p == data) return true;
         return false;

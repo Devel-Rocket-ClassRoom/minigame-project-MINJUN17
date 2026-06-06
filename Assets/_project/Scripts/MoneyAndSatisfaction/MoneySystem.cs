@@ -68,14 +68,16 @@ public class MoneySystem : MonoBehaviour
 
     public SettlementResult CalculateSettlement()
     {
+        long operationCost = gridManager != null ? gridManager.ActiveCellCount * PricePerSquareMeter : 0;
         return new SettlementResult
         {
-            MaterialCost = SalesTracker.Instance != null
-                            ? SalesTracker.Instance.CalculateMaterialCost() : 0,
-            SalaryCost = StaffManager.Instance != null
-                            ? StaffManager.Instance.CalculateTotalSalaryCost() : 0,
-            OperationCost = gridManager != null
-                            ? gridManager.ActiveCellCount * PricePerSquareMeter : 0,
+            MaterialCost  = SalesTracker.Instance != null
+                             ? SalesTracker.Instance.CalculateMaterialCost() : 0,
+            SalaryCost    = StaffManager.Instance != null
+                             ? StaffManager.Instance.CalculateTotalSalaryCost() : 0,
+            OperationCost = operationCost,
+            AirconCost    = AirconManager.Instance != null
+                             ? AirconManager.Instance.CalculateExtraCost(operationCost) : 0,
         };
     }
 

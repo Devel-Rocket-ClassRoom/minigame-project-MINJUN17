@@ -38,11 +38,19 @@ public class StaffCandidatePool : MonoBehaviour
     private void Start()
     {
         if (timeSystem != null) timeSystem.OnDayStarted += HandleDayStarted;
+        if (PhoneManager.Instance != null) PhoneManager.Instance.OnUnlocked += HandlePhoneUnlocked;
     }
 
     private void OnDestroy()
     {
         if (timeSystem != null) timeSystem.OnDayStarted -= HandleDayStarted;
+        if (PhoneManager.Instance != null) PhoneManager.Instance.OnUnlocked -= HandlePhoneUnlocked;
+    }
+
+    /// <summary>전화기 카탈로그 해금 시 라이더 주니어 후보 즉시 1명 추가.</summary>
+    private void HandlePhoneUnlocked()
+    {
+        SeedApplicant(StaffRole.Rider, StaffType.Junior);
     }
 
     public bool PurchaseRecruitment(RecruitmentTier tier)
@@ -86,10 +94,10 @@ public class StaffCandidatePool : MonoBehaviour
                 var ticket = _pendingTickets[i];
                 var prevState = Random.state;        // 전역 난수 상태 보존
                 Random.InitState(ticket.seed);       // 티켓 고정 시드 → 재시작해도 동일 후보
-                for (int n = 0; n < applicantsPerTicket; n++)
+                foreach (var c in MakeDiverseBatch(ticket.tier))
                 {
-                    var c = MakeApplicant(ticket.tier);
-                    if (c != null) { AddApplicant(c); applicantsChanged = true; }
+                    AddApplicant(c);
+                    applicantsChanged = true;
                 }
                 Random.state = prevState;            // 다른 난수 시스템 영향 없게 복원
                 _pendingTickets.RemoveAt(i);
@@ -129,22 +137,68 @@ public class StaffCandidatePool : MonoBehaviour
         OnApplicantsChanged?.Invoke();
     }
 
+    /// <summary>
+    /// 전화기 해금 전: Cook 1 + Server 1 (2명, 다른 포지션 보장).
+    /// 전화기 해금 후: Cook + Server + Rider (3명, 다른 포지션 보장).
+    /// 특정 포지션 정원 초과 시 나머지 여유 포지션으로 채움.
+    /// </summary>
+    private List<StaffCandidate> MakeDiverseBatch(RecruitmentTier tier)
+    {
+        var sm = StaffManager.Instance;
+        bool phoneUnlocked = sm != null && sm.IsRiderHiringUnlocked;
+
+        // 원하는 포지션 순서 (전화기 해금 여부에 따라)
+        var desired = phoneUnlocked
+            ? new List<StaffRole> { StaffRole.Cook, StaffRole.Server, StaffRole.Rider }
+            : new List<StaffRole> { StaffRole.Cook, StaffRole.Server };
+
+        int target = desired.Count;
+        var result = new List<StaffCandidate>();
+        var filledRoles = new List<StaffRole>();
+
+        // 1패스: 원하는 포지션마다 1명씩 (자리 있을 때만)
+        foreach (var role in desired)
+        {
+            if (sm == null || !sm.HasRoomFor(role)) continue;
+            var c = MakeApplicantForRole(tier, role);
+            if (c != null) { result.Add(c); filledRoles.Add(role); }
+        }
+
+        // 2패스: 부족하면 여유 있는 아무 포지션으로 채움 (동일 포지션 허용)
+        int attempts = 0;
+        while (result.Count < target && attempts < 10)
+        {
+            attempts++;
+            var role = PickRole();
+            if (role == null) break;
+            var c = MakeApplicantForRole(tier, role.Value);
+            if (c != null) result.Add(c);
+        }
+
+        return result;
+    }
+
     private StaffCandidate MakeApplicant(RecruitmentTier tier)
+    {
+        var role = PickRole();
+        if (role == null) return null;
+        return MakeApplicantForRole(tier, role.Value);
+    }
+
+    private StaffCandidate MakeApplicantForRole(RecruitmentTier tier, StaffRole role)
     {
         var cfg = GetConfig(tier);
         if (cfg == null) return null;
 
-        var role = PickRole();
-        if (role == null) return null;              // 뽑을 직군 없음 (전 직군 만원)
         var grade = PickGrade(cfg);
-        var baseData = StaffManager.Instance.GetGrade(role.Value, grade);
+        var baseData = StaffManager.Instance?.GetGrade(role, grade);
         if (baseData == null) return null;
 
         return new StaffCandidate
         {
             candidateName = PickName(),
-            baseData = baseData,
-            hireVariance = Random.Range(-statVariance, statVariance),
+            baseData      = baseData,
+            hireVariance  = Random.Range(-statVariance, statVariance),
         };
     }
 

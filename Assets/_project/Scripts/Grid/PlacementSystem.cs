@@ -142,7 +142,7 @@ public class PlacementSystem : MonoBehaviour
         if (IsAlreadyPlaced(data)) { Debug.Log("[PlacementSystem] 이미 설치됨"); return false; }
 
         var zone = GridManager.ToCellZone(data.zone);
-        if (!gridManager.CanPlace(data.fixedCell, data.width, data.height, zone))
+        if (!gridManager.CanPlace(data.fixedCell, data.width, data.height, zone, data.wallMount))
         {
             Debug.LogWarning($"[PlacementSystem] InstantPlace 실패 — 셀 {data.fixedCell} 점유/비활성/존 불일치");
             return false;
@@ -329,7 +329,7 @@ public class PlacementSystem : MonoBehaviour
     private bool ApplyPlace()
     {
         if (_previewData != null && _previewData.fixedSingle) return false;   // 고정 가구는 신규 설치 불가 (이동만)
-        if (!gridManager.CanPlace(_currentOrigin, PreviewWidth, PreviewHeight, GridManager.ToCellZone(_previewData.zone))) return false;
+        if (!gridManager.CanPlace(_currentOrigin, PreviewWidth, PreviewHeight, GridManager.ToCellZone(_previewData.zone), _previewData.wallMount)) return false;
 
         // 설치 비용 차감 (0이면 무료, 무료가 아니고 잔액 부족이면 배치 실패)
         long cost = _previewData.purchaseCost;
@@ -358,7 +358,7 @@ public class PlacementSystem : MonoBehaviour
     private bool ApplyMove()
     {
         // 못 놓는 위치면 아무것도 하지 않고 false (사용자가 계속 드래그하거나 Cancel)
-        if (!gridManager.CanPlace(_currentOrigin, PreviewWidth, PreviewHeight, GridManager.ToCellZone(_previewData.zone))) return false;
+        if (!gridManager.CanPlace(_currentOrigin, PreviewWidth, PreviewHeight, GridManager.ToCellZone(_previewData.zone), _previewData.wallMount)) return false;
 
         _movingOriginal.Origin = _currentOrigin;
         _movingOriginal.RotationStep = _previewRotationStep;
@@ -398,7 +398,7 @@ public class PlacementSystem : MonoBehaviour
         FloorIndex floor = CameraController.Instance != null
             ? CameraController.Instance.CurrentFloor
             : FloorIndex.Floor1;
-        zoneHighlighter.Show(GridManager.ToCellZone(data.zone), floor);
+        zoneHighlighter.Show(GridManager.ToCellZone(data.zone), floor, data.wallMount);
     }
 
     private void DragMove()
@@ -415,7 +415,7 @@ public class PlacementSystem : MonoBehaviour
     {
         _previewInstance.transform.position =
             gridManager.CellToWorld(_currentOrigin, PreviewWidth, PreviewHeight) + (Vector3)_previewData.fixedWorldOffset;
-        Color color = gridManager.CanPlace(_currentOrigin, PreviewWidth, PreviewHeight, GridManager.ToCellZone(_previewData.zone))
+        Color color = gridManager.CanPlace(_currentOrigin, PreviewWidth, PreviewHeight, GridManager.ToCellZone(_previewData.zone), _previewData.wallMount)
             ? validColor : invalidColor;
         if (_previewRenderers != null)
         {

@@ -779,7 +779,7 @@ Transform:
   m_GameObject: {fileID: 24810108}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 8, y: 47, z: 0}
+  m_LocalPosition: {x: 8, y: 48, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2210,7 +2210,7 @@ Transform:
   m_GameObject: {fileID: 48031571}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 7.98, y: 48.1, z: 0}
+  m_LocalPosition: {x: 7.98, y: 48.95, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2317,8 +2317,8 @@ Transform:
   m_GameObject: {fileID: 50323276}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 8.01, y: 5.5059, z: 0}
-  m_LocalScale: {x: 1, y: 0.78502506, z: 1}
+  m_LocalPosition: {x: 8.01, y: 5.4458, z: 0}
+  m_LocalScale: {x: 1, y: 0.75244653, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1670252631}
@@ -2409,7 +2409,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 365725609}
         m_TargetAssemblyTypeName: PlacementModeUI, Assembly-CSharp
-        m_MethodName: OnRemoveClicked
+        m_MethodName: OnCancelClicked
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3468,6 +3468,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 1062168228}
+        m_TargetAssemblyTypeName: TabButtonGroup, Assembly-CSharp
+        m_MethodName: SelectTab
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 3
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 1062168226}
         m_TargetAssemblyTypeName: UnlockShopPanel, Assembly-CSharp
         m_MethodName: SetCategory
@@ -4716,6 +4728,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 1062168228}
+        m_TargetAssemblyTypeName: TabButtonGroup, Assembly-CSharp
+        m_MethodName: SelectTab
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 1062168226}
         m_TargetAssemblyTypeName: UnlockShopPanel, Assembly-CSharp
         m_MethodName: SetCategory
@@ -6814,6 +6838,7 @@ MonoBehaviour:
   placementSystem: {fileID: 1118384909}
   windowRoot: {fileID: 1015142051}
   placementModeUI: {fileID: 365725609}
+  defaultZone: 1
 --- !u!114 &266777590
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12055,6 +12080,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 1015142056}
+        m_TargetAssemblyTypeName: TabButtonGroup, Assembly-CSharp
+        m_MethodName: SelectTab
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 1
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 266777589}
         m_TargetAssemblyTypeName: PlacedShopPanel, Assembly-CSharp
         m_MethodName: SetZone
@@ -12392,7 +12429,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 29.999939, y: 30.00003}
+  m_AnchoredPosition: {x: 30, y: 30.000061}
   m_SizeDelta: {x: 70, y: 70}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &504870484
@@ -14335,7 +14372,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 39.75
+  m_fontSize: 31.35
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -15247,6 +15284,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 1062168228}
+        m_TargetAssemblyTypeName: TabButtonGroup, Assembly-CSharp
+        m_MethodName: SelectTab
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 4
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 1062168226}
         m_TargetAssemblyTypeName: UnlockShopPanel, Assembly-CSharp
         m_MethodName: SetCategory
@@ -16157,6 +16206,18 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 1062168228}
+        m_TargetAssemblyTypeName: TabButtonGroup, Assembly-CSharp
+        m_MethodName: SelectTab
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 4
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
         m_CallState: 2
       - m_Target: {fileID: 1062168226}
         m_TargetAssemblyTypeName: UnlockShopPanel, Assembly-CSharp
@@ -20176,6 +20237,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 1062168228}
+        m_TargetAssemblyTypeName: TabButtonGroup, Assembly-CSharp
+        m_MethodName: SelectTab
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 1
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 1062168226}
         m_TargetAssemblyTypeName: UnlockShopPanel, Assembly-CSharp
         m_MethodName: SetCategory
@@ -24265,7 +24338,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 29.999939, y: 30.00003}
+  m_AnchoredPosition: {x: 30, y: 30.000061}
   m_SizeDelta: {x: 70, y: 70}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &938832032
@@ -26272,6 +26345,7 @@ GameObject:
   - component: {fileID: 1015142052}
   - component: {fileID: 1015142054}
   - component: {fileID: 1015142055}
+  - component: {fileID: 1015142056}
   m_Layer: 5
   m_Name: PlacedMenu
   m_TagString: Untagged
@@ -26330,6 +26404,26 @@ MonoBehaviour:
   slideOffset: 30
   ease: 9
   startOpen: 0
+--- !u!114 &1015142056
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1015142051}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02a5246a4d32b1b42ad0336fa10b9782, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TabButtonGroup
+  buttons:
+  - {fileID: 1198890288}
+  - {fileID: 491695904}
+  - {fileID: 1169107498}
+  - {fileID: 1174403700}
+  activeColor: {r: 1, g: 1, b: 1, a: 1}
+  dimColor: {r: 0.55, g: 0.55, b: 0.55, a: 1}
+  defaultIndex: 0
 --- !u!1 &1021204183
 GameObject:
   m_ObjectHideFlags: 0
@@ -27277,6 +27371,7 @@ GameObject:
   - component: {fileID: 1062168225}
   - component: {fileID: 1062168226}
   - component: {fileID: 1062168227}
+  - component: {fileID: 1062168228}
   m_Layer: 5
   m_Name: UnlockMenu
   m_TagString: Untagged
@@ -27335,6 +27430,7 @@ MonoBehaviour:
   placementSystem: {fileID: 1118384909}
   popupPanel: {fileID: 0}
   panelRoot: {fileID: 1062168223}
+  defaultCategory: 0
 --- !u!114 &1062168227
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27355,6 +27451,27 @@ MonoBehaviour:
   slideOffset: 30
   ease: 9
   startOpen: 0
+--- !u!114 &1062168228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1062168223}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02a5246a4d32b1b42ad0336fa10b9782, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TabButtonGroup
+  buttons:
+  - {fileID: 176450355}
+  - {fileID: 790976261}
+  - {fileID: 1561301173}
+  - {fileID: 109187089}
+  - {fileID: 594555525}
+  activeColor: {r: 1, g: 1, b: 1, a: 1}
+  dimColor: {r: 0.55, g: 0.55, b: 0.55, a: 1}
+  defaultIndex: 0
 --- !u!1 &1062524982
 GameObject:
   m_ObjectHideFlags: 0
@@ -28920,6 +29037,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1118384911}
+  - component: {fileID: 1118384946}
   - component: {fileID: 1118384938}
   - component: {fileID: 1118384934}
   - component: {fileID: 1118384923}
@@ -29017,23 +29135,14 @@ MonoBehaviour:
   - {x: 6, y: 50}
   - {x: 7, y: 50}
   - {x: 8, y: 50}
-  - {x: 0, y: 49}
-  - {x: 2, y: 49}
-  - {x: 3, y: 49}
-  - {x: 4, y: 49}
-  - {x: 5, y: 49}
-  - {x: 6, y: 49}
-  - {x: 7, y: 49}
-  - {x: 8, y: 49}
   - {x: 0, y: 2}
   - {x: 0, y: 3}
   - {x: 0, y: 4}
   - {x: 0, y: 5}
+  - {x: 6, y: 48}
   - {x: 6, y: 47}
-  - {x: 6, y: 46}
-  - {x: 6, y: 45}
-  - {x: 7, y: 45}
-  - {x: 8, y: 45}
+  - {x: 7, y: 46}
+  - {x: 8, y: 46}
   - {x: 6, y: 6}
   - {x: 6, y: 5}
   - {x: 7, y: 6}
@@ -29046,6 +29155,8 @@ MonoBehaviour:
   - {x: 6, y: 8}
   - {x: 7, y: 8}
   - {x: 8, y: 8}
+  - {x: 7, y: 48}
+  - {x: 7, y: 47}
   reservedCells:
   - {x: 8, y: 4}
   - {x: 7, y: 4}
@@ -29060,9 +29171,9 @@ MonoBehaviour:
   - {x: 1, y: 2}
   - {x: 1, y: 3}
   - {x: 7, y: 47}
-  - {x: 7, y: 47}
+  - {x: 7, y: 46}
   - {x: 8, y: 46}
-  - {x: 8, y: 46}
+  - {x: 8, y: 47}
   - {x: 0, y: 8}
   - {x: 1, y: 8}
   - {x: 0, y: 9}
@@ -29072,6 +29183,24 @@ MonoBehaviour:
   - {x: 6, y: 8}
   - {x: 7, y: 8}
   - {x: 8, y: 8}
+  - {x: 7, y: 48}
+  - {x: 8, y: 48}
+  - {x: 7, y: 49}
+  - {x: 8, y: 49}
+  - {x: 7, y: 7}
+  - {x: 8, y: 8}
+  - {x: 0, y: 0}
+  - {x: 1, y: 0}
+  - {x: 0, y: 6}
+  - {x: 1, y: 6}
+  - {x: 2, y: 6}
+  - {x: 0, y: 7}
+  - {x: 1, y: 7}
+  - {x: 2, y: 7}
+  - {x: 3, y: 9}
+  - {x: 4, y: 9}
+  - {x: 5, y: 9}
+  - {x: 6, y: 9}
 --- !u!4 &1118384911
 Transform:
   m_ObjectHideFlags: 0
@@ -29369,7 +29498,7 @@ MonoBehaviour:
   revenueDivisor: 100
   dummyTop100: 
   autoGenerateDummies: 1
-  autoDummyTopScore: 50000
+  autoDummyTopScore: 70000
   autoDummyBottomScore: 100
   autoDummyExpCurve: 0.5
 --- !u!114 &1118384929
@@ -29400,6 +29529,7 @@ MonoBehaviour:
   ringTimeout: 3
   minOrderCount: 1
   maxOrderCount: 3
+  newCallStartHour: 8
   newCallCutoffHour: 22
   timeSystem: {fileID: 1118384919}
 --- !u!114 &1118384932
@@ -29461,6 +29591,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 2a1d9f639cba9db4a86e149b0fa1e3b4, type: 2}
   - {fileID: 11400000, guid: 50587e369e1240e4db514839ef7613ec, type: 2}
   - {fileID: 11400000, guid: a851002380cf5144ab8f4ae4a2e0b40a, type: 2}
+  - {fileID: 11400000, guid: ac4738496564ba5449ff40f2ea348bc0, type: 2}
   allMenus:
   - {fileID: 11400000, guid: ae74d7a0bfda48e4ca212b82df9236a1, type: 2}
   - {fileID: 11400000, guid: 6afaffa1ff818f343b2d5adafdbe4d4b, type: 2}
@@ -29491,6 +29622,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 566169bc16ffb764399c096a70f75dac, type: 2}
   - {fileID: 11400000, guid: 74de6b7a3626ae640897fd30ff46ae6d, type: 2}
   - {fileID: 11400000, guid: 46c6b369273f93244b818a66677e1752, type: 2}
+  - {fileID: 11400000, guid: ac4738496564ba5449ff40f2ea348bc0, type: 2}
   startingMenus: []
 --- !u!114 &1118384935
 MonoBehaviour:
@@ -29988,6 +30120,20 @@ MonoBehaviour:
   - {fileID: 1611098058}
   - {fileID: 452685965}
   fadeDuration: 0.6
+--- !u!114 &1118384946
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1118384907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dad62987e4da0034d867b1f97890bb74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AirconManager
+  operationCostRate: 0.1
+  satisfactionMultiplier: 1.05
 --- !u!1 &1118943364
 GameObject:
   m_ObjectHideFlags: 0
@@ -31227,6 +31373,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 1015142056}
+        m_TargetAssemblyTypeName: TabButtonGroup, Assembly-CSharp
+        m_MethodName: SelectTab
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 2
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 266777589}
         m_TargetAssemblyTypeName: PlacedShopPanel, Assembly-CSharp
         m_MethodName: SetZone
@@ -31391,6 +31549,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 1015142056}
+        m_TargetAssemblyTypeName: TabButtonGroup, Assembly-CSharp
+        m_MethodName: SelectTab
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 3
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 266777589}
         m_TargetAssemblyTypeName: PlacedShopPanel, Assembly-CSharp
         m_MethodName: SetZone
@@ -31916,9 +32086,9 @@ Camera:
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
-    y: 0.08925751
+    y: 0
     width: 1
-    height: 0.821485
+    height: 1
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
@@ -32375,7 +32545,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 39.75
+  m_fontSize: 31.35
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -32551,6 +32721,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 1015142056}
+        m_TargetAssemblyTypeName: TabButtonGroup, Assembly-CSharp
+        m_MethodName: SelectTab
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 266777589}
         m_TargetAssemblyTypeName: PlacedShopPanel, Assembly-CSharp
         m_MethodName: SetZone
@@ -36768,7 +36950,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 56.2
+  m_fontSize: 45.2
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -39433,7 +39615,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 39.75
+  m_fontSize: 31.35
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -39511,7 +39693,7 @@ Transform:
   m_GameObject: {fileID: 1428901049}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.5, y: -0.5, z: 0}
+  m_LocalPosition: {x: 0.5, y: -0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -40094,7 +40276,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 29.999939, y: 30.00003}
+  m_AnchoredPosition: {x: 30, y: 30.000061}
   m_SizeDelta: {x: 70, y: 70}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &1460937217
@@ -40288,7 +40470,7 @@ Transform:
   m_GameObject: {fileID: 1464814158}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 25, z: 0}
+  m_LocalPosition: {x: 0, y: 26, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -42787,7 +42969,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 65.9
+  m_fontSize: 50.9
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -44253,6 +44435,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 1062168228}
+        m_TargetAssemblyTypeName: TabButtonGroup, Assembly-CSharp
+        m_MethodName: SelectTab
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 2
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 1062168226}
         m_TargetAssemblyTypeName: UnlockShopPanel, Assembly-CSharp
         m_MethodName: SetCategory
@@ -46503,7 +46697,7 @@ Transform:
   m_GameObject: {fileID: 1670252630}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.38, y: 0.5, z: 0}
+  m_LocalPosition: {x: 0.5, y: 0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -46545,7 +46739,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 29.999939, y: 30.00003}
+  m_AnchoredPosition: {x: 30, y: 30.000061}
   m_SizeDelta: {x: 70, y: 70}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &1679000739
@@ -53743,7 +53937,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 58.4
+  m_fontSize: 43.8
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1

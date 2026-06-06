@@ -40,13 +40,15 @@ public class PlacementZoneHighlighter : MonoBehaviour
 
     private CellZone _allowed;
     private FloorIndex _floor;
+    private bool _wallMount;
 
     /// <summary>현재 floor에서 allowed 존은 초록, 나머지 활성 셀은 빨강으로 칠한다.</summary>
-    public void Show(CellZone allowed, FloorIndex floor)
+    public void Show(CellZone allowed, FloorIndex floor, bool wallMount = false)
     {
         EnsureInit();
         _allowed = allowed;
         _floor = floor;
+        _wallMount = wallMount;
         _root.gameObject.SetActive(true);
         Refresh(default, 0, 0, hasPreview: false);
     }
@@ -72,8 +74,8 @@ public class PlacementZoneHighlighter : MonoBehaviour
             if (cell == null || !cell.isActive) continue;
             if (!grid.IsCellOnFloor(y, _floor)) continue;
 
-            // 존이 맞아도 점유/예약/벽이면 못 놓음 → 빨강
-            bool placeable = GridManager.ZoneAccepts(_allowed, cell.zone) && !cell.isOccupied && !cell.isReserved && !cell.isWall;
+            // 존이 맞아도 점유/예약이면 못 놓음 → 빨강 (isWall은 CanPlace와 동일하게 검사하지 않음)
+            bool placeable = !cell.isOccupied && (_wallMount || (GridManager.ZoneAccepts(_allowed, cell.zone) && !cell.isReserved));
 
             // 설치중인 가구가 덮는 셀이면 파란색
             bool underPreview = hasPreview
@@ -83,7 +85,7 @@ public class PlacementZoneHighlighter : MonoBehaviour
             var sr = GetRenderer(used++);
             sr.transform.position = grid.CellToWorld(new Vector2Int(x, y));
             sr.transform.localScale = new Vector3(cellFill, cellFill, 1f);   // 칸 사이 간격
-            sr.color = underPreview ? previewColor : (placeable ? allowedColor : blockedColor);
+            sr.color = underPreview ? (placeable ? previewColor : blockedColor) : (placeable ? allowedColor : blockedColor);
             sr.gameObject.SetActive(true);
         }
 

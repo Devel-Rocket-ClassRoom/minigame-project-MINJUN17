@@ -1113,6 +1113,15 @@ MonoBehaviour:
     m_Localized: 
     m_Metadata:
       m_Items: []
+  - m_Id: 4713575561625600
+    m_Localized: Air Conditioner
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4713575611957248
+    m_Localized: Installing raises maintenance costs slightly and increases customer
+      satisfaction
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

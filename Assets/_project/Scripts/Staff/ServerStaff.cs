@@ -22,6 +22,8 @@ public class ServerStaff : Staff
     // Stair 경유 보조 필드
     private Stair _pendingStair;
     private ServerState _stairAfterState;
+    // teleport 직후 GetFloorAt 오차 방지용 — 착지한 층을 명시적으로 기억
+    private FloorIndex? _teleportedFloor;
 
     public float EffectiveKindness => _data.kindness * (1f + _hireVariance) * _growthMultiplier;
 
@@ -339,7 +341,9 @@ public class ServerStaff : Staff
         }
 
         // 좌석 floor가 다르면 먼저 stair 경유
-        FloorIndex myFloor = GridManager.Instance.GetFloorAt(transform.position);
+        // teleport 직후엔 GetFloorAt 오차를 피하기 위해 착지 층을 명시적으로 사용
+        FloorIndex myFloor = _teleportedFloor ?? GridManager.Instance.GetFloorAt(transform.position);
+        _teleportedFloor = null;   // 한 번만 사용
         FloorIndex seatFloor = GridManager.Instance.GetFloorAt(seat.transform.position);
         if (myFloor != seatFloor)
         {
@@ -376,8 +380,8 @@ public class ServerStaff : Staff
             customer.OnFoodDelivered(this, _carryingFood);
             _carryingFood = null;
 
-            // 배달 끝나고 F2에 있으면 stair로 F1 복귀
-            FloorIndex afterFloor = GridManager.Instance.GetFloorAt(transform.position);
+            // 배달 끝나고 F2에 있으면 stair로 F1 복귀 (좌석 층 기준으로 판단해 오차 방지)
+            FloorIndex afterFloor = GridManager.Instance.GetFloorAt(seat.transform.position);
             if (afterFloor == FloorIndex.Floor2)
             {
                 Stair backStair = StairManager.Instance?.FindNearestStairOnFloor(afterFloor, transform.position);
@@ -407,10 +411,12 @@ public class ServerStaff : Staff
         if (!HasArrived()) return;
 
         // 텔레포트
+        FloorIndex landingFloor = _pendingStair.PairStair.Floor;
         Vector3 landingPos = _pendingStair.GetTeleportLandingPos(PathRole.Server, transform.position);
         transform.position = landingPos;
         _mover.Clear();
 
+        _teleportedFloor = landingFloor;   // GetFloorAt 오차 방지
         _pendingStair = null;
         ChangeState(_stairAfterState);
     }

@@ -52,6 +52,9 @@ public class FurnitureData : ScriptableObject, ISaveIdentifiable
     [Tooltip("체크 시 이 가구는 길찾기를 막지 않음 — 직원/손님이 통과 가능 (설치 시 가구끼리 겹침은 그대로 방지).")]
     public bool passThrough;
 
+    [Tooltip("벽·주방 경계 셀 등 존 무관하게 설치 가능 — 존 체크·벽 체크를 건너뜀 (에어컨 등 벽걸이 가구용).")]
+    public bool wallMount;
+
     [Header("고정 위치 즉시 설치 (드래그 X)")]
     [Tooltip("체크 시 카탈로그 클릭하면 fixedCell 위치에 즉시 spawn. 이동/삭제/회전 불가, 1회만 설치 가능.")]
     public bool fixedPlacement;

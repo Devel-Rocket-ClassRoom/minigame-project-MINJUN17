@@ -20,6 +20,10 @@ MonoBehaviour:
   anchorX: 0
   anchorY: 0
   fixedSingle: 0
+  lockMove: 1
+  singleInstance: 1
+  passThrough: 0
+  wallMount: 0
   fixedPlacement: 1
   fixedCell: {x: 5, y: 53}
   fixedWorldOffset: {x: 0, y: 0.7}

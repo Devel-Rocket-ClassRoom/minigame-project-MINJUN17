@@ -14,7 +14,7 @@ furniture.fishCuttingTable,,생선 손질대,Fish Cutting Table
 unlock.cookingtool,,구매하면 이 도구로 만드는 메뉴가 해금 목록에 등장합니다.,Purchase to unlock menus made with this tool.
 unlock.food,,새로운 손님이 등장할지도 모릅니다.,A new customer might appear.
 furniture.phone,,전화기,Phone
-furniture.phone.desc,,해금하고 설치시 배달직원 고용이 가능합니다,Unlock and install to enable hiring delivery staff
+furniture.phone.desc,,설치하고 배달 직원 고용 시 배달 업무가 가능합니다,Unlock and install to enable hiring delivery staff
 furniture.dtOrderWindow,,DT 주문창구,DT Order Window
 furniture.dtPickupWindow,,DT 픽업창구,DT Pickup Window
 furniture.toilet1,,변기 1,Toilet 1
@@ -25,6 +25,8 @@ furniture.toilet3,,변기 3,Toilet 3
 furniture.toilet3.desc,,손님이 사용 시 만족도를 얻습니다,Customers gain satisfaction when used
 furniture.sink,,세면대,Sink
 furniture.sink.desc,,손님이 사용 시 추가 만족도를 얻습니다,Customers gain extra satisfaction when used
+furniture.aircon,,에어컨,Air Conditioner
+furniture.aircon.desc,,설치 시 유지비가 소폭 상승하고 손님들의 만족도가 올라갑니다,Installing raises maintenance costs slightly and increases customer satisfaction
 menu.burger,,햄버거,Burger
 menu.sushi,,초밥,Sushi
 menu.bread,,빵,Bread
@@ -159,10 +161,10 @@ customer.police,,경찰,Police Officer
 customer.rapper,,래퍼,Rapper
 customer.rich,,부자,Rich Man
 staff.role.cook,,요리사,Cook
-staff.role.server,,서버,Server
-staff.role.rider,,라이더,Rider
-staff.grade.junior,,주니어,Junior
-staff.grade.senior,,시니어,Senior
+staff.role.server,,서빙 직원,Server
+staff.role.rider,,배달기사,Rider
+staff.grade.junior,,초보,Junior
+staff.grade.senior,,숙련된,Senior
 staff.grade.manager,,매니저,Manager
 recruitment.normal,,일반 모집권,Normal Recruitment
 recruitment.normal.desc,,신입 위주의 후보가 도착합니다,Mostly junior applicants

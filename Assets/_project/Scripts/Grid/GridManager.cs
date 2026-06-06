@@ -406,15 +406,15 @@ public class GridManager : MonoBehaviour
         return false;
     }
 
-    public bool CanPlace(Vector2Int origin, int width, int height, CellZone zone)
+    public bool CanPlace(Vector2Int origin, int width, int height, CellZone zone, bool wallMount = false)
     {
         for(int dx = 0; dx < width; dx++)
         {
             for (int dy = 0; dy < height; dy++)
             {
                 GridCell cell = GetCell(origin + new Vector2Int(dx, dy));
-                if (cell == null || cell.isOccupied || !cell.isActive || cell.isReserved
-                    || !ZoneAccepts(zone, cell.zone)) return false;
+                if (cell == null || cell.isOccupied || !cell.isActive) return false;
+                if (!wallMount && (cell.isReserved || !ZoneAccepts(zone, cell.zone))) return false;
             }
         }
         return true;
