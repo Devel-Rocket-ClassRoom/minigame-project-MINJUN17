@@ -320,8 +320,6 @@ public class StartSceneCameraController : MonoBehaviour
     {
         if (newGameConfirmDialog == null)
         {
-            // 경고창이 없으면 안전 fallback — 그냥 진행하지 말고 경고만
-            Debug.LogWarning("[StartScene] newGameConfirmDialog 미연결 — 안전을 위해 새 게임 시작 중단.");
             return;
         }
         newGameConfirmDialog.SetActive(true);
@@ -361,7 +359,6 @@ public class StartSceneCameraController : MonoBehaviour
     {
         if (string.IsNullOrEmpty(gameSceneName))
         {
-            Debug.LogError("[StartScene] gameSceneName이 비어있음. Inspector에서 설정 필요.");
             return;
         }
         SceneManager.LoadScene(gameSceneName);

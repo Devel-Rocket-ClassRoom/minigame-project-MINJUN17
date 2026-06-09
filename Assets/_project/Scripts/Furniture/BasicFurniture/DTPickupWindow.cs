@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -50,7 +50,6 @@ public class DTPickupWindow : MonoBehaviour
         var car = food.order?.dtCustomer;
         if (car == null)
         {
-            Debug.LogWarning("[DTPickupWindow] PlaceFood: food.order.dtCustomer가 null — 폐기");
             Destroy(food.gameObject);
             return;
         }

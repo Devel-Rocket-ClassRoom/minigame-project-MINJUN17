@@ -31,7 +31,6 @@ public class DropdownMenu : MonoBehaviour
     {
         if (menuPanel == null)
         {
-            Debug.LogError("[DropdownMenu] menuPanel이 비어 있습니다.");
             return;
         }
 

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using DG.Tweening;
 
 /// <summary>
@@ -30,7 +30,6 @@ public class FloatingStarsEffect : MonoBehaviour
     {
         if (starSprites == null || starSprites.Length == 0)
         {
-            Debug.LogWarning("[FloatingStarsEffect] starSprites 비어있음");
             Destroy(gameObject);
             return;
         }

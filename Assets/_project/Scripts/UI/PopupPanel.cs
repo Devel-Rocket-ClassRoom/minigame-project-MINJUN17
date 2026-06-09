@@ -43,8 +43,6 @@ public class PopupPanel : MonoBehaviour
         if (panel == null) panel = transform as RectTransform;
         if (panel == null)
         {
-            Debug.LogError($"[PopupPanel] panel 미지정 + 이 오브젝트가 RectTransform이 아님 — " +
-                           $"인스펙터에서 panel을 지정하세요: {name}", this);
             return;
         }
 

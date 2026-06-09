@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -86,13 +86,11 @@ public class CameraController : MonoBehaviour
 
         if (GridManager.Instance == null || mainCamera == null)
         {
-            Debug.LogWarning("[CameraController] SetFloor: GridManager/mainCamera 없음");
             return;
         }
         Bounds? boundsOpt = GridManager.Instance.GetActiveBoundsForFloor(floor);
         if (!boundsOpt.HasValue)
         {
-            Debug.LogWarning($"[CameraController] SetFloor({floor}): 활성 셀 없음 — stage 확장됐는지 확인");
             return;
         }
         Bounds bounds = boundsOpt.Value;
@@ -100,7 +98,6 @@ public class CameraController : MonoBehaviour
         Vector3 currentPos = mainCamera.transform.position;
         Vector3 newPos = new Vector3(currentPos.x, bounds.center.y, currentPos.z);
         float ortho = GetCurrentOrthoSize();
-        Debug.Log($"[CameraController] SetFloor({floor}): y {currentPos.y:F1}→{newPos.y:F1}, bounds y={bounds.center.y:F1}");
 
         if (_toggleCo != null) StopCoroutine(_toggleCo);
         ApplyImmediate(newPos, ortho);   // 애니메이션 X, 즉시 점프
@@ -212,13 +209,11 @@ public class CameraController : MonoBehaviour
             if (scale < 0.01f) scale = 0.01f;
             int newX = Mathf.Max(1, Mathf.RoundToInt(_baseRefX * scale));
             int newY = Mathf.Max(1, Mathf.RoundToInt(_baseRefY * scale));
-            Debug.Log($"[CameraController] ApplyZoom via PPC: ortho={orthoSize:F2} scale={scale:F2} refRes={newX}x{newY}");
             pixelPerfectCamera.refResolutionX = newX;
             pixelPerfectCamera.refResolutionY = newY;
         }
         else if (mainCamera != null && mainCamera.orthographic)
         {
-            Debug.Log($"[CameraController] ApplyZoom via orthographicSize: {orthoSize:F2} (PPC null or disabled)");
             mainCamera.orthographicSize = orthoSize;
         }
     }

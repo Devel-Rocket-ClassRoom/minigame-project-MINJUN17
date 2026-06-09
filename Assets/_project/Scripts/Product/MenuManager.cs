@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -53,8 +53,6 @@ public class MenuManager : MonoBehaviour
         var unlocked = UnlockedMenus;
         if (unlocked.Count == 0)
         {
-            Debug.LogWarning("[MenuManager] PickRandomByWeight 호출됐지만 해금된 메뉴가 0개 — " +
-                             "씬에 CatalogManager 있는지 / Starting Menus 채워졌는지 확인");
             return null;
         }
 

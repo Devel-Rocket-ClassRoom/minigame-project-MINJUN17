@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -131,7 +131,6 @@ public class DTSystem : MonoBehaviour
         var car = go.GetComponent<DTCustomer>();
         if (car == null)
         {
-            Debug.LogWarning("[DTSystem] dtCustomerPrefab에 DTCustomer 컴포넌트 없음");
             Destroy(go);
             return;
         }
@@ -143,17 +142,6 @@ public class DTSystem : MonoBehaviour
     {
         if (!CanSpawn())
         {
-            Debug.LogWarning($"[DTSystem] CanSpawn=false\n" +
-                $"  DTLane.Instance={DTLane.Instance != null}\n" +
-                $"  WaypointCount={DTLane.Instance?.WaypointCount ?? 0}\n" +
-                $"  IsFull={DTLane.Instance?.IsFull}\n" +
-                $"  DTWindowManager.Instance={DTWindowManager.Instance != null}\n" +
-                $"  FirstOrderWindow={DTWindowManager.Instance?.FirstOrderWindow != null}\n" +
-                $"  FirstPickupWindow={DTWindowManager.Instance?.FirstPickupWindow != null}\n" +
-                $"  dtCustomerPrefab={dtCustomerPrefab != null}\n" +
-                $"  pool.Length={pool?.Length ?? 0}\n" +
-                $"  timeSystem.IsOpen={timeSystem?.IsOpen}\n" +
-                $"  timeSystem.Hour={timeSystem?.Hour}  cutoff={newSpawnCutoffHour}");
             return;
         }
         Spawn();

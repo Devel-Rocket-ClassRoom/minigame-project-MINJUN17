@@ -95,7 +95,6 @@ public class DayCycleController : MonoBehaviour
         int remaining = DTLane.Instance != null ? DTLane.Instance.ActiveCarCount : 0;
         if (remaining > 0)
         {
-            Debug.LogWarning($"[DayCycle] DT safety timeout ({dtSafetyTimeout}s) — forcing {remaining} car(s) to clear");
             DTLane.Instance.ClearAllCars();
         }
         TryTriggerSettlement();

@@ -350,7 +350,6 @@ public class ServerStaff : Staff
             Stair stair = StairManager.Instance?.FindNearestStairOnFloor(myFloor, transform.position);
             if (stair == null || !stair.HasPair)
             {
-                Debug.LogWarning($"[ServerStaff] No stair on {myFloor} to reach {seatFloor} seat — discarding food");
                 if (_carryingFood != null) Destroy(_carryingFood.gameObject);
                 _carryingFood = null;
                 ChangeState(ServerState.IDLE_AT_COUNTER);

@@ -97,7 +97,6 @@ public class SaveLoadManager : MonoBehaviour
         if (File.Exists(path))
         {
             File.Delete(path);
-            Debug.Log($"[SaveLoad] 슬롯 {slot} 세이브 삭제");
         }
     }
 
@@ -127,7 +126,6 @@ public class SaveLoadManager : MonoBehaviour
         }
         catch (Exception e)
         {
-            Debug.LogWarning($"[SaveLoad] 슬롯 {slot} 미리보기 실패: {e.Message}");
             return false;
         }
     }
@@ -157,12 +155,10 @@ public class SaveLoadManager : MonoBehaviour
             if (File.Exists(finalPath)) File.Replace(tmpPath, finalPath, null);
             else                         File.Move(tmpPath, finalPath);
 
-            Debug.Log($"[SaveLoad] 슬롯 {slot} 저장 완료 → {finalPath}");
             return true;
         }
         catch (Exception e)
         {
-            Debug.LogError($"[SaveLoad] 슬롯 {slot} 저장 실패: {e}");
             return false;
         }
     }
@@ -172,7 +168,6 @@ public class SaveLoadManager : MonoBehaviour
         var path = FilePath(slot);
         if (!File.Exists(path))
         {
-            Debug.Log($"[SaveLoad] 슬롯 {slot} 세이브 없음 → {path}");
             return false;
         }
 
@@ -185,12 +180,10 @@ public class SaveLoadManager : MonoBehaviour
             if (!TryMigrate(data)) return false;
 
             ApplySaveData(data);
-            Debug.Log($"[SaveLoad] 슬롯 {slot} 로드 완료 (저장 시점: {new DateTime(data.timestampTicks):yyyy-MM-dd HH:mm}, v{data.version})");
             return true;
         }
         catch (Exception e)
         {
-            Debug.LogError($"[SaveLoad] 슬롯 {slot} 로드 실패: {e}");
             return false;
         }
     }
@@ -204,11 +197,9 @@ public class SaveLoadManager : MonoBehaviour
 
         if (data.version > CurrentVersion)
         {
-            Debug.LogError($"[SaveLoad] 미래 버전 세이브 (v{data.version} > v{CurrentVersion}). 로드 거부.");
             return false;
         }
 
-        Debug.Log($"[SaveLoad] 마이그레이션: v{data.version} → v{CurrentVersion}");
 
         // 예시: v1 → v2 (현재는 새 필드 추가뿐이라 별도 처리 불필요 — null 필드는 FromData에서 안전 처리됨)
         // if (data.version < 2) { /* v1 → v2 변환 */ }

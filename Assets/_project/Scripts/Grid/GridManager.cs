@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -289,7 +289,6 @@ public class GridManager : MonoBehaviour
     {
         if (floorTilemap == null)
         {
-            Debug.LogWarning("[GridManager] floorTilemap 미할당 — 인스펙터에서 Floor Tilemap 슬롯에 Tilemap을 드래그하세요");
             return;
         }
         int gridH = GridHeight;

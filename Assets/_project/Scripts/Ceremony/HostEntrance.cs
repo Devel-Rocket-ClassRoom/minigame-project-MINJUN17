@@ -1,4 +1,4 @@
-using DG.Tweening;
+﻿using DG.Tweening;
 using UnityEngine;
 
 /// <summary>
@@ -52,7 +52,7 @@ public class HostEntrance : MonoBehaviour
     public Tween WalkIn(System.Action onArrived = null)
     {
         CaptureArrivePos();
-        if (host == null) { Debug.LogWarning("[HostEntrance] host(RectTransform) 가 null"); return null; }
+        if (host == null) { return null; }
 
         host.anchoredPosition = _arrivePos + entranceOffset;
         if (animator != null) animator.PlayWalk();

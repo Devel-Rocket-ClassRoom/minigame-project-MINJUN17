@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -151,7 +151,6 @@ public class MarketingManager : MonoBehaviour
                     var md = SaveIdRegistry.GetById<MarketingData>(e.marketingSaveId);
                     if (md == null)
                     {
-                        Debug.LogWarning($"[MarketingManager] MarketingData 못 찾음: {e.marketingSaveId}");
                         continue;
                     }
                     _active.Add(new ActiveCampaign { Data = md, RemainingMonths = e.remainingMonths });
@@ -164,7 +163,6 @@ public class MarketingManager : MonoBehaviour
                     var md = SaveIdRegistry.GetById<MarketingData>(id);
                     if (md == null)
                     {
-                        Debug.LogWarning($"[MarketingManager] MarketingData 못 찾음: {id}");
                         continue;
                     }
                     _pending.Add(md);

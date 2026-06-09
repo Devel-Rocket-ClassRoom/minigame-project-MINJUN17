@@ -370,7 +370,6 @@ public class StaffManager : MonoBehaviour
             };
             if (staff == null)
             {
-                Debug.LogWarning($"[StaffManager] 복원 실패 (prefab 없음 또는 role 인식 안됨): {sd.role}");
                 continue;
             }
 

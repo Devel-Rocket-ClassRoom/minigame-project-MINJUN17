@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -139,7 +139,6 @@ public class CustomerManager : MonoBehaviour // 매니저 겸 스포너
             if (d.preferredMenu == menu)
             {
                 _unlocked.Add(d);
-                Debug.Log($"[CustomerManager] 신규 손님 해금 (선호 음식 {menu.name} 해금): {d.name}");
             }
         }
     }

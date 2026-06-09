@@ -325,7 +325,6 @@ public class StaffCandidatePool : MonoBehaviour
                     var sd = SaveIdRegistry.GetById<StaffData>(e.staffDataSaveId);
                     if (sd == null)
                     {
-                        Debug.LogWarning($"[StaffCandidatePool] StaffData 못 찾음: {e.staffDataSaveId}");
                         continue;
                     }
                     _applicants.Add(new StaffCandidate

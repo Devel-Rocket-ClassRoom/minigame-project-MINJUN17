@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -48,7 +48,6 @@ public static class SaveIdRegistry
             if (item is ISaveIdentifiable ident && !string.IsNullOrEmpty(ident.SaveId))
             {
                 if (_byId.ContainsKey(ident.SaveId))
-                    Debug.LogWarning($"[SaveIdRegistry] 중복 saveId: {ident.SaveId} ({item.name} vs {_byId[ident.SaveId].name})");
                 else
                     _byId[ident.SaveId] = item;
             }

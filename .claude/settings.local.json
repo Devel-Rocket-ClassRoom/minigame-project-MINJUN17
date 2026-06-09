@@ -35,7 +35,9 @@
       "Bash(xargs grep -l \"Tilemap\\\\|tilemap\")",
       "Bash(xargs grep \"dtVisuals\\\\|DT.*Road\\\\|Road.*DT\\\\|street.*tile\\\\|tile.*road\" -i)",
       "Bash(xargs grep -l \"DTOrder\\\\|DTPickup\\\\|DriveThru\")",
-      "Bash(dir Assets\\\\_Recovery)"
+      "Bash(dir Assets\\\\_Recovery)",
+      "Bash(powershell.exe -NonInteractive -Command ' *)",
+      "Bash(git config *)"
     ]
   }
 }

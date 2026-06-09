@@ -320,7 +320,6 @@ public abstract class Staff : MonoBehaviour
         var staffData = SaveIdRegistry.GetById<StaffData>(data.staffDataSaveId);
         if (staffData == null)
         {
-            Debug.LogWarning($"[Staff] StaffData 못 찾음: {data.staffDataSaveId}");
             return;
         }
 

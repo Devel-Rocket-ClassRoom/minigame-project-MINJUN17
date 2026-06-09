@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -475,7 +475,6 @@ public class Customer : MonoBehaviour
             Stair stair = StairManager.Instance?.FindNearestStairOnFloor(myFloor, transform.position);
             if (stair == null || !stair.HasPair)
             {
-                Debug.LogWarning($"[Customer] No stair on {myFloor} to reach {seatFloor} seat — leaving");
                 _satisfaction = 0;
                 ChangeState(CustomerState.LEAVE);
                 return;

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.EnhancedTouch;
@@ -139,12 +139,11 @@ public class PlacementSystem : MonoBehaviour
     {
         if (data == null || !data.fixedPlacement) return false;
         if (Mode != Mode.None) return false;
-        if (IsAlreadyPlaced(data)) { Debug.Log("[PlacementSystem] 이미 설치됨"); return false; }
+        if (IsAlreadyPlaced(data)) { return false; }
 
         var zone = GridManager.ToCellZone(data.zone);
         if (!gridManager.CanPlace(data.fixedCell, data.width, data.height, zone, data.wallMount))
         {
-            Debug.LogWarning($"[PlacementSystem] InstantPlace 실패 — 셀 {data.fixedCell} 점유/비활성/존 불일치");
             return false;
         }
 
@@ -153,7 +152,6 @@ public class PlacementSystem : MonoBehaviour
         {
             if (MoneySystem.Instance == null || !MoneySystem.Instance.CanAfford(cost))
             {
-                Debug.Log($"[PlacementSystem] 돈 부족 (필요 {cost:N0}원)");
                 return false;
             }
             MoneySystem.Instance.Spend(cost);
@@ -167,7 +165,7 @@ public class PlacementSystem : MonoBehaviour
     public void StartPlace(FurnitureData data)
     {
         if (Mode != Mode.None) return;
-        if (data.singleInstance && IsAlreadyPlaced(data)) { Debug.Log("[PlacementSystem] 이미 설치됨 (1개 제한)"); return; }
+        if (data.singleInstance && IsAlreadyPlaced(data)) { return; }
 
         // 현재 floor 활성 영역의 중앙에 spawn (놓을 수 있는지와 무관하게 일단 가운데)
         Vector2Int startOrigin = gridManager.GetActiveAreaCenter(data.width, data.height);
@@ -337,7 +335,6 @@ public class PlacementSystem : MonoBehaviour
         {
             if (MoneySystem.Instance == null || !MoneySystem.Instance.CanAfford(cost))
             {
-                Debug.Log($"[PlacementSystem] 설치 실패 — 돈 부족 (필요 {cost:N0}원)");
                 return false;
             }
             MoneySystem.Instance.Spend(cost);
@@ -532,7 +529,6 @@ public class PlacementSystem : MonoBehaviour
                 var fdata = SaveIdRegistry.GetById<FurnitureData>(pd.furnitureSaveId);
                 if (fdata == null)
                 {
-                    Debug.LogWarning($"[PlacementSystem] FurnitureData 못 찾음: {pd.furnitureSaveId}");
                     continue;
                 }
                 PlaceInitial(fdata, new Vector2Int(pd.originX, pd.originY), pd.rotationStep);
