@@ -48,6 +48,7 @@ public static class SaveIdRegistry
             if (item is ISaveIdentifiable ident && !string.IsNullOrEmpty(ident.SaveId))
             {
                 if (_byId.ContainsKey(ident.SaveId))
+                    _byId[ident.SaveId] = item;
                 else
                     _byId[ident.SaveId] = item;
             }
