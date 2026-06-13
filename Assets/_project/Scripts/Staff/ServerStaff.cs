@@ -25,6 +25,11 @@ public class ServerStaff : Staff
     // teleport 직후 GetFloorAt 오차 방지용 — 착지한 층을 명시적으로 기억
     private FloorIndex? _teleportedFloor;
 
+    // 배달 목표 좌표 캐시. 매 프레임 GetFurnitureApproachPosition(from=내위치)를 다시 부르면
+    // 등거리 접근셀 사이에서 목표가 깜빡여 PathMover가 경로를 계속 리셋(제자리 진동)함.
+    // WALK_TO_SEAT 진입 시 한 번만 계산해 고정 → 도착할 때까지 동일 목표 유지.
+    private Vector3? _deliverTarget;
+
     public float EffectiveKindness => _data.kindness * (1f + _hireVariance) * _growthMultiplier;
 
     public bool IsIdle => _state == ServerState.IDLE_AT_COUNTER;
@@ -75,6 +80,8 @@ public class ServerStaff : Staff
         _state = next;
         _stateTimer = 0f;
         if (next != ServerState.IDLE_AT_COUNTER) _currentRestTarget = null;
+        // 좌석으로 향하기 시작/재시작할 때만 배달 목표를 새로 잡도록 캐시 무효화
+        if (next != ServerState.WALK_TO_SEAT) _deliverTarget = null;
     }
 
     private void IdleAtCounterState()
@@ -361,11 +368,17 @@ public class ServerStaff : Staff
             return;
         }
 
-        // 음식 놓을 위치 = 의자가 속한 테이블 세트의 FoodDropOff (의자 단독이면 의자 자체)
+        // 음식 놓을 위치 = 의자가 속한 테이블 세트의 FoodDropOff (의자 단독이면 의자 자체).
+        // 목표는 진입 시 한 번만 계산해 고정 — 매 프레임 from=내위치로 재계산하면 등거리 접근셀
+        // 사이에서 목표가 깜빡여 경로가 계속 리셋되며 제자리에서 진동(배달 불가)함.
         Transform dropOff = seat.FoodDropOff;
-        Vector3 target = dropOff != null
-            ? GridManager.Instance.GetFurnitureApproachPosition(dropOff.position, PathRole.Server, transform.position)
-            : customer.transform.position;   // 좌석 정보 없으면 fallback
+        if (_deliverTarget == null)
+        {
+            _deliverTarget = dropOff != null
+                ? GridManager.Instance.GetFurnitureApproachPosition(dropOff.position, PathRole.Server, transform.position)
+                : customer.transform.position;   // 좌석 정보 없으면 fallback
+        }
+        Vector3 target = _deliverTarget.Value;
 
         MoveTo(target);
         if (HasArrived())
