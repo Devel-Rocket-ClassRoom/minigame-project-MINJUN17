@@ -1,0 +1,19 @@
+name: ✨ 기능 제안 / 개선
+description: 새 기능이나 개선 아이디어를 제안합니다
+title: "[제안] "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: 어떤 기능 / 개선인가요?
+      placeholder: 예) 직원 자동배치 버튼이 있으면 좋겠어요
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: 왜 필요한가요?
+      description: 어떤 점이 불편하거나 좋아지는지
+    validations:
+      required: false
