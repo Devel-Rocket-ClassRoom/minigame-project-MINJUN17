@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "321942841451",
+    "project_id": "sdrestaurant-1fe17",
+    "storage_bucket": "sdrestaurant-1fe17.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:321942841451:android:68f522739545d37c80a92e",
+        "android_client_info": {
+          "package_name": "com.minjun.minigame"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSs0Dya1f-Bw6cVGb0NqQqoXYzTsLSNow"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

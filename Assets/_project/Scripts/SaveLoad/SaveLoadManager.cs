@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -155,6 +156,10 @@ public class SaveLoadManager : MonoBehaviour
             if (File.Exists(finalPath)) File.Replace(tmpPath, finalPath, null);
             else                         File.Move(tmpPath, finalPath);
 
+            // 로컬 저장 성공 → 클라우드에도 자동 백업 (로그인 상태일 때만, 실패해도 게임엔 영향 없음)
+            if (UserDataService.Instance != null && AuthManager.Instance != null && AuthManager.Instance.IsLoggedIn)
+                UserDataService.Instance.UploadSaveAsync(slot).Forget();
+
             return true;
         }
         catch (Exception e)
@@ -213,6 +218,22 @@ public class SaveLoadManager : MonoBehaviour
 
     private static string FilePath(int slot) =>
         Path.Combine(Application.persistentDataPath, string.Format(FileFormat, slot));
+
+    // ─────────────────────────────────────── 클라우드 세이브 연동용 (JSON 원문 입출력)
+
+    /// <summary>슬롯의 세이브 JSON 원문을 읽음 (클라우드 업로드용). 파일 없으면 null.</summary>
+    public static string ExportSlotJson(int slot)
+    {
+        var path = FilePath(slot);
+        return File.Exists(path) ? File.ReadAllText(path) : null;
+    }
+
+    /// <summary>클라우드에서 받은 JSON을 슬롯 파일로 씀 (다운로드용).</summary>
+    public static void ImportSlotJson(int slot, string json)
+    {
+        if (string.IsNullOrEmpty(json)) return;
+        File.WriteAllText(FilePath(slot), json);
+    }
 
     // ─────────────────────────────────────── 내부 — Phase별로 여기에 매니저 추가
 

@@ -113,3 +113,15 @@ Assets/Scenes/TestScene-ymj.unity
 Assets/Scenes/TestScene-ymj.unity.meta
 Assets/TestPrefabs-ymj/
 Assets/TestPrefabs-ymj.meta
+
+# Firebase config (API 키 등 민감 정보 - 커밋 금지)
+google-services.json
+google-services.json.meta
+GoogleService-Info.plist
+GoogleService-Info.plist.meta
+
+# Firebase 대용량 네이티브 바이너리 (GitHub 100MB 초과 / 플랫폼별, SDK 재임포트로 생성됨)
+Assets/Firebase/Plugins/x86_64/FirebaseCppApp-*.bundle
+Assets/Firebase/Plugins/x86_64/FirebaseCppApp-*.bundle.meta
+Assets/Firebase/Plugins/x86_64/FirebaseCppApp-*.so
+Assets/Firebase/Plugins/x86_64/FirebaseCppApp-*.so.meta

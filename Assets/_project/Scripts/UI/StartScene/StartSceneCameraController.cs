@@ -1,4 +1,5 @@
 using System.Collections;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -68,6 +69,28 @@ public class StartSceneCameraController : MonoBehaviour
     private void Start()
     {
         InitializeState();
+        // 인트로는 자동 재생하지 않음. 로그인/닉네임 완료 후 BeginIntro()로 시작.
+    }
+
+    /// <summary>로그인·닉네임 완료 후 외부(LoginUI/NicknameUI)에서 호출해 인트로 연출을 시작한다.</summary>
+    public void BeginIntro()
+    {
+        if (isSequenceRunning || isSkipped) return;   // 중복 호출 방지
+        BeginIntroAsync().Forget();
+    }
+
+    private async UniTaskVoid BeginIntroAsync()
+    {
+        // 인트로 전에 클라우드 세이브를 로컬로 동기화 (다른 기기에서도 이어하기 가능하도록)
+        if (UserDataService.Instance != null && AuthManager.Instance != null && AuthManager.Instance.IsLoggedIn)
+        {
+            await UserDataService.Instance.DownloadSaveAsync(Slot);
+
+            // 다운로드 결과를 반영해 이어하기 버튼 표시 갱신
+            if (continueButton != null)
+                continueButton.gameObject.SetActive(SaveLoadManager.HasSave(Slot));
+        }
+
         StartCoroutine(PlayIntro());
     }
 
