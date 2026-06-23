@@ -28,6 +28,11 @@ public class SettingsPanel : MonoBehaviour
     [Tooltip("GoHome 시 로드할 씬 이름")]
     [SerializeField] private string homeSceneName = "StartScene";
 
+    [Header("로그아웃")]
+    [SerializeField] private Button logoutButton;
+    [Tooltip("로그아웃 후 로드할 씬 이름 (로그인 화면이 있는 시작씬)")]
+    [SerializeField] private string logoutSceneName = "StartScene";
+
     [Header("언어 드롭다운")]
     [SerializeField] private TMP_Dropdown languageDropdown;
     [Tooltip("AvailableLocales로 옵션을 자동 채움(네이티브 이름). 끄면 수동 옵션 사용.")]
@@ -55,6 +60,8 @@ public class SettingsPanel : MonoBehaviour
         if (openButton  != null) openButton.onClick.AddListener(Open);
         if (closeButton != null) closeButton.onClick.AddListener(Close);
         if (dimBackdrop != null) dimBackdrop.onClick.AddListener(Close);
+
+        if (logoutButton != null) logoutButton.onClick.AddListener(OnLogoutClicked);
     }
 
     private void Start()
@@ -67,7 +74,16 @@ public class SettingsPanel : MonoBehaviour
         if (bottomButton != null) bottomButton.onClick.RemoveListener(OnBottomClicked);
         if (openButton   != null) openButton.onClick.RemoveListener(Open);
         if (closeButton  != null) closeButton.onClick.RemoveListener(Close);
+        if (logoutButton != null) logoutButton.onClick.RemoveListener(OnLogoutClicked);
         if (languageDropdown != null) languageDropdown.onValueChanged.RemoveListener(OnLanguageChanged);
+    }
+
+    // ─────────────────────────────────────── 로그아웃
+    private void OnLogoutClicked()
+    {
+        AuthManager.Instance?.SignOut();   // 인증 해제
+        Time.timeScale = 1f;               // 인게임 일시정지 상태일 수 있으니 복구
+        SceneManager.LoadScene(logoutSceneName);   // 로그인 화면(시작씬)으로
     }
 
     // ─────────────────────────────────────── 맨 밑 버튼

@@ -81,7 +81,6 @@ public class DatabaseManager : MonoBehaviour
         }
     }
 
-    /// <summary>이미 JSON 문자열인 데이터를 직렬화 없이 그대로 저장 (세이브 등). SetAsync와 달리 재직렬화 안 함.</summary>
     public async UniTask<(bool success, string error)> SetRawAsync(string path, string json)
     {
         try
@@ -97,7 +96,6 @@ public class DatabaseManager : MonoBehaviour
         }
     }
 
-    /// <summary>경로의 데이터를 JSON 문자열 그대로 읽음 (세이브 등). 데이터 없으면 json은 null.</summary>
     public async UniTask<(bool success, string json, string error)> GetRawAsync(string path)
     {
         try

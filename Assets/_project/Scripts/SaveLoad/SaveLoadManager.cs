@@ -149,14 +149,14 @@ public class SaveLoadManager : MonoBehaviour
             var data = BuildSaveData();
             string json = JsonConvert.SerializeObject(data, JsonSettings);
 
-            // Atomic write: 임시 파일에 먼저 쓰고 교체 (저장 중 크래시 시 원본 보존)
+            
             var finalPath = FilePath(slot);
             var tmpPath   = finalPath + ".tmp";
             File.WriteAllText(tmpPath, json);
             if (File.Exists(finalPath)) File.Replace(tmpPath, finalPath, null);
             else                         File.Move(tmpPath, finalPath);
 
-            // 로컬 저장 성공 → 클라우드에도 자동 백업 (로그인 상태일 때만, 실패해도 게임엔 영향 없음)
+            
             if (UserDataService.Instance != null && AuthManager.Instance != null && AuthManager.Instance.IsLoggedIn)
                 UserDataService.Instance.UploadSaveAsync(slot).Forget();
 
@@ -228,7 +228,6 @@ public class SaveLoadManager : MonoBehaviour
         return File.Exists(path) ? File.ReadAllText(path) : null;
     }
 
-    /// <summary>클라우드에서 받은 JSON을 슬롯 파일로 씀 (다운로드용).</summary>
     public static void ImportSlotJson(int slot, string json)
     {
         if (string.IsNullOrEmpty(json)) return;

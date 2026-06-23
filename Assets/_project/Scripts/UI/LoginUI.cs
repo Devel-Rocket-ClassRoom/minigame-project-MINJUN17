@@ -9,9 +9,10 @@ public class LoginUI : MonoBehaviour
     [SerializeField] private TMP_InputField emailInput;
     [SerializeField] private TMP_InputField passwordInput;
 
-    [Header("버튼")] 
+    [Header("버튼")]
     [SerializeField] private Button loginButton;
     [SerializeField] private Button signUpButton;
+    [SerializeField] private Button guestButton;
 
     [Header("표시")]
     [SerializeField] private TMP_Text messageText;
@@ -20,13 +21,14 @@ public class LoginUI : MonoBehaviour
     [SerializeField] private GameObject loginPanel;
     [SerializeField] private GameObject nicknamePanel;
 
-    [SerializeField] private GameObject authOverlay;                    // 로그인+닉네임+딤 묶은 부모
-    [SerializeField] private StartSceneCameraController introController; // 인트로 연출 컨트롤러
+    [SerializeField] private GameObject authOverlay;      
+    [SerializeField] private StartSceneCameraController introController; 
 
     private void Start()
     {
         loginButton.onClick.AddListener(() => LoginAsync().Forget());
         signUpButton.onClick.AddListener(() => SignUpAsync().Forget());
+        if (guestButton != null) guestButton.onClick.AddListener(() => GuestLoginAsync().Forget());
     }
 
     private async UniTaskVoid LoginAsync()
@@ -37,12 +39,11 @@ public class LoginUI : MonoBehaviour
 
         if (!ok) { SetMessage(err); return; }
 
-        // 로그인 성공 → 닉네임이 이미 있나 확인
         var profile = await UserDataService.Instance.LoadProfileAsync();
         if (profile != null && !string.IsNullOrEmpty(profile.nickname))
-            CompleteAuth();             // 닉네임 있음 → 오버레이 닫고 인트로 시작
+            CompleteAuth();      
         else
-            ShowNicknamePanel();        // 닉네임 없음 → 닉네임 입력
+            ShowNicknamePanel();
     }
 
     private async UniTaskVoid SignUpAsync()
@@ -53,8 +54,21 @@ public class LoginUI : MonoBehaviour
 
         if (!ok) { SetMessage(err); return; }
 
-        // 회원가입 성공 → 무조건 닉네임 입력으로
         ShowNicknamePanel();
+    }
+
+    private async UniTaskVoid GuestLoginAsync()
+    {
+        SetMessage("게스트 로그인 중...");
+        var (ok, err) = await AuthManager.Instance.SignInAnonymouslyAsync();
+
+        if (!ok) { SetMessage(err); return; }
+
+        var profile = await UserDataService.Instance.LoadProfileAsync();
+        if (profile != null && !string.IsNullOrEmpty(profile.nickname))
+            CompleteAuth();
+        else
+            ShowNicknamePanel();
     }
 
     private void ShowNicknamePanel()
@@ -63,7 +77,6 @@ public class LoginUI : MonoBehaviour
         nicknamePanel.SetActive(true);
     }
 
-    /// <summary>인증 완료 → 로그인 오버레이를 닫고 시작씬 인트로 연출을 시작한다.</summary>
     private void CompleteAuth()
     {
         if (authOverlay != null) authOverlay.SetActive(false);
